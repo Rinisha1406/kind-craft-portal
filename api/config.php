@@ -18,4 +18,3 @@ function getDBConnection() {
 
     return $conn;
 }
-?>

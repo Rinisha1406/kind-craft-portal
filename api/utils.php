@@ -61,4 +61,3 @@ function verify_auth_token($conn) {
     
     return null;
 }
-?>

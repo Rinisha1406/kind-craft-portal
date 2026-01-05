@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Gem, Lock, Mail, AlertCircle } from "lucide-react";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
@@ -25,11 +25,11 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
+
+    if (!username || !password) {
       toast({
         title: "Missing Fields",
-        description: "Please enter both email and password.",
+        description: "Please enter both username and password.",
         variant: "destructive",
       });
       return;
@@ -38,7 +38,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(username, password);
 
       if (error) {
         // If user doesn't exist, show appropriate message
@@ -87,14 +87,14 @@ const AdminLogin = () => {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(15_50%_55%_/_0.1),_transparent_50%)]" />
-      
-      <motion.div 
+
+      <motion.div
         className="w-full max-w-md relative z-10"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="text-center mb-8">
-          <motion.div 
+          <motion.div
             className="w-20 h-20 gold-gradient rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-gold"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -110,7 +110,7 @@ const AdminLogin = () => {
           </p>
         </div>
 
-        <motion.div 
+        <motion.div
           className="bg-card/95 backdrop-blur-xl p-10 rounded-3xl shadow-gold border border-gold/20"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -122,7 +122,7 @@ const AdminLogin = () => {
             <div className="text-sm">
               <p className="text-foreground font-medium mb-1">Demo Credentials</p>
               <p className="text-muted-foreground">
-                Email: <span className="text-primary font-mono">admin@golden.com</span><br />
+                Username: <span className="text-primary font-mono">admin</span><br />
                 Password: <span className="text-primary font-mono">admin123</span>
               </p>
             </div>
@@ -130,15 +130,15 @@ const AdminLogin = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground font-medium">Email Address</Label>
+              <Label htmlFor="username" className="text-foreground font-medium">Username</Label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@golden.com"
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="admin"
                   required
                   className="h-14 pl-12 rounded-xl border-border focus:border-primary text-base"
                 />
@@ -159,7 +159,7 @@ const AdminLogin = () => {
                 />
               </div>
             </div>
-            
+
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 type="submit"
@@ -183,7 +183,7 @@ const AdminLogin = () => {
           </form>
         </motion.div>
 
-        <motion.p 
+        <motion.p
           className="text-center mt-8 text-champagne/50 text-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

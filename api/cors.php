@@ -1,9 +1,13 @@
 <?php
 // Handle CORS
 // Allow from localhost:8080 (Vite) and others for development
-if (isset($_SERVER['HTTP_ORIGIN'])) {
-    // You can specify allowed origins here, or allow all using *
-    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+$allowed_origins = ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins) || empty($origin)) {
+    // Default to the first allowed origin if empty for dev safety, or simply echo back valid ones
+    $allow_origin = in_array($origin, $allowed_origins) ? $origin : $allowed_origins[0];
+    header("Access-Control-Allow-Origin: $allow_origin");
     header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Max-Age: 86400');    // cache for 1 day
 }
@@ -21,4 +25,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 header('Content-Type: application/json');
-?>

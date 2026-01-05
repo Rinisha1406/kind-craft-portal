@@ -63,4 +63,3 @@ if (password_verify($password, $user['password_hash'])) {
 }
 
 $conn->close();
-?>
