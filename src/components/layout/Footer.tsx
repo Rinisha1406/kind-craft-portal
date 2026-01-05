@@ -1,84 +1,144 @@
 import { Link } from "react-router-dom";
-import { Gem, Phone, Mail, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
+import { Gem, Phone, Mail, MapPin, Instagram, Facebook, Twitter, Youtube, ArrowUpRight } from "lucide-react";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-charcoal text-secondary pt-16 pb-8">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+    <footer className="bg-charcoal text-champagne relative overflow-hidden">
+      {/* Decorative gradient */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_hsl(38_70%_45%_/_0.08),_transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_hsl(15_50%_55%_/_0.05),_transparent_40%)]" />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Main Footer */}
+        <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
-          <div>
-            <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 gold-gradient rounded-lg flex items-center justify-center">
-                <Gem className="w-5 h-5 text-primary-foreground" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Link to="/" className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 gold-gradient rounded-xl flex items-center justify-center shadow-gold">
+                <Gem className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-serif font-bold text-champagne">
-                Golden<span className="text-gold">Legacy</span>
-              </span>
+              <div>
+                <span className="text-xl font-serif font-bold text-champagne">
+                  Golden<span className="text-gold">Legacy</span>
+                </span>
+                <span className="block text-xs text-champagne/60">Since 1974</span>
+              </div>
             </Link>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              Premium jewelry and trusted matrimony services for our cherished community members.
+            <p className="text-champagne/60 text-sm leading-relaxed mb-6">
+              Premium jewelry and trusted matrimony services for our cherished community. 
+              Building legacies for over 50 years.
             </p>
-          </div>
+            <div className="flex gap-3">
+              {[Instagram, Facebook, Twitter, Youtube].map((Icon, i) => (
+                <motion.a
+                  key={i}
+                  href="#"
+                  className="w-10 h-10 bg-champagne/10 rounded-full flex items-center justify-center text-champagne/60 hover:gold-gradient hover:text-primary-foreground transition-all"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Icon className="w-4 h-4" />
+                </motion.a>
+              ))}
+            </div>
+          </motion.div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="font-serif text-lg font-semibold text-champagne mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              {["Home", "Products", "Matrimony", "Members", "Contact"].map((link) => (
-                <li key={link}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+          >
+            <h4 className="font-serif text-lg font-semibold text-champagne mb-6">Quick Links</h4>
+            <ul className="space-y-3">
+              {[
+                { name: "Home", path: "/" },
+                { name: "Products", path: "/products" },
+                { name: "Matrimony", path: "/matrimony" },
+                { name: "Membership", path: "/members" },
+                { name: "Contact Us", path: "/contact" },
+              ].map((link) => (
+                <li key={link.name}>
                   <Link
-                    to={link === "Home" ? "/" : `/${link.toLowerCase()}`}
-                    className="text-muted-foreground text-sm hover:text-gold transition-colors"
+                    to={link.path}
+                    className="group flex items-center gap-2 text-champagne/60 text-sm hover:text-gold transition-colors"
                   >
-                    {link}
+                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {link.name}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          {/* Categories */}
-          <div>
-            <h4 className="font-serif text-lg font-semibold text-champagne mb-4">Categories</h4>
-            <ul className="space-y-2">
-              {["Gold Jewelry", "Silver Collection", "Diamond Pieces", "Platinum Range", "Gemstones"].map((cat) => (
+          {/* Collections */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <h4 className="font-serif text-lg font-semibold text-champagne mb-6">Collections</h4>
+            <ul className="space-y-3">
+              {["Gold Jewelry", "Diamond Collection", "Silver Pieces", "Platinum Range", "Bridal Sets", "Gemstone Jewelry"].map((cat) => (
                 <li key={cat}>
                   <Link
                     to="/products"
-                    className="text-muted-foreground text-sm hover:text-gold transition-colors"
+                    className="group flex items-center gap-2 text-champagne/60 text-sm hover:text-gold transition-colors"
                   >
+                    <span className="w-1.5 h-1.5 bg-gold/50 rounded-full" />
                     {cat}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Contact */}
-          <div>
-            <h4 className="font-serif text-lg font-semibold text-champagne mb-4">Contact Us</h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-3 text-muted-foreground text-sm">
-                <Phone className="w-4 h-4 text-gold" />
-                +91 98765 43210
-              </li>
-              <li className="flex items-center gap-3 text-muted-foreground text-sm">
-                <Mail className="w-4 h-4 text-gold" />
-                info@goldenlegacy.com
-              </li>
-              <li className="flex items-start gap-3 text-muted-foreground text-sm">
-                <MapPin className="w-4 h-4 text-gold mt-0.5" />
-                123 Jewelry Street, Mumbai, Maharashtra 400001
-              </li>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <h4 className="font-serif text-lg font-semibold text-champagne mb-6">Contact Us</h4>
+            <ul className="space-y-4">
+              {[
+                { icon: Phone, text: "+91 98765 43210" },
+                { icon: Mail, text: "info@goldenlegacy.com" },
+                { icon: MapPin, text: "123 Jewelry Street, Mumbai, Maharashtra 400001" },
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-3 text-champagne/60 text-sm">
+                  <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <item.icon className="w-4 h-4 text-gold" />
+                  </div>
+                  <span className="leading-relaxed">{item.text}</span>
+                </li>
+              ))}
             </ul>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="border-t border-muted/20 pt-8 text-center">
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Golden Legacy. All rights reserved.
-          </p>
+        {/* Bottom Bar */}
+        <div className="border-t border-champagne/10 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-champagne/40 text-sm">
+              © {currentYear} Golden Legacy. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm text-champagne/40">
+              <a href="#" className="hover:text-gold transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-gold transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-gold transition-colors">Refund Policy</a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

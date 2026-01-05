@@ -1,28 +1,65 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Gem, Heart, Users, Star } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Gem, Heart, Users, Star, Shield, Award, Sparkles, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
+import heroImage from "@/assets/hero-jewelry.jpg";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerContainer = {
+  animate: { transition: { staggerChildren: 0.1 } }
+};
 
 const features = [
   {
     icon: Gem,
     title: "Premium Jewelry",
-    description: "Exquisite gold, silver, diamond, and platinum collections crafted with perfection.",
+    description: "Exquisite gold, silver, diamond, and platinum collections crafted with perfection by master artisans.",
   },
   {
     icon: Heart,
     title: "Matrimony Services",
-    description: "Find your perfect life partner within our trusted community network.",
+    description: "Find your perfect life partner within our trusted community network with personalized matchmaking.",
   },
   {
     icon: Users,
-    title: "Community Members",
-    description: "Join our growing family of members and enjoy exclusive benefits.",
+    title: "Exclusive Community",
+    description: "Join our growing family of members and enjoy exclusive benefits, events, and lifetime privileges.",
   },
   {
-    icon: Star,
-    title: "Trusted Legacy",
-    description: "Decades of trust and quality service to our cherished community.",
+    icon: Shield,
+    title: "Certified Quality",
+    description: "Every piece comes with hallmark certification and lifetime exchange guarantee.",
+  },
+];
+
+const stats = [
+  { number: "50+", label: "Years of Legacy" },
+  { number: "10K+", label: "Happy Families" },
+  { number: "500+", label: "Successful Matches" },
+  { number: "100%", label: "Certified Gold" },
+];
+
+const testimonials = [
+  {
+    name: "Meera & Arjun Sharma",
+    text: "Golden Legacy helped us find each other through their matrimony service. The jewelry for our wedding was absolutely stunning!",
+    role: "Married in 2023",
+  },
+  {
+    name: "Priyanka Patel",
+    text: "The craftsmanship of their bridal set exceeded all expectations. It's been in my family for generations now.",
+    role: "Member since 2015",
+  },
+  {
+    name: "Rajesh & Sunita Mehta",
+    text: "Exceptional service and quality. The team made our daughter's wedding truly memorable with their exquisite collection.",
+    role: "Loyal Customers",
   },
 ];
 
@@ -30,102 +67,324 @@ const Index = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="hero-gradient min-h-[80vh] flex items-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img src={heroImage} alt="Luxury Jewelry" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-transparent" />
+        </div>
+        
+        {/* Animated decorative elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div 
+            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div 
+            className="absolute bottom-32 right-1/3 w-48 h-48 bg-rose-gold rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.25, 0.2] }}
+            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+          />
+        </div>
+
         <div className="container mx-auto px-4 py-20 relative z-10">
-          <div className="max-w-3xl animate-slide-up">
-            <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
-              Welcome to Golden Legacy
-            </span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground mb-6 leading-tight">
-              Where Tradition Meets
-              <span className="text-gold-gradient block">Timeless Elegance</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl leading-relaxed">
-              Discover our exquisite jewelry collections and connect with our vibrant community 
-              through trusted matrimony and membership services.
-            </p>
-            <div className="flex flex-wrap gap-4">
+          <motion.div 
+            className="max-w-2xl"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
+          >
+            <motion.span 
+              variants={fadeInUp}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
+            >
+              <Sparkles className="w-4 h-4" />
+              Celebrating 50 Years of Excellence
+            </motion.span>
+            
+            <motion.h1 
+              variants={fadeInUp}
+              className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
+            >
+              Where Tradition
+              <span className="block text-gold-gradient">Meets Elegance</span>
+            </motion.h1>
+            
+            <motion.p 
+              variants={fadeInUp}
+              className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
+            >
+              Discover our legacy of exquisite jewelry collections and connect with our vibrant 
+              community through trusted matrimony and membership services.
+            </motion.p>
+            
+            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
               <Link to="/products">
-                <Button size="lg" className="gold-gradient text-primary-foreground shadow-gold hover:opacity-90 text-base px-8">
+                <Button size="lg" className="gold-gradient text-primary-foreground shadow-gold hover:scale-105 transition-transform text-base px-8 animate-pulse-gold">
                   Explore Collection
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
               <Link to="/matrimony">
-                <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground text-base px-8">
+                <Button size="lg" variant="outline" className="border-champagne/50 text-champagne hover:bg-champagne/10 backdrop-blur-sm text-base px-8">
+                  <Heart className="mr-2 w-5 h-5" />
                   Matrimony Services
                 </Button>
               </Link>
-            </div>
-          </div>
-        </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full opacity-20 hidden lg:block">
-          <div className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-32 right-40 w-48 h-48 bg-rose-gold rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
+            </motion.div>
+
+            {/* Floating Stats */}
+            <motion.div 
+              variants={fadeInUp}
+              className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4"
+            >
+              {stats.map((stat, i) => (
+                <motion.div 
+                  key={stat.label}
+                  className="text-center p-4 bg-charcoal/50 backdrop-blur-md rounded-xl border border-gold/20"
+                  whileHover={{ scale: 1.05, borderColor: "hsl(38, 70%, 45%)" }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <div className="text-3xl font-bold text-gold">{stat.number}</div>
+                  <div className="text-xs text-champagne/70">{stat.label}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-serif font-bold text-foreground mb-4">
+      <section className="py-24 bg-background relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] gold-gradient rounded-full blur-[200px] opacity-5" />
+        
+        <div className="container mx-auto px-4 relative">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
               Our Services
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
+              Everything You Need
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Everything you need for a blessed life - from stunning jewelry to meaningful connections.
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              From stunning jewelry to meaningful connections - we're here for every milestone in your life.
             </p>
-          </div>
+          </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div
+              <motion.div
                 key={feature.title}
-                className="p-6 bg-card rounded-xl border border-border shadow-card hover:shadow-hover transition-all duration-300 group"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="group p-8 bg-card rounded-2xl border border-border shadow-card hover:shadow-gold transition-all duration-500 relative overflow-hidden"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
               >
-                <div className="w-14 h-14 gold-gradient rounded-xl flex items-center justify-center mb-5 shadow-gold group-hover:scale-110 transition-transform">
-                  <feature.icon className="w-7 h-7 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-serif font-semibold text-foreground mb-2">
+                <div className="absolute inset-0 gold-gradient opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
+                <motion.div 
+                  className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center mb-6 shadow-gold"
+                  whileHover={{ rotate: 5, scale: 1.1 }}
+                >
+                  <feature.icon className="w-8 h-8 text-primary-foreground" />
+                </motion.div>
+                <h3 className="text-xl font-serif font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {feature.description}
                 </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-24 bg-charcoal relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(15_50%_55%_/_0.1),_transparent_50%)]" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <span className="inline-block px-4 py-2 bg-gold/20 text-gold rounded-full text-sm font-medium mb-6">
+                Why Choose Us
+              </span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-champagne mb-6">
+                A Legacy of Trust & Excellence
+              </h2>
+              <p className="text-champagne/70 text-lg mb-8 leading-relaxed">
+                For over five decades, Golden Legacy has been the cornerstone of our community, 
+                providing exceptional jewelry and fostering meaningful connections through our 
+                matrimony services.
+              </p>
+              
+              <div className="space-y-6">
+                {[
+                  { icon: Award, title: "Master Craftsmen", desc: "Jewelry crafted by 3rd generation artisans" },
+                  { icon: Shield, title: "100% Certified", desc: "BIS hallmark on every gold piece" },
+                  { icon: Star, title: "Lifetime Exchange", desc: "Exchange old jewelry at full value" },
+                ].map((item, i) => (
+                  <motion.div 
+                    key={item.title}
+                    className="flex items-start gap-4 p-4 bg-charcoal/50 border border-gold/20 rounded-xl"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ x: 10, borderColor: "hsl(38, 70%, 45%)" }}
+                  >
+                    <div className="w-12 h-12 gold-gradient rounded-xl flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-6 h-6 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h4 className="text-champagne font-semibold mb-1">{item.title}</h4>
+                      <p className="text-champagne/60 text-sm">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
+            </motion.div>
+
+            <motion.div
+              className="relative"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="relative aspect-square rounded-3xl overflow-hidden">
+                <div className="absolute inset-0 gold-gradient opacity-20" />
+                <div className="absolute inset-4 border-2 border-gold/30 rounded-2xl" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div 
+                    className="w-32 h-32 gold-gradient rounded-full flex items-center justify-center shadow-gold"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Gem className="w-16 h-16 text-primary-foreground" />
+                  </motion.div>
+                </div>
+                
+                {/* Floating elements */}
+                <motion.div 
+                  className="absolute top-10 left-10 w-20 h-20 bg-gold/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-gold/20"
+                  animate={{ y: [0, -15, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <Star className="w-8 h-8 text-gold" />
+                </motion.div>
+                <motion.div 
+                  className="absolute bottom-10 right-10 w-20 h-20 bg-rose-gold/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-rose-gold/20"
+                  animate={{ y: [0, 15, 0] }}
+                  transition={{ duration: 3.5, repeat: Infinity }}
+                >
+                  <Heart className="w-8 h-8 text-rose-gold" />
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 bg-secondary/30 relative">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+              Testimonials
+            </span>
+            <h2 className="text-4xl font-serif font-bold text-foreground mb-4">
+              What Our Families Say
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, i) => (
+              <motion.div
+                key={testimonial.name}
+                className="bg-card p-8 rounded-2xl border border-border shadow-card relative"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                whileHover={{ y: -5 }}
+              >
+                <Quote className="w-10 h-10 text-primary/20 mb-4" />
+                <p className="text-muted-foreground mb-6 italic leading-relaxed">
+                  "{testimonial.text}"
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 gold-gradient rounded-full flex items-center justify-center text-primary-foreground font-bold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">{testimonial.name}</p>
+                    <p className="text-sm text-primary">{testimonial.role}</p>
+                  </div>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-charcoal relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,_hsl(38_70%_45%_/_0.15),_transparent_50%)]" />
+      <section className="py-24 bg-charcoal relative overflow-hidden">
+        <motion.div 
+          className="absolute inset-0"
+          animate={{ 
+            background: [
+              "radial-gradient(circle at 20% 50%, hsl(38 70% 45% / 0.15), transparent 50%)",
+              "radial-gradient(circle at 80% 50%, hsl(38 70% 45% / 0.15), transparent 50%)",
+              "radial-gradient(circle at 20% 50%, hsl(38 70% 45% / 0.15), transparent 50%)",
+            ]
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+        />
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl font-serif font-bold text-champagne mb-4">
-            Join Our Community
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-            Become a member today and unlock exclusive access to premium collections, 
-            special discounts, and matrimony services.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/members">
-              <Button size="lg" className="gold-gradient text-primary-foreground shadow-gold hover:opacity-90">
-                Become a Member
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-champagne/30 text-champagne hover:bg-champagne/10">
-                Contact Us
-              </Button>
-            </Link>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-champagne mb-6">
+              Begin Your Journey With Us
+            </h2>
+            <p className="text-champagne/70 max-w-2xl mx-auto mb-10 text-lg">
+              Join our exclusive community and unlock premium access to our collections, 
+              personalized services, and special events.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link to="/members">
+                <Button size="lg" className="gold-gradient text-primary-foreground shadow-gold hover:scale-105 transition-transform px-10">
+                  Become a Member
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button size="lg" variant="outline" className="border-champagne/30 text-champagne hover:bg-champagne/10 px-10">
+                  Get in Touch
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
     </MainLayout>
