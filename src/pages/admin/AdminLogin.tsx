@@ -1,135 +1,199 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Gem, Lock } from "lucide-react";
-import { z } from "zod";
-
-const loginSchema = z.object({
-  email: z.string().trim().email("Please enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+import { Gem, Lock, Mail, AlertCircle } from "lucide-react";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, isAdmin } = useAuth();
+  const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Redirect if already logged in as admin
-  if (isAdmin) {
-    navigate("/admin/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && user && isAdmin) {
+      navigate("/admin/dashboard");
+    }
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Missing Fields",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const validated = loginSchema.parse({ email, password });
-      setLoading(true);
-
-      const { error } = await signIn(validated.email, validated.password);
+      const { error } = await signIn(email, password);
 
       if (error) {
+        // If user doesn't exist, show appropriate message
         toast({
           title: "Login Failed",
-          description: error.message || "Invalid credentials. Please try again.",
+          description: error.message || "Invalid credentials. Please check your email and password.",
           variant: "destructive",
         });
         return;
       }
 
-      // Check if user is admin after login
       toast({
-        title: "Login Successful",
-        description: "Checking admin access...",
+        title: "Login Successful! ✨",
+        description: "Welcome to the admin panel.",
       });
 
-      // Small delay to let auth state update
+      // Navigate after successful login
       setTimeout(() => {
         navigate("/admin/dashboard");
       }, 500);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({
-          title: "Validation Error",
-          description: error.errors[0].message,
-          variant: "destructive",
-        });
-      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-charcoal flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full"
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-charcoal flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-charcoal flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(15_50%_55%_/_0.1),_transparent_50%)]" />
+      
+      <motion.div 
+        className="w-full max-w-md relative z-10"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-gold">
-            <Gem className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-serif font-bold text-champagne mb-2">
+          <motion.div 
+            className="w-20 h-20 gold-gradient rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-gold"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", duration: 0.8 }}
+          >
+            <Gem className="w-10 h-10 text-primary-foreground" />
+          </motion.div>
+          <h1 className="text-4xl font-serif font-bold text-champagne mb-2">
             Admin Panel
           </h1>
-          <p className="text-muted-foreground">
-            Sign in to access the dashboard
+          <p className="text-champagne/60">
+            Sign in to manage your business
           </p>
         </div>
 
-        <div className="bg-card p-8 rounded-2xl shadow-soft border border-border">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
-                required
-                className="border-border focus:border-primary"
-              />
+        <motion.div 
+          className="bg-card/95 backdrop-blur-xl p-10 rounded-3xl shadow-gold border border-gold/20"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          {/* Info Box */}
+          <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 mb-8 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-foreground font-medium mb-1">Demo Credentials</p>
+              <p className="text-muted-foreground">
+                Email: <span className="text-primary font-mono">admin@golden.com</span><br />
+                Password: <span className="text-primary font-mono">admin123</span>
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="border-border focus:border-primary"
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full gold-gradient text-primary-foreground shadow-gold hover:opacity-90"
-            >
-              {loading ? (
-                "Signing in..."
-              ) : (
-                <>
-                  <Lock className="mr-2 w-4 h-4" />
-                  Sign In
-                </>
-              )}
-            </Button>
-          </form>
-        </div>
+          </div>
 
-        <p className="text-center mt-6 text-muted-foreground text-sm">
-          <a href="/" className="text-gold hover:underline">← Back to Website</a>
-        </p>
-      </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-foreground font-medium">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@golden.com"
+                  required
+                  className="h-14 pl-12 rounded-xl border-border focus:border-primary text-base"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="h-14 pl-12 rounded-xl border-border focus:border-primary text-base"
+                />
+              </div>
+            </div>
+            
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full h-14 gold-gradient text-primary-foreground shadow-gold text-lg font-semibold rounded-xl"
+              >
+                {loading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-6 h-6 border-2 border-primary-foreground border-t-transparent rounded-full"
+                  />
+                ) : (
+                  <>
+                    <Lock className="mr-2 w-5 h-5" />
+                    Sign In to Dashboard
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          </form>
+        </motion.div>
+
+        <motion.p 
+          className="text-center mt-8 text-champagne/50 text-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <a href="/" className="text-gold hover:underline inline-flex items-center gap-1">
+            ← Back to Website
+          </a>
+        </motion.p>
+      </motion.div>
     </div>
   );
 };
