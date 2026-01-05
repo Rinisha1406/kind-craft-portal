@@ -19,13 +19,7 @@ const staggerContainer = {
   animate: { transition: { staggerChildren: 0.1 } }
 };
 
-
-
 const Counter = ({ value, label }: { value: string; label: string }) => {
-  const [count, setCount] = useState(0);
-  const numericValue = parseInt(value.replace(/\D/g, ""));
-  const suffix = value.replace(/\d/g, "");
-
   return (
     <motion.div
       className="text-center p-4 bg-charcoal/50 backdrop-blur-md rounded-xl border border-gold/20"
@@ -33,21 +27,9 @@ const Counter = ({ value, label }: { value: string; label: string }) => {
       initial={{ opacity: 0, scale: 0.5 }}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
-      onViewportEnter={() => {
-        let start = 0;
-        const end = numericValue;
-        const duration = 2000;
-        const incrementTime = (duration / end) * 10; // Speed adjustment
-
-        const timer = setInterval(() => {
-          start += 1;
-          setCount(start);
-          if (start === end) clearInterval(timer);
-        }, Math.max(incrementTime, 10)); // Min 10ms for smooth 60fps
-      }}
     >
       <div className="text-3xl font-bold text-gold">
-        {count}{suffix}
+        {value}
       </div>
       <div className="text-xs text-champagne/70">{label}</div>
     </motion.div>
@@ -78,10 +60,10 @@ const features = [
 ];
 
 const stats = [
-  { number: "50+", label: "Years of Legacy" },
-  { number: "10K+", label: "Happy Families" },
-  { number: "500+", label: "Successful Matches" },
-  { number: "100%", label: "Certified Gold" },
+  { number: "48+", label: "Years of Legacy" },
+  { number: "9K+", label: "Happy Families" },
+  { number: "483+", label: "Successful Matches" },
+  { number: "97%", label: "Certified Gold" },
 ];
 
 const testimonials = [
@@ -146,7 +128,7 @@ const Index = () => {
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
             >
               <Sparkles className="w-4 h-4" />
-              Celebrating 50 Years of Excellence
+              Celebrating 48 Years of Excellence
             </motion.span>
 
             <motion.h1

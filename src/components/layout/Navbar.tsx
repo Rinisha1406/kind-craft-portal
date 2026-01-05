@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const navLinks = [
   { name: "Home", path: "/" },
+  { name: "Services", path: "/services" },
   { name: "Products", path: "/products" },
   { name: "Matrimony", path: "/matrimony" },
   { name: "Members", path: "/members" },
@@ -123,8 +124,8 @@ const Navbar = () => {
                       to={link.path}
                       onClick={() => setIsOpen(false)}
                       className={`block px-4 py-3 rounded-xl font-medium transition-colors ${isActive(link.path)
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted"
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted"
                         }`}
                     >
                       {link.name}

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
+import Services from "./pages/Services";
 import Products from "./pages/Products";
 import Matrimony from "./pages/Matrimony";
 import MatrimonyProfile from "./pages/MatrimonyProfile";
@@ -30,6 +31,7 @@ const App = () => (
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/services" element={<Services />} />
             <Route path="/products" element={<Products />} />
             <Route path="/matrimony" element={<Matrimony />} />
             <Route path="/matrimony/profile" element={<MatrimonyProfile />} />

@@ -74,14 +74,23 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             registration_type: "matrimony",
             full_name: validated.fullName,
             dob: validated.dob,
-            fatherName: validated.fatherName,
-            motherName: validated.motherName,
+            father_name: validated.fatherName,
+            mother_name: validated.motherName,
             salary: validated.salary,
-            city: validated.city,
+            location: validated.city,
             caste: validated.caste,
             community: validated.community,
             occupation: validated.occupation,
             gender: validated.gender,
+            details: {
+              dob: validated.dob,
+              father_name: validated.fatherName,
+              mother_name: validated.motherName,
+              caste: validated.caste,
+              community: validated.community,
+              salary: validated.salary,
+              location: validated.city,
+            }
           }
         }
       });
@@ -132,7 +141,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
             placeholder="Name"
             required
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
@@ -142,7 +152,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="Phone"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
@@ -151,7 +162,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             id="gender"
             value={formData.gender}
             onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-            className="w-full h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl px-3 border"
+            disabled={submitting}
+            className="w-full h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl px-3 border disabled:opacity-50"
           >
             <option value="" className="bg-charcoal text-gray-400">Gender</option>
             <option value="male" className="bg-charcoal">Male</option>
@@ -170,7 +182,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
               type="date"
               value={formData.dob}
               onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-              className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10"
+              disabled={submitting}
+              className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 disabled:opacity-50"
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-champagne/50 pointer-events-none" />
           </div>
@@ -182,7 +195,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.fatherName}
             onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
             placeholder="Father's Name"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
@@ -192,7 +206,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.motherName}
             onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
             placeholder="Mother's Name"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
       </div>
@@ -205,7 +220,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.caste}
             onChange={(e) => setFormData({ ...formData, caste: e.target.value })}
             placeholder="Caste"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
@@ -215,7 +231,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.community}
             onChange={(e) => setFormData({ ...formData, community: e.target.value })}
             placeholder="Community"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
@@ -225,7 +242,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.occupation}
             onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
             placeholder="Occupation"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
       </div>
@@ -238,7 +256,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.salary}
             onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
             placeholder="Annual Salary"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2 md:col-span-2">
@@ -248,7 +267,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             value={formData.city}
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             placeholder="City"
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            disabled={submitting}
+            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
           />
         </div>
       </div>
@@ -326,7 +346,7 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="Enter your phone number"
             required
-            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
           />
         </div>
         <div className="space-y-2">
@@ -340,7 +360,7 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             placeholder="Enter your password"
             required
-            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
           />
         </div>
 
@@ -359,7 +379,7 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
           </a>
         </div>
 
-        <Button type="submit" className="w-full h-10 text-lg gold-gradient text-primary-foreground shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
+        <Button type="submit" className="w-1/2 mx-auto flex h-10 text-lg gold-gradient text-primary-foreground shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
           {submitting ? "Signing In..." : "Sign In"}
         </Button>
       </div>
@@ -434,7 +454,7 @@ const Matrimony = () => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <img src={matrimonyHero} alt="Happy Couple" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/95 via-charcoal/80 to-charcoal/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-transparent" />
         </div>
 
         {/* Animated decorative elements */}

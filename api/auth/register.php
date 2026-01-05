@@ -8,7 +8,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $input = get_json_input();
+file_put_contents('../debug_register.log', date('Y-m-d H:i:s') . " - Input: " . file_get_contents('php://input') . "\n", FILE_APPEND);
+
 if (!$input || !isset($input['phone']) || !isset($input['password'])) {
+    file_put_contents('../debug_register.log', " - Missing fields\n", FILE_APPEND);
     send_json_response(['error' => 'Missing phone or password'], 400);
 }
 
@@ -17,6 +20,7 @@ $password = $input['password'];
 $full_name = isset($input['options']['data']['full_name']) ? $input['options']['data']['full_name'] : '';
 
 $conn = getDBConnection();
+file_put_contents('../debug_register.log', " - DB Connected\n", FILE_APPEND);
 
 // Check if user exists
 $stmt = $conn->prepare("SELECT id FROM users WHERE phone = ?");
@@ -41,6 +45,7 @@ try {
     if (!$stmt->execute()) {
         throw new Exception("Failed to create user");
     }
+    file_put_contents('../debug_register.log', " - User inserted\n", FILE_APPEND);
 
     // Insert profile
     $profile_id = generate_uuid();
@@ -58,6 +63,7 @@ try {
     if (!$stmt->execute()) {
         throw new Exception("Failed to assign role");
     }
+    file_put_contents('../debug_register.log', " - Role assigned\n", FILE_APPEND);
 
     // Handle Matrimony Registration
     if (isset($input['options']['data']['registration_type']) && $input['options']['data']['registration_type'] === 'matrimony') {
@@ -69,13 +75,13 @@ try {
         $gender = $matrimony_data['gender'] ?? 'other';
         $occupation = $matrimony_data['occupation'] ?? null;
         $education = null; // Add if collection in form
-        $location = $matrimony_data['city'] ?? null;
+        $location = $matrimony_data['location'] ?? $matrimony_data['city'] ?? null;
         $bio = null; // Add if collection in form
         
         // details JSON for extra fields
         $details = json_encode([
-             'father_name' => $matrimony_data['fatherName'] ?? null,
-             'mother_name' => $matrimony_data['motherName'] ?? null,
+             'father_name' => $matrimony_data['father_name'] ?? $matrimony_data['fatherName'] ?? null,
+             'mother_name' => $matrimony_data['mother_name'] ?? $matrimony_data['motherName'] ?? null,
              'caste' => $matrimony_data['caste'] ?? null,
              'community' => $matrimony_data['community'] ?? null,
              'salary' => $matrimony_data['salary'] ?? null,
@@ -93,6 +99,7 @@ try {
              // Better to fail so they try again.
              throw new Exception("Failed to create matrimony profile: " . $stmt_mat->error);
         }
+        file_put_contents('../debug_register.log', " - Matrimony inserted\n", FILE_APPEND);
     }
 
     $conn->commit();
@@ -119,6 +126,7 @@ try {
 
 } catch (Exception $e) {
     $conn->rollback();
+    file_put_contents('../debug_register.log', " - Exception: " . $e->getMessage() . "\n", FILE_APPEND);
     send_json_response(['error' => $e->getMessage()], 500);
 }
 
