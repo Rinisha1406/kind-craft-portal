@@ -47,7 +47,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="h-screen bg-background flex overflow-hidden">
       {/* Sidebar */}
       <aside className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
         <div className="p-6 border-b border-sidebar-border">
@@ -55,7 +55,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
             <div className="w-10 h-10 gold-gradient rounded-lg flex items-center justify-center">
               <Gem className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-serif font-bold text-lg">Admin Panel</span>
+            <span className="font-serif font-bold text-lg">Admin</span>
           </Link>
         </div>
 
@@ -66,11 +66,10 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent"
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 {item.name}

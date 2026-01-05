@@ -101,8 +101,8 @@ export default {
           "100%": { backgroundPosition: "200% 0" },
         },
         "pulse-gold": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(38 70% 45% / 0.4)" },
-          "50%": { boxShadow: "0 0 0 15px hsl(38 70% 45% / 0)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(161 94% 30% / 0.4)" },
+          "50%": { boxShadow: "0 0 0 15px hsl(161 94% 30% / 0)" },
         },
         "float": {
           "0%, 100%": { transform: "translateY(0)" },

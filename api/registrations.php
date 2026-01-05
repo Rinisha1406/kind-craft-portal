@@ -28,22 +28,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = get_json_input();
     $full_name = $input['full_name'] ?? '';
-    $email = $input['email'] ?? '';
+    $email = $input['email'] ?? null;
     $phone = $input['phone'] ?? '';
     $type = $input['registration_type'] ?? 'general';
+    $details = isset($input['details']) ? json_encode($input['details']) : null;
     
-    if (empty($full_name) || empty($email)) {
-        send_json_response(['error' => 'Missing required fields'], 400);
+    if (empty($full_name)) {
+        send_json_response(['error' => 'Missing required fields (full_name)'], 400);
     }
     
     $id = generate_uuid();
-    $stmt = $conn->prepare("INSERT INTO registrations (id, full_name, email, phone, registration_type) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $id, $full_name, $email, $phone, $type);
+    $stmt = $conn->prepare("INSERT INTO registrations (id, full_name, email, phone, registration_type, details) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $id, $full_name, $email, $phone, $type, $details);
     
     if ($stmt->execute()) {
         send_json_response(['error' => null]);
     } else {
-        send_json_response(['error' => 'Failed'], 500);
+        error_log("Registration error: " . $stmt->error);
+        send_json_response(['error' => 'Failed to save registration: ' . $stmt->error], 500);
     }
 }
 

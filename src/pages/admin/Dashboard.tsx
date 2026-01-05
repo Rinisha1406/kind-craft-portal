@@ -9,8 +9,6 @@ interface Stats {
   products: number;
   matrimony: number;
   members: number;
-  messages: number;
-  registrations: number;
 }
 
 const Dashboard = () => {
@@ -18,33 +16,25 @@ const Dashboard = () => {
     products: 0,
     matrimony: 0,
     members: 0,
-    messages: 0,
-    registrations: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [recentRegistrations, setRecentRegistrations] = useState<any[]>([]);
 
   useEffect(() => {
-    fetchStats();
-    fetchRecentRegistrations();
+    fetchStats()
   }, []);
 
   const fetchStats = async () => {
     try {
-      const [products, matrimony, members, messages, registrations] = await Promise.all([
+      const [products, matrimony, members] = await Promise.all([
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("matrimony_profiles").select("id", { count: "exact", head: true }),
         supabase.from("members").select("id", { count: "exact", head: true }),
-        supabase.from("contact_messages").select("id", { count: "exact", head: true }).eq("is_read", false),
-        supabase.from("registrations").select("id", { count: "exact", head: true }).eq("status", "pending"),
       ]);
 
       setStats({
         products: products.count || 0,
         matrimony: matrimony.count || 0,
         members: members.count || 0,
-        messages: messages.count || 0,
-        registrations: registrations.count || 0,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -53,21 +43,10 @@ const Dashboard = () => {
     }
   };
 
-  const fetchRecentRegistrations = async () => {
-    const { data } = await supabase
-      .from("registrations")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5);
-    setRecentRegistrations(data || []);
-  };
-
   const statCards = [
     { title: "Total Products", value: stats.products, icon: Package, color: "from-gold to-gold-dark", change: "+12%" },
     { title: "Matrimony Profiles", value: stats.matrimony, icon: Heart, color: "from-rose-gold to-accent", change: "+8%" },
     { title: "Active Members", value: stats.members, icon: Users, color: "from-primary to-charcoal", change: "+5%" },
-    { title: "Unread Messages", value: stats.messages, icon: Mail, color: "from-silver to-platinum", change: "New" },
-    { title: "Pending Registrations", value: stats.registrations, icon: UserCheck, color: "from-diamond to-silver", change: "Action" },
   ];
 
   return (
@@ -142,7 +121,7 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {recentRegistrations.length > 0 ? (
+                {/* {recentRegistrations.length > 0 ? (
                   <div className="space-y-4">
                     {recentRegistrations.map((reg, i) => (
                       <motion.div
@@ -161,11 +140,10 @@ const Dashboard = () => {
                             <p className="text-sm text-muted-foreground">{reg.registration_type}</p>
                           </div>
                         </div>
-                        <span className={`text-xs px-3 py-1 rounded-full ${
-                          reg.status === "approved" ? "bg-green-100 text-green-800" :
-                          reg.status === "rejected" ? "bg-red-100 text-red-800" :
-                          "bg-yellow-100 text-yellow-800"
-                        }`}>
+                        <span className={`text-xs px-3 py-1 rounded-full ${reg.status === "approved" ? "bg-green-100 text-green-800" :
+                            reg.status === "rejected" ? "bg-red-100 text-red-800" :
+                              "bg-yellow-100 text-yellow-800"
+                          }`}>
                           {reg.status || "pending"}
                         </span>
                       </motion.div>
@@ -173,7 +151,7 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">No recent registrations</p>
-                )}
+                )} */}
               </CardContent>
             </Card>
           </motion.div>

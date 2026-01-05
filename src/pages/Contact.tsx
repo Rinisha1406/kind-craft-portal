@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle, Sparkles, Instagram, Facebook, Twitter } from "lucide-react";
 import { z } from "zod";
+import contactHero from "@/assets/contact-hero.png";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -43,6 +44,16 @@ const Contact = () => {
   const [submitting, setSubmitting] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const { toast } = useToast();
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 }
+  };
+
+  const staggerContainer = {
+    animate: { transition: { staggerChildren: 0.1 } }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,32 +91,57 @@ const Contact = () => {
   return (
     <MainLayout>
       {/* Hero */}
-      <section className="py-24 bg-gradient-to-b from-secondary/50 to-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
-        
+      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img src={contactHero} alt="Contact Us" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-transparent" />
+        </div>
+
+        {/* Animated decorative elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-32 right-1/3 w-48 h-48 bg-rose-gold rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.25, 0.2] }}
+            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+          />
+        </div>
+
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
-            className="text-center max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+          <motion.div
+            className="max-w-3xl"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
           >
-            <motion.span 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
+            <motion.span
+              variants={fadeInUp}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
             >
               <MessageCircle className="w-4 h-4" />
               Get in Touch
             </motion.span>
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-foreground mb-6">
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
+            >
               We'd Love to
-              <span className="text-gold-gradient block">Hear From You</span>
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Have a question about our jewelry collections or services? We're here to help 
+              <span className="block text-gold-gradient">Hear From You</span>
+            </motion.h1>
+
+            <motion.p
+              variants={fadeInUp}
+              className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
+            >
+              Have a question about our jewelry collections or services? We're here to help
               and make your experience memorable.
-            </p>
+            </motion.p>
           </motion.div>
         </div>
       </section>
@@ -124,7 +160,7 @@ const Contact = () => {
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -5 }}
               >
-                <motion.div 
+                <motion.div
                   className="w-14 h-14 gold-gradient rounded-2xl flex items-center justify-center mb-4 shadow-gold group-hover:scale-110 transition-transform"
                   whileHover={{ rotate: 5 }}
                 >
@@ -159,7 +195,7 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">We typically respond within 24 hours</p>
                   </div>
                 </div>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
@@ -289,7 +325,7 @@ const Contact = () => {
               <div className="bg-card rounded-3xl overflow-hidden border border-border shadow-card">
                 <div className="aspect-video bg-gradient-to-br from-secondary to-muted flex items-center justify-center relative">
                   <div className="text-center">
-                    <motion.div 
+                    <motion.div
                       className="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 shadow-gold"
                       animate={{ y: [0, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}

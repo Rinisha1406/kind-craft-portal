@@ -1,7 +1,7 @@
 // Compat layer to replace Supabase with PHP API
 // This mimics the Supabase client interface used in the app
 
-const API_URL = 'http://localhost/api'; // Adjust if needed
+const API_URL = 'http://localhost/kind-craft-portal/api'; // Adjust if needed
 
 // Helper to make requests
 async function apiRequest(endpoint: string, method: string, body?: any) {
@@ -152,6 +152,8 @@ class QueryBuilder {
   neq(column: string, value: any) { return this; } // Ignored for now
 
   order(column: string, { ascending = true } = {}) { return this; }
+
+  limit(count: number) { return this; }
 
   maybeSingle() {
     return this.then((res: any) => {

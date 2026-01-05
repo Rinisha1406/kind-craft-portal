@@ -10,7 +10,7 @@ const Footer = () => {
       {/* Decorative gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_hsl(38_70%_45%_/_0.08),_transparent_40%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_hsl(15_50%_55%_/_0.05),_transparent_40%)]" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Main Footer */}
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -32,7 +32,7 @@ const Footer = () => {
               </div>
             </Link>
             <p className="text-champagne/60 text-sm leading-relaxed mb-6">
-              Premium jewelry and trusted matrimony services for our cherished community. 
+              Premium jewelry and trusted matrimony services for our cherished community.
               Building legacies for over 50 years.
             </p>
             <div className="flex gap-3">
@@ -137,6 +137,7 @@ const Footer = () => {
               <a href="#" className="hover:text-gold transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-gold transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-gold transition-colors">Refund Policy</a>
+              <Link to="/admin/login" className="hover:text-gold transition-colors">Admin</Link>
             </div>
           </div>
         </div>

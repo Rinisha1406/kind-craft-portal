@@ -83,7 +83,7 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-charcoal flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-charcoal flex items-center justify-center p-4 relative">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,_hsl(15_50%_55%_/_0.1),_transparent_50%)]" />
@@ -103,7 +103,7 @@ const AdminLogin = () => {
             <Gem className="w-10 h-10 text-primary-foreground" />
           </motion.div>
           <h1 className="text-4xl font-serif font-bold text-champagne mb-2">
-            Admin Panel
+            Admin
           </h1>
           <p className="text-champagne/60">
             Sign in to manage your business
@@ -116,17 +116,6 @@ const AdminLogin = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {/* Info Box */}
-          <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 mb-8 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="text-foreground font-medium mb-1">Demo Credentials</p>
-              <p className="text-muted-foreground">
-                Username: <span className="text-primary font-mono">admin</span><br />
-                Password: <span className="text-primary font-mono">admin123</span>
-              </p>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">

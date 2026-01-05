@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Crown, Star, Award, Sparkles, Gift, Percent, Users, Calendar, ArrowRight } from "lucide-react";
 import { z } from "zod";
+import membersHero from "@/assets/members-hero.png";
 
 const membershipPlans = [
   {
@@ -60,6 +61,16 @@ const Members = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 }
+  };
+
+  const staggerContainer = {
+    animate: { transition: { staggerChildren: 0.1 } }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -95,32 +106,57 @@ const Members = () => {
   return (
     <MainLayout>
       {/* Hero */}
-      <section className="py-24 bg-gradient-to-b from-secondary/50 to-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
-        
+      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img src={membersHero} alt="Exclusive Membership" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-transparent" />
+        </div>
+
+        {/* Animated decorative elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-32 right-1/3 w-48 h-48 bg-rose-gold rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.25, 0.2] }}
+            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+          />
+        </div>
+
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
-            className="text-center max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+          <motion.div
+            className="max-w-3xl"
+            initial="initial"
+            animate="animate"
+            variants={staggerContainer}
           >
-            <motion.span 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2 }}
+            <motion.span
+              variants={fadeInUp}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
             >
               <Crown className="w-4 h-4" />
               Exclusive Membership
             </motion.span>
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-foreground mb-6">
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
+            >
               Join Our
-              <span className="text-gold-gradient block">Elite Community</span>
-            </h1>
-            <p className="text-muted-foreground text-lg mb-8">
-              Become a member and unlock exclusive benefits, premium discounts, and personalized services 
+              <span className="block text-gold-gradient">Elite Community</span>
+            </motion.h1>
+
+            <motion.p
+              variants={fadeInUp}
+              className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
+            >
+              Become a member and unlock exclusive benefits, premium discounts, and personalized services
               that make every moment special.
-            </p>
+            </motion.p>
           </motion.div>
         </div>
       </section>
@@ -138,7 +174,7 @@ const Members = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <motion.div 
+                <motion.div
                   className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-gold"
                   whileHover={{ rotate: 5, scale: 1.1 }}
                 >
@@ -155,7 +191,7 @@ const Members = () => {
       {/* Pricing Plans */}
       <section className="py-24">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -170,11 +206,10 @@ const Members = () => {
               <motion.div
                 key={plan.name}
                 onClick={() => setSelectedPlan(plan.name)}
-                className={`relative p-8 rounded-3xl border-2 cursor-pointer transition-all duration-500 ${
-                  selectedPlan === plan.name
-                    ? "border-primary shadow-gold bg-card scale-105 z-10"
-                    : "border-border hover:border-primary/50 bg-card"
-                }`}
+                className={`relative p-8 rounded-3xl border-2 cursor-pointer transition-all duration-500 ${selectedPlan === plan.name
+                  ? "border-primary shadow-gold bg-card scale-105 z-10"
+                  : "border-border hover:border-primary/50 bg-card"
+                  }`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -182,7 +217,7 @@ const Members = () => {
                 whileHover={{ y: -5 }}
               >
                 {plan.popular && (
-                  <motion.div 
+                  <motion.div
                     className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 gold-gradient text-primary-foreground text-sm font-medium rounded-full shadow-gold"
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
@@ -191,9 +226,9 @@ const Members = () => {
                     Most Popular
                   </motion.div>
                 )}
-                
+
                 <div className="text-center mb-8">
-                  <motion.div 
+                  <motion.div
                     className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center bg-gradient-to-br ${plan.color} shadow-lg`}
                     whileHover={{ rotate: 5, scale: 1.1 }}
                   >
@@ -205,7 +240,7 @@ const Members = () => {
                     {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
                   </div>
                 </div>
-                
+
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3 text-sm">
@@ -216,8 +251,8 @@ const Members = () => {
                     </li>
                   ))}
                 </ul>
-                
-                <Button 
+
+                <Button
                   className={`w-full ${selectedPlan === plan.name ? "gold-gradient text-primary-foreground shadow-gold" : ""}`}
                   variant={selectedPlan === plan.name ? "default" : "outline"}
                 >
@@ -232,10 +267,10 @@ const Members = () => {
       {/* Registration Form */}
       <section className="py-24 bg-charcoal relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-lg mx-auto">
-            <motion.div 
+            <motion.div
               className="text-center mb-10"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -247,9 +282,9 @@ const Members = () => {
                 Selected: <span className="text-gold font-semibold">{selectedPlan} Membership</span>
               </p>
             </motion.div>
-            
-            <motion.form 
-              onSubmit={handleSubmit} 
+
+            <motion.form
+              onSubmit={handleSubmit}
               className="bg-card p-10 rounded-3xl shadow-gold border border-gold/20"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -290,7 +325,7 @@ const Members = () => {
                   />
                 </div>
               </div>
-              
+
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="mt-8">
                 <Button
                   type="submit"
@@ -305,7 +340,7 @@ const Members = () => {
                   )}
                 </Button>
               </motion.div>
-              
+
               <p className="text-center text-sm text-muted-foreground mt-6">
                 By registering, you agree to our Terms of Service and Privacy Policy
               </p>

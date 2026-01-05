@@ -19,7 +19,7 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <motion.nav 
+    <motion.nav
       className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -29,7 +29,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <motion.div 
+            <motion.div
               className="w-12 h-12 gold-gradient rounded-xl flex items-center justify-center shadow-gold"
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
@@ -53,9 +53,8 @@ const Navbar = () => {
                 className="relative px-4 py-2"
               >
                 <motion.span
-                  className={`relative z-10 text-sm font-medium transition-colors ${
-                    isActive(link.path) ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`relative z-10 text-sm font-medium transition-colors ${isActive(link.path) ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                    }`}
                   whileHover={{ scale: 1.05 }}
                 >
                   {link.name}
@@ -71,17 +70,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Admin Link */}
-          <div className="hidden lg:flex items-center gap-4">
-            <Link to="/admin/login">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground rounded-full px-6">
-                  Admin Panel
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </motion.div>
-            </Link>
-          </div>
+
 
           {/* Mobile Menu Button */}
           <motion.button
@@ -133,28 +122,16 @@ const Navbar = () => {
                     <Link
                       to={link.path}
                       onClick={() => setIsOpen(false)}
-                      className={`block px-4 py-3 rounded-xl font-medium transition-colors ${
-                        isActive(link.path) 
-                          ? "bg-primary/10 text-primary" 
+                      className={`block px-4 py-3 rounded-xl font-medium transition-colors ${isActive(link.path)
+                          ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-muted"
-                      }`}
+                        }`}
                     >
                       {link.name}
                     </Link>
                   </motion.div>
                 ))}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: navLinks.length * 0.05 }}
-                  className="pt-2"
-                >
-                  <Link to="/admin/login" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full gold-gradient text-primary-foreground rounded-xl">
-                      Admin Panel
-                    </Button>
-                  </Link>
-                </motion.div>
+
               </div>
             </motion.div>
           )}
