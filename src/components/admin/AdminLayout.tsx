@@ -2,15 +2,13 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Gem, LayoutDashboard, Package, Heart, Users, Mail, UserCheck, LogOut, Loader2 } from "lucide-react";
+import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2 } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Products", path: "/admin/products", icon: Package },
   { name: "Matrimony", path: "/admin/matrimony", icon: Heart },
   { name: "Members", path: "/admin/members", icon: Users },
-  { name: "Registrations", path: "/admin/registrations", icon: UserCheck },
-  { name: "Messages", path: "/admin/messages", icon: Mail },
 ];
 
 interface AdminLayoutProps {

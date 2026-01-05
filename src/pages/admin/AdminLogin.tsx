@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Gem, Lock, Mail, AlertCircle } from "lucide-react";
+import { Gem, Lock, Mail, AlertCircle, Phone } from "lucide-react";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
@@ -119,15 +119,15 @@ const AdminLogin = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-foreground font-medium">Username</Label>
+              <Label htmlFor="username" className="text-foreground font-medium">Phone Number</Label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   id="username"
-                  type="text"
+                  type="tel"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
+                  placeholder="Enter phone number"
                   required
                   className="h-14 pl-12 rounded-xl border-border focus:border-primary text-base"
                 />

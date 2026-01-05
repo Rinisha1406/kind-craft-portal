@@ -8,17 +8,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $input = get_json_input();
-if (!$input || !isset($input['email']) || !isset($input['password'])) {
-    send_json_response(['error' => 'Missing email or password'], 400);
+if (!$input || !isset($input['phone']) || !isset($input['password'])) {
+    send_json_response(['error' => 'Missing phone or password'], 400);
 }
 
-$email = $input['email'];
+$phone = $input['phone'];
 $password = $input['password'];
 
 $conn = getDBConnection();
 
-$stmt = $conn->prepare("SELECT id, email, password_hash FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
+$stmt = $conn->prepare("SELECT id, email, phone, password_hash FROM users WHERE phone = ?");
+$stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
 

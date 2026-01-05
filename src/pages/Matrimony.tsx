@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Search, UserPlus, MapPin, Briefcase, GraduationCap, Heart, Sparkles, Users, Shield, CheckCircle } from "lucide-react";
+import { Search, UserPlus, MapPin, Briefcase, GraduationCap, Heart, Sparkles, Users, Shield, CheckCircle, Calendar } from "lucide-react";
 import { z } from "zod";
 import matrimonyHero from "@/assets/matrimony-hero.jpg";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -64,28 +64,25 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
       const validated = registrationSchema.parse(formData);
       setSubmitting(true);
 
-      // Note: We're sending these fields to Supabase. 
-      // Ensure the 'registrations' table has a 'details' JSONB column or individual columns for these.
-      // If not, this might need backend schema updates.
-      const { error } = await supabase.from("registrations").insert({
-        full_name: validated.fullName,
-        phone: validated.phone || null,
-        registration_type: "matrimony",
-        // Using a details object for extra fields to be safe if specific columns don't exist, 
-        // OR assuming we can pass them if they do. 
-        // For this task, I'll assume passing them as a 'details' JSON block is safer 
-        // if I can't modify the schema, OR I'll try to spread them if user implies columns exist.
-        // Given the request, I'll structure it to pass 'details' with these extras.
-        details: {
-          father_name: validated.fatherName,
-          mother_name: validated.motherName,
-          salary: validated.salary,
-          city: validated.city,
-          caste: validated.caste,
-          community: validated.community,
-          occupation: validated.occupation,
-          dob: validated.dob,
-          gender: validated.gender,
+      // Register User with Phone + DOB as Password
+      // We also pass the profile details in options.data so the backend can create the profile
+      const { data, error } = await supabase.auth.signUp({
+        phone: validated.phone,
+        password: validated.dob, // Format: YYYY-MM-DD
+        options: {
+          data: {
+            registration_type: "matrimony",
+            full_name: validated.fullName,
+            dob: validated.dob,
+            fatherName: validated.fatherName,
+            motherName: validated.motherName,
+            salary: validated.salary,
+            city: validated.city,
+            caste: validated.caste,
+            community: validated.community,
+            occupation: validated.occupation,
+            gender: validated.gender,
+          }
         }
       });
 
@@ -93,9 +90,12 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
 
       toast({
         title: "Registration Successful! 🎉",
-        description: "Our team will contact you within 24 hours.",
+        description: "Your account has been created. Use your Phone Number and DOB to login.",
       });
       onClose();
+      // Switch to Sign In tab potentially, or auto-login logic handles it
+      onSignInClick && onSignInClick();
+
       setFormData({
         fullName: "",
         phone: "",
@@ -109,12 +109,12 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
         dob: "",
         gender: "",
       });
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
       } else {
         console.error(error);
-        toast({ title: "Error", description: "Failed to submit registration.", variant: "destructive" });
+        toast({ title: "Registration Failed", description: error.message || "Failed to create account.", variant: "destructive" });
       }
     } finally {
       setSubmitting(false);
@@ -164,13 +164,16 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="dob" className="text-champagne/90 font-serif tracking-wide">Date of Birth</Label>
-          <Input
-            id="dob"
-            type="date"
-            value={formData.dob}
-            onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl [color-scheme:dark]"
-          />
+          <div className="relative">
+            <Input
+              id="dob"
+              type="date"
+              value={formData.dob}
+              onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+              className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10"
+            />
+            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-champagne/50 pointer-events-none" />
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="fatherName" className="text-champagne/90 font-serif tracking-wide">Father's Name</Label>
@@ -270,7 +273,7 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
 
 const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
   const [formData, setFormData] = useState({
-    email: "",
+    phone: "",
     password: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -281,7 +284,7 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
     setSubmitting(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
+        phone: formData.phone,
         password: formData.password,
       });
 
@@ -291,7 +294,15 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
         title: "Welcome back!",
         description: "Successfully signed in.",
       });
-      // Redirect or handle post-login
+
+      // Redirect to profile dashboard
+      // We need to access navigate, but this component is inside Matrimony. Not receiving navigate prop.
+      // Ideally we reload or the parent handles auth state change.
+      // Since we are using valid Auth, the parent/layout might redirect if we had a global listener.
+      // But let's trigger a reload or use window.location for now if we can't easily hook into router here without refactor.
+      // Actually, let's assume we can use window.location.href = '/matrimony/profile' for simplicity or verify if we can pass navigate.
+      // The snippet showing Matrimony.tsx didn't show useNavigate import.
+      window.location.href = '/matrimony/profile';
     } catch (error: any) {
       toast({
         title: "Sign in failed",
@@ -307,13 +318,13 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
     <form onSubmit={handleSignIn} className="space-y-6 mt-6">
       <div className="max-w-sm mx-auto space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="signin-email" className="text-champagne/90 font-serif tracking-wide">Email Address</Label>
+          <Label htmlFor="signin-phone" className="text-champagne/90 font-serif tracking-wide">Phone Number</Label>
           <Input
-            id="signin-email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="Enter your email"
+            id="signin-phone"
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            placeholder="Enter your phone number"
             required
             className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
           />
@@ -476,7 +487,6 @@ const Matrimony = () => {
                     >
                       <div className="text-center mb-6">
                         <h3 className="text-2xl font-serif font-bold text-champagne">Create Profile</h3>
-                        <p className="text-champagne/60 text-sm">Begin your journey</p>
                       </div>
                       <RegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
                     </motion.div>
@@ -490,7 +500,6 @@ const Matrimony = () => {
                     >
                       <div className="text-center mb-6">
                         <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
-                        <p className="text-champagne/60 text-sm">Sign in to access your profile</p>
                       </div>
                       <SignInForm onRegisterClick={() => setActiveTab("register")} />
                     </motion.div>
@@ -502,8 +511,6 @@ const Matrimony = () => {
           </div>
         </div>
       </section>
-
-
 
     </MainLayout >
   );

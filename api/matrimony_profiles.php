@@ -22,6 +22,9 @@ if ($method === 'GET') {
     if (isset($_GET['id'])) {
         $id = $conn->real_escape_string($_GET['id']);
         $sql .= " WHERE id = '$id'";
+    } elseif (isset($_GET['user_id'])) {
+        $uid = $conn->real_escape_string($_GET['user_id']);
+        $sql .= " WHERE user_id = '$uid'";
     }
 
     // Order by created_at desc default
@@ -42,11 +45,57 @@ if ($method === 'GET') {
     send_json_response(['data' => $data, 'error' => null]);
 }
 
-// Handle POST requests (Create profile)
+// Handle POST requests (Create profile - usually handled by reg, but independent create possible)
 if ($method === 'POST') {
     $input = get_json_input();
-    // TODO: Implement insert logic
-    send_json_response(['data' => $input, 'error' => null]);
+    // Implementation skipped as registration handles it, but good to have eventually.
+    send_json_response(['data' => $input, 'error' => null]); 
+}
+
+// Handle PUT/PATCH requests (Update profile)
+if ($method === 'PUT' || $method === 'PATCH') {
+    $input = get_json_input();
+    $id = isset($_GET['id']) ? $conn->real_escape_string($_GET['id']) : null;
+    $user_id = isset($_GET['user_id']) ? $conn->real_escape_string($_GET['user_id']) : null;
+    
+    if (!$id && !$user_id) {
+         send_json_response(['error' => 'Missing ID'], 400);
+    }
+    
+    // Construct Update Query
+    $updates = [];
+    $types = "";
+    $params = [];
+    
+    if (isset($input['image_url'])) {
+        $updates[] = "image_url = ?";
+        $types .= "s";
+        $params[] = $input['image_url'];
+    }
+    
+    if (!empty($updates)) {
+        $sql = "UPDATE matrimony_profiles SET " . implode(", ", $updates);
+        if ($id) {
+             $sql .= " WHERE id = ?";
+             $types .= "s";
+             $params[] = $id;
+        } else {
+             $sql .= " WHERE user_id = ?";
+             $types .= "s";
+             $params[] = $user_id;
+        }
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        
+        if ($stmt->execute()) {
+             send_json_response(['message' => 'Profile updated']);
+        } else {
+             send_json_response(['error' => 'Update failed: ' . $conn->error], 500);
+        }
+    } else {
+        send_json_response(['message' => 'No changes']);
+    }
 }
 
 $conn->close();

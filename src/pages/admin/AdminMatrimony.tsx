@@ -19,6 +19,7 @@ interface MatrimonyProfile {
   contact_phone: string | null;
   is_active: boolean;
   created_at: string;
+  details: any; // JSON column
 }
 
 const AdminMatrimony = () => {
@@ -102,11 +103,14 @@ const AdminMatrimony = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Age</TableHead>
-                <TableHead>Gender</TableHead>
+                <TableHead>DOB</TableHead>
+                <TableHead>Mobile Number</TableHead>
+                <TableHead>Father's Name</TableHead>
+                <TableHead>Mother's Name</TableHead>
+                <TableHead>Caste</TableHead>
+                <TableHead>Community</TableHead>
                 <TableHead>Occupation</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Contact</TableHead>
+                <TableHead>Salary</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -114,13 +118,13 @@ const AdminMatrimony = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={11} className="text-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
                   </TableCell>
                 </TableRow>
               ) : profiles.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
                     No matrimony profiles found
                   </TableCell>
                 </TableRow>
@@ -128,17 +132,14 @@ const AdminMatrimony = () => {
                 profiles.map((profile) => (
                   <TableRow key={profile.id}>
                     <TableCell className="font-medium">{profile.full_name}</TableCell>
-                    <TableCell>{profile.age}</TableCell>
-                    <TableCell className="capitalize">{profile.gender}</TableCell>
+                    <TableCell>{profile.details?.dob || "-"}</TableCell>
+                    <TableCell>{profile.contact_phone || "-"}</TableCell>
+                    <TableCell>{profile.details?.father_name || "-"}</TableCell>
+                    <TableCell>{profile.details?.mother_name || "-"}</TableCell>
+                    <TableCell>{profile.details?.caste || "-"}</TableCell>
+                    <TableCell>{profile.details?.community || "-"}</TableCell>
                     <TableCell>{profile.occupation || "-"}</TableCell>
-                    <TableCell>{profile.location || "-"}</TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {profile.contact_email && <div>{profile.contact_email}</div>}
-                        {profile.contact_phone && <div className="text-muted-foreground">{profile.contact_phone}</div>}
-                        {!profile.contact_email && !profile.contact_phone && "-"}
-                      </div>
-                    </TableCell>
+                    <TableCell>{profile.details?.salary || "-"}</TableCell>
                     <TableCell>
                       <Badge className={profile.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
                         {profile.is_active ? "Active" : "Hidden"}

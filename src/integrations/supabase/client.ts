@@ -34,8 +34,8 @@ async function apiRequest(endpoint: string, method: string, body?: any) {
 
 class SupabaseCompat {
   auth = {
-    signInWithPassword: async ({ email, password }: any) => {
-      const res = await apiRequest('/auth/login.php', 'POST', { email, password });
+    signInWithPassword: async ({ phone, password }: any) => {
+      const res = await apiRequest('/auth/login.php', 'POST', { phone, password });
       if (!res.error && res.data?.session) {
         localStorage.setItem('sb-access-token', res.data.session.access_token);
         this._notifyAuthListeners('SIGNED_IN', res.data.session);
@@ -45,7 +45,7 @@ class SupabaseCompat {
     signUp: async (credentials: any) => {
       // Handle options.data.full_name
       const payload = {
-        email: credentials.email,
+        phone: credentials.phone,
         password: credentials.password,
         options: credentials.options
       };
@@ -96,6 +96,10 @@ class SupabaseCompat {
     getUser: async () => {
       const res = await apiRequest('/auth/me.php', 'GET');
       return { data: { user: res.data }, error: res.error };
+    },
+    updateUser: async (attributes: any) => {
+      const res = await apiRequest('/auth/update.php', 'PUT', attributes);
+      return res;
     }
   };
 
