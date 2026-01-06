@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   // Helper to get token
-  const getToken = () => localStorage.getItem("auth_token");
+  const getToken = () => localStorage.getItem("sb-access-token");
 
   useEffect(() => {
     // Check for existing session
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAdmin(roles.includes('admin'));
         } else {
           // Invalid token
-          localStorage.removeItem("auth_token");
+          localStorage.removeItem("sb-access-token");
           setUser(null);
           setSession(null);
         }
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const token = data.data.session.access_token;
-      localStorage.setItem("auth_token", token);
+      localStorage.setItem("sb-access-token", token);
 
       const user = {
         id: data.data.user.id,
@@ -145,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Auto login after signup
       const token = data.data.session.access_token;
-      localStorage.setItem("auth_token", token);
+      localStorage.setItem("sb-access-token", token);
 
       const user = {
         id: data.data.user.id,
@@ -163,7 +163,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("sb-access-token");
     setUser(null);
     setSession(null);
     setIsAdmin(false);

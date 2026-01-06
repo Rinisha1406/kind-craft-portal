@@ -1,7 +1,7 @@
 <?php
 // Handle CORS
 // Allow from localhost:8080 (Vite) and others for development
-$allowed_origins = ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000'];
+$allowed_origins = ['http://localhost:8080', 'http://localhost:5173', 'http://localhost:3000', 'http://localhost'];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 // DEBUG LOGGING

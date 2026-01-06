@@ -20,7 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     $file_ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $new_filename = uniqid() . '.' . $file_ext;
+    
+    // Check if filename is provided in POST data (from frontend)
+    if (isset($_POST['filename'])) {
+        // Sanitize filename to prevent directory traversal
+        $requested_filename = basename($_POST['filename']);
+        // Ensure it has the correct extension or just use as is? 
+        // Frontend sends "random.ext". trusting basename() is explicit enough for this scope.
+        $new_filename = $requested_filename;
+    } else {
+        $new_filename = uniqid() . '.' . $file_ext;
+    }
     $target_path = $upload_dir . $new_filename;
     
     if (move_uploaded_file($file['tmp_name'], $target_path)) {

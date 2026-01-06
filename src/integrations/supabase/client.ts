@@ -8,6 +8,8 @@ async function apiRequest(endpoint: string, method: string, body?: any) {
   const token = localStorage.getItem('sb-access-token');
   const headers: Record<string, string> = {};
 
+  console.log('[API Request]', method, endpoint, 'Token exists:', !!token);
+
   // Note: FormData handles its own Content-Type boundary
   if (!(body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
@@ -15,6 +17,9 @@ async function apiRequest(endpoint: string, method: string, body?: any) {
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log('[API Request] Attaching Authorization header');
+  } else {
+    console.warn('[API Request] No token found in localStorage (sb-access-token)');
   }
 
   try {
@@ -114,6 +119,7 @@ class SupabaseCompat {
         const formData = new FormData();
         // PHP expects 'file' key
         formData.append('file', file);
+        formData.append('filename', path); // Send the intended filename
         const res = await apiRequest('/upload.php', 'POST', formData);
 
         if (res.error) return { data: null, error: res.error };
@@ -122,7 +128,9 @@ class SupabaseCompat {
       },
       getPublicUrl: (path: string) => {
         // Assuming logic returns full or relative path that works
-        return { data: { publicUrl: path } };
+        // Verify if path already has /uploads prefix (from upload response) or needs it
+        const publicUrl = path.startsWith('/uploads/') ? path : `/uploads/${path}`;
+        return { data: { publicUrl } };
       }
     })
   }

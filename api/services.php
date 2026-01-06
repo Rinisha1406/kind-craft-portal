@@ -31,7 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 // POST: Create Service
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = verify_auth_token($conn);
-    if (!is_admin($conn, $user)) send_json_response(['error' => 'Forbidden'], 403);
+    if (!$user) {
+        file_put_contents('debug_auth.log', " - Services POST: User is NULL. 403 Forbidden.\n", FILE_APPEND);
+        send_json_response(['error' => 'Forbidden - No User'], 403);
+    }
+    if (!is_admin($conn, $user)) {
+        file_put_contents('debug_auth.log', " - Services POST: User " . $user['id'] . " is NOT admin. 403 Forbidden.\n", FILE_APPEND);
+        send_json_response(['error' => 'Forbidden - Not Admin'], 403);
+    }
     
     $input = get_json_input();
     $id = generate_uuid();
@@ -55,11 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // The user said "remove icon name, cta text, cta link".
     // I should provide defaults for now to be safe.
     
-    $stmt = $conn->prepare("INSERT INTO services (id, title, description, icon, image_url, features, cta_text, cta_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    $stmt = $conn->prepare("INSERT INTO services (id, title, description, icon, image_url, features, cta_text, cta_link, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $icon = 'Sparkles'; 
     $cta_text = '';
     $cta_link = '';
-    $stmt->bind_param("ssssssss", $id, $title, $description, $icon, $image_url, $features, $cta_text, $cta_link);
+    $is_active = isset($input['is_active']) ? ($input['is_active'] ? 1 : 0) : 1; // Default to 1 (active)
+    $stmt->bind_param("ssssssssi", $id, $title, $description, $icon, $image_url, $features, $cta_text, $cta_link, $is_active);
     
     if ($stmt->execute()) {
         send_json_response(['error' => null, 'data' => ['id' => $id]]);

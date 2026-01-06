@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
 import { Plus, Edit, Trash2, Link as LinkIcon, Eye, EyeOff, Check, X, ImageIcon, Loader2 } from "lucide-react";
 
 interface Service {
@@ -214,7 +215,7 @@ const AdminServices = () => {
                                 <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Image</TableHead>
                                 <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Title</TableHead>
                                 <TableHead className="text-gold font-serif whitespace-nowrap">Description</TableHead>
-                                <TableHead className="text-gold font-serif whitespace-nowrap">Status</TableHead>
+                                <TableHead className="text-gold font-serif whitespace-nowrap text-center">Visible</TableHead>
                                 <TableHead className="text-right text-gold font-serif whitespace-nowrap">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -243,18 +244,11 @@ const AdminServices = () => {
                                         </TableCell>
                                         <TableCell className="font-medium text-white group-hover:text-gold transition-colors whitespace-nowrap">{service.title}</TableCell>
                                         <TableCell className="max-w-xs truncate text-emerald-100/70" title={service.description}>{service.description}</TableCell>
-                                        <TableCell>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleToggleActive(service)}
-                                                className={`h-8 px-3 rounded-full border ${service.is_active
-                                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
-                                                    : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20 hover:bg-zinc-500/20"
-                                                    }`}
-                                            >
-                                                {service.is_active ? "Active" : "Inactive"}
-                                            </Button>
+                                        <TableCell className="text-center">
+                                            <Switch
+                                                checked={service.is_active}
+                                                onCheckedChange={() => handleToggleActive(service)}
+                                            />
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
