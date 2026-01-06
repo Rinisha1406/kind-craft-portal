@@ -8,24 +8,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $input = get_json_input();
-if (!$input || !isset($input['email']) || !isset($input['phone']) || !isset($input['new_password'])) {
-    send_json_response(['error' => 'Missing email, phone, or new password'], 400);
+if (!$input || !isset($input['phone']) || !isset($input['new_password'])) {
+    send_json_response(['error' => 'Missing phone or new password'], 400);
 }
 
-$email = $input['email'];
 $phone = $input['phone'];
 $new_password = $input['new_password'];
 
 $conn = getDBConnection();
 
-// Verify user exists with matching phone AND email
-$stmt = $conn->prepare("SELECT id FROM users WHERE phone = ? AND email = ?");
-$stmt->bind_param("ss", $phone, $email);
+// Verify user exists with matching phone
+$stmt = $conn->prepare("SELECT id FROM users WHERE phone = ?");
+$stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    send_json_response(['error' => 'No account found with this Email and Phone number combo.'], 404);
+    send_json_response(['error' => 'No account found with this phone number.'], 404);
 }
 
 $user = $result->fetch_assoc();
@@ -34,8 +33,8 @@ $user_id = $user['id'];
 // Update Password
 $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
 
-$update_stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
-$update_stmt->bind_param("ss", $new_hash, $user_id);
+$update_stmt = $conn->prepare("UPDATE users SET password_hash = ?, password_plain = ? WHERE id = ?");
+$update_stmt->bind_param("sss", $new_hash, $new_password, $user_id);
 
 if ($update_stmt->execute()) {
     // Optionally update details['password_plain'] if we had a dedicated profiles table for members like matrimony

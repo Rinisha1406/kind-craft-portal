@@ -1,14 +1,24 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+
+// Types
+interface User {
+  id: string;
+  phone: string;
+  role?: string;
+}
+
+interface Session {
+  access_token: string;
+  user: User;
+}
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: Error | null }>;
+  signIn: (phone: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (phone: string, password: string, fullName?: string, options?: any) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -20,66 +30,142 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-
+  // Helper to get token
+  const getToken = () => localStorage.getItem("auth_token");
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Check for existing session
+    const checkSession = async () => {
+      const token = getToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-        // Defer admin check with setTimeout
-        if (session?.user) {
-          setTimeout(() => {
-            const roles = (session.user as any).app_metadata?.roles || [];
-            // For development/demo, we'll allow the admin user access even without the specific role
-            // or if the role/metadata setup is missing
-            setIsAdmin(true);
-          }, 0);
+      try {
+        const response = await fetch("http://localhost/kind-craft-portal/api/auth/me.php", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const user = {
+            id: data.data.id,
+            phone: data.data.phone,
+            role: data.data.role
+          };
+          const newSession = {
+            access_token: token,
+            user
+          };
+
+          setUser(user);
+          setSession(newSession);
+
+          // Check admin role
+          const roles = data.data.app_metadata?.roles || [];
+          setIsAdmin(roles.includes('admin'));
         } else {
-          setIsAdmin(false);
+          // Invalid token
+          localStorage.removeItem("auth_token");
+          setUser(null);
+          setSession(null);
         }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        const roles = (session.user as any).app_metadata?.roles || [];
-        setIsAdmin(true);
-        setLoading(false);
-      } else {
+      } catch (error) {
+        console.error("Session check failed", error);
+      } finally {
         setLoading(false);
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    checkSession();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+  const signIn = async (phone: string, password: string) => {
+    try {
+      const response = await fetch("http://localhost/kind-craft-portal/api/auth/login.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: new Error(data.error || "Login failed") };
+      }
+
+      const token = data.data.session.access_token;
+      localStorage.setItem("auth_token", token);
+
+      const user = {
+        id: data.data.user.id,
+        phone: data.data.user.phone,
+        role: data.data.user.role
+      };
+
+      setUser(user);
+      setSession({ access_token: token, user });
+
+      const roles = data.data.user.app_metadata?.roles || [];
+      setIsAdmin(roles.includes('admin'));
+
+      return { error: null };
+    } catch (err: any) {
+      return { error: err };
+    }
   };
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: { full_name: fullName }
+  const signUp = async (phone: string, password: string, fullName?: string, options?: any) => {
+    try {
+      const payload = {
+        phone,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            ...options?.data
+          }
+        }
+      };
+
+      const response = await fetch("http://localhost/kind-craft-portal/api/auth/register.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { error: new Error(data.error || "Registration failed") };
       }
-    });
-    return { error: error as Error | null };
+
+      // Auto login after signup
+      const token = data.data.session.access_token;
+      localStorage.setItem("auth_token", token);
+
+      const user = {
+        id: data.data.user.id,
+        phone: data.data.user.phone,
+        role: data.data.user.role
+      };
+
+      setUser(user);
+      setSession({ access_token: token, user });
+
+      return { error: null };
+    } catch (err: any) {
+      return { error: err };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem("auth_token");
+    setUser(null);
+    setSession(null);
     setIsAdmin(false);
   };
 

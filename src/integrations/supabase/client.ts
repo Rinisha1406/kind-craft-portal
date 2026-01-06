@@ -5,7 +5,7 @@ const API_URL = 'http://localhost/kind-craft-portal/api'; // Adjust if needed
 
 // Helper to make requests
 async function apiRequest(endpoint: string, method: string, body?: any) {
-  const token = localStorage.getItem('sb-access-token');
+  const token = localStorage.getItem('auth_token');
   const headers: Record<string, string> = {};
 
   // Note: FormData handles its own Content-Type boundary
@@ -57,12 +57,12 @@ class SupabaseCompat {
       return res;
     },
     signOut: async () => {
-      localStorage.removeItem('sb-access-token');
+      localStorage.removeItem('auth_token');
       this._notifyAuthListeners('SIGNED_OUT', null);
       return { error: null };
     },
     getSession: async () => {
-      const token = localStorage.getItem('sb-access-token');
+      const token = localStorage.getItem('auth_token');
       if (!token) return { data: { session: null } };
 
       // Verify token with /me

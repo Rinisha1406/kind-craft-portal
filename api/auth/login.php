@@ -17,8 +17,8 @@ $password = $input['password'];
 
 $conn = getDBConnection();
 
-$stmt = $conn->prepare("SELECT id, email, phone, password_hash FROM users WHERE phone = ? OR email = ?");
-$stmt->bind_param("ss", $phone, $phone);
+$stmt = $conn->prepare("SELECT id, phone, password_hash FROM users WHERE phone = ?");
+$stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -43,7 +43,7 @@ if (password_verify($password, $user['password_hash'])) {
         'data' => [
             'user' => [
                 'id' => $user['id'],
-                'email' => $user['email'],
+                'phone' => $user['phone'],
                 'app_metadata' => ['roles' => $roles],
                 'role' => 'authenticated'
             ],
@@ -52,7 +52,7 @@ if (password_verify($password, $user['password_hash'])) {
                 'token_type' => 'bearer',
                 'user' => [
                     'id' => $user['id'],
-                    'email' => $user['email']
+                    'phone' => $user['phone']
                 ]
             ]
         ],

@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Gem, Lock, Mail, AlertCircle, Phone } from "lucide-react";
+import { Gem, Lock, Mail, AlertCircle, Phone, Users } from "lucide-react";
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("admin");
+  const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -26,10 +26,10 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !password) {
+    if (!phone || !password) {
       toast({
         title: "Missing Fields",
-        description: "Please enter both username and password.",
+        description: "Please enter both phone and password.",
         variant: "destructive",
       });
       return;
@@ -38,7 +38,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const { error } = await signIn(username, password);
+      const { error } = await signIn(phone, password);
 
       if (error) {
         // If user doesn't exist, show appropriate message
@@ -119,15 +119,15 @@ const AdminLogin = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-foreground font-medium">Phone Number</Label>
+              <Label htmlFor="phone" className="text-foreground font-medium">Phone Number / Admin ID</Label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
-                  id="username"
-                  type="tel"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter phone number"
+                  id="phone"
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Enter phone or admin id"
                   required
                   className="h-14 pl-12 rounded-xl border-border focus:border-primary text-base"
                 />

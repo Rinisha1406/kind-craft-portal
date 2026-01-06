@@ -11,13 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'DELE
     file_put_contents('../debug_products.log', " - Input: " . file_get_contents('php://input') . "\n", FILE_APPEND);
 }
 
-function is_admin($conn, $user) {
-    if (!$user) return false;
-    $stmt = $conn->prepare("SELECT role FROM user_roles WHERE user_id = ? AND role = 'admin'");
-    $stmt->bind_param("s", $user['id']);
-    $stmt->execute();
-    return $stmt->get_result()->num_rows > 0;
-}
+
 
 // GET: Fetch products
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

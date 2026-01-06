@@ -55,3 +55,17 @@ function verify_auth_token($conn) {
     
     return null;
 }
+
+// Check is admin
+function is_admin($conn, $user) {
+    if (!$user || !isset($user['id'])) return false;
+    
+    $user_id = $user['id'];
+    $stmt = $conn->prepare("SELECT role FROM user_roles WHERE user_id = ? AND role = 'admin'");
+    $stmt->bind_param("s", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    return $result->num_rows > 0;
+}
+?>

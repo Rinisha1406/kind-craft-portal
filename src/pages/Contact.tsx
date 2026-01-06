@@ -13,15 +13,13 @@ import contactHero from "@/assets/contact-hero.png";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Please enter a valid email").max(255),
-  phone: z.string().trim().max(15).optional(),
+  phone: z.string().trim().min(10, "Please enter a valid phone number").max(15),
   subject: z.string().trim().max(200).optional(),
   message: z.string().trim().min(10, "Message must be at least 10 characters").max(1000),
 });
 
 const contactInfo = [
   { icon: Phone, label: "Call Us", value: "+91 98765 43210", subtext: "Mon-Sat, 10AM-8PM" },
-  { icon: Mail, label: "Email Us", value: "info@goldenlegacy.com", subtext: "We reply within 24hrs" },
   { icon: MapPin, label: "Visit Us", value: "123 Jewelry Street", subtext: "Mumbai, Maharashtra 400001" },
   { icon: Clock, label: "Working Hours", value: "10:00 AM - 8:00 PM", subtext: "Monday to Saturday" },
 ];
@@ -36,7 +34,6 @@ const faqs = [
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
     subject: "",
     message: "",
@@ -64,8 +61,7 @@ const Contact = () => {
 
       const { error } = await supabase.from("contact_messages").insert({
         name: validated.name,
-        email: validated.email,
-        phone: validated.phone || null,
+        phone: validated.phone,
         subject: validated.subject || null,
         message: validated.message,
       });
@@ -76,7 +72,7 @@ const Contact = () => {
         title: "Message Sent! ✨",
         description: "Thank you for reaching out. We'll get back to you within 24 hours.",
       });
-      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      setFormData({ name: "", phone: "", subject: "", message: "" });
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
@@ -210,29 +206,18 @@ const Contact = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@example.com"
-                        required
-                        className="h-12 rounded-xl"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone">Phone Number *</Label>
                       <Input
                         id="phone"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+91 98765 43210"
+                        required
                         className="h-12 rounded-xl"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-5">
                     <div className="space-y-2">
                       <Label htmlFor="subject">Subject</Label>
                       <Input

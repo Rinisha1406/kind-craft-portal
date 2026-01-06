@@ -58,8 +58,8 @@ $conn->begin_transaction();
 
 try {
     // Update USERS table (Login credentials)
-    $u_stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
-    $u_stmt->bind_param("ss", $new_hash, $user_id);
+    $u_stmt = $conn->prepare("UPDATE users SET password_hash = ?, password_plain = ? WHERE id = ?");
+    $u_stmt->bind_param("sss", $new_hash, $new_password, $user_id);
     if (!$u_stmt->execute()) {
         throw new Exception("Failed to update login credentials");
     }

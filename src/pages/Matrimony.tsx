@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Search, UserPlus, MapPin, Briefcase, GraduationCap, Heart, Sparkles, Users, Shield, CheckCircle, Calendar } from "lucide-react";
 import { z } from "zod";
 import matrimonyHero from "@/assets/matrimony-hero.jpg";
@@ -57,6 +58,8 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const { signUp, signIn } = useAuth();
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -65,14 +68,14 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
       setSubmitting(true);
 
       // Register User with Phone + DOB as Password
-      // We also pass the profile details in options.data so the backend can create the profile
-      const { data, error } = await supabase.auth.signUp({
-        phone: validated.phone,
-        password: validated.dob, // Format: YYYY-MM-DD
-        options: {
+      const { error } = await signUp(
+        validated.phone,
+        validated.dob, // Format: YYYY-MM-DD
+        validated.fullName,
+        {
           data: {
             registration_type: "matrimony",
-            full_name: validated.fullName,
+            full_name: validated.fullName, // Still passing this for consistency
             dob: validated.dob,
             father_name: validated.fatherName,
             mother_name: validated.motherName,
@@ -93,7 +96,7 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             }
           }
         }
-      });
+      );
 
       if (error) throw error;
 
@@ -297,16 +300,14 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
     password: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const { signIn } = useAuth();
   const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        phone: formData.phone,
-        password: formData.password,
-      });
+      const { error } = await signIn(formData.phone, formData.password);
 
       if (error) throw error;
 
@@ -315,13 +316,6 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
         description: "Successfully signed in.",
       });
 
-      // Redirect to profile dashboard
-      // We need to access navigate, but this component is inside Matrimony. Not receiving navigate prop.
-      // Ideally we reload or the parent handles auth state change.
-      // Since we are using valid Auth, the parent/layout might redirect if we had a global listener.
-      // But let's trigger a reload or use window.location for now if we can't easily hook into router here without refactor.
-      // Actually, let's assume we can use window.location.href = '/matrimony/profile' for simplicity or verify if we can pass navigate.
-      // The snippet showing Matrimony.tsx didn't show useNavigate import.
       window.location.href = '/matrimony/profile';
     } catch (error: any) {
       toast({

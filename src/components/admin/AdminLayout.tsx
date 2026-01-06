@@ -2,11 +2,12 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2 } from "lucide-react";
+import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Products", path: "/admin/products", icon: Package },
+  { name: "Services", path: "/admin/services", icon: Sparkles },
   { name: "Matrimony", path: "/admin/matrimony", icon: Heart },
   { name: "Members", path: "/admin/members", icon: Users },
 ];
@@ -95,7 +96,6 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-emerald-900/20 border border-gold/10">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-sm text-emerald-100/80 font-medium">{user.email}</span>
             </div>
             <Link to="/" target="_blank">
               <Button variant="outline" size="sm" className="border-gold/30 text-gold hover:bg-gold hover:text-emerald-950 transition-colors">

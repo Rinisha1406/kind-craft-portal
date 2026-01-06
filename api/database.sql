@@ -16,12 +16,13 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `users` (
   `id` char(36) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
+  `password_plain` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
+  UNIQUE KEY `phone` (`phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

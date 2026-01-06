@@ -12,17 +12,19 @@ import membersHero from "@/assets/members-hero.png";
 
 const registrationSchema = z.object({
   fullName: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Please enter a valid email").max(255),
   phone: z.string().trim().min(10, "Please enter a valid phone number").max(15),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 // --- Auth Components ---
 
+import { useAuth } from "@/hooks/useAuth";
+
 const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onSignInClick: () => void }) => {
-  const [formData, setFormData] = useState({ fullName: "", email: "", phone: "", password: "" });
+  const [formData, setFormData] = useState({ fullName: "", phone: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+  const { signUp } = useAuth();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,15 +32,10 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
       const validated = registrationSchema.parse(formData);
       setSubmitting(true);
 
-      const { data, error } = await supabase.auth.signUp({
-        phone: validated.phone,
-        password: validated.password,
-        options: {
-          data: {
-            registration_type: "member", // This triggers the backend logic to insert into `registrations` too
-            full_name: validated.fullName,
-            email: validated.email,
-          }
+      const { error } = await signUp(validated.phone, validated.password, validated.fullName, {
+        data: {
+          registration_type: "member", // This triggers the backend logic to insert into `registrations` too
+          full_name: validated.fullName,
         }
       });
 
@@ -50,7 +47,7 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
       });
       onClose();
       onSignInClick();
-      setFormData({ fullName: "", email: "", phone: "", password: "" });
+      setFormData({ fullName: "", phone: "", password: "" });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
@@ -74,17 +71,7 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
           className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
         />
       </div>
-      <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Email Address</Label>
-        <Input
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          placeholder="Enter your email"
-          required
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
-        />
-      </div>
+
       <div className="space-y-2">
         <Label className="text-champagne/90 font-serif">Phone Number</Label>
         <Input
@@ -122,18 +109,16 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
 };
 
 const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick: () => void, onForgotClick: () => void }) => {
-  const [formData, setFormData] = useState({ identifier: "", password: "" });
+  const [formData, setFormData] = useState({ phone: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+  const { signIn } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        phone: formData.identifier,
-        password: formData.password,
-      });
+      const { error } = await signIn(formData.phone, formData.password);
 
       if (error) throw error;
 
@@ -149,13 +134,13 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
   return (
     <form onSubmit={handleSignIn} className="space-y-5 mt-4">
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Phone or Email</Label>
+        <Label className="text-champagne/90 font-serif">Phone Number</Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/50" />
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/50" />
           <Input
-            value={formData.identifier}
-            onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
-            placeholder="Enter phone or email"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            placeholder="Enter phone number"
             required
             className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
           />
@@ -199,7 +184,7 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
 };
 
 const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void }) => {
-  const [formData, setFormData] = useState({ email: "", phone: "", newPassword: "", confirmPassword: "" });
+  const [formData, setFormData] = useState({ phone: "", newPassword: "", confirmPassword: "" });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -217,7 +202,6 @@ const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           phone: formData.phone,
-          email: formData.email,
           new_password: formData.newPassword
         })
       });
@@ -236,10 +220,6 @@ const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void
 
   return (
     <form onSubmit={handleReset} className="space-y-4 mt-4">
-      <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Registered Email</Label>
-        <Input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
-      </div>
       <div className="space-y-2">
         <Label className="text-champagne/90 font-serif">Registered Phone</Label>
         <Input required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />

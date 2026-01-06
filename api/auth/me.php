@@ -33,7 +33,7 @@ $profile = $profile_stmt->get_result()->fetch_assoc();
 send_json_response([
     'data' => [
         'id' => $user['id'],
-        'email' => $user['email'],
+        'phone' => $profile['phone'] ?? '',
         'app_metadata' => ['roles' => $roles],
         'user_metadata' => [
             'full_name' => $profile['full_name'] ?? ''

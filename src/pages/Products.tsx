@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ interface Product {
   category: string;
   description: string | null;
   image_url: string | null;
+  is_active: boolean;
 }
 
 const fadeInUp = {
@@ -62,7 +63,6 @@ const Products = () => {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -236,19 +236,32 @@ const Products = () => {
                         {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
                       </Badge>
 
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-6">
-                        <Button size="sm" className="gold-gradient text-primary-foreground shadow-gold">
-                          <ShoppingBag className="w-4 h-4 mr-2" />
-                          View Details
-                        </Button>
-                      </div>
+                      {/* Sold Out Overlay */}
+                      {!product.is_active && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10 backdrop-blur-[2px]">
+                          <Badge variant="destructive" className="text-lg px-4 py-2 border-2 border-red-200">
+                            Sold Out
+                          </Badge>
+                        </div>
+                      )}
+
+                      {/* Hover Overlay - Only if active */}
+                      {product.is_active && (
+                        <Link to={`/product/${product.id}`} className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-6 z-20">
+                          <Button size="sm" className="gold-gradient text-primary-foreground shadow-gold">
+                            <ShoppingBag className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
+                        </Link>
+                      )}
                     </div>
 
                     <div className="p-6">
-                      <h3 className="font-serif text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
-                        {product.name}
-                      </h3>
+                      <Link to={`/product/${product.id}`}>
+                        <h3 className="font-serif text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                          {product.name}
+                        </h3>
+                      </Link>
                       {product.description && (
                         <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
                           {product.description}

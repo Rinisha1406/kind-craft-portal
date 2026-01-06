@@ -1,12 +1,11 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gem, Heart, Users, PenTool, RefreshCw, ArrowRight, ShieldCheck, Sparkles, Moon } from "lucide-react";
+import { Gem, Heart, Users, PenTool, RefreshCw, ArrowRight, ShieldCheck, Sparkles, Moon, Star, Sun, Cloud, Music, Camera, Gift } from "lucide-react"; // Import all generic icons possibly used
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
 import heroImage from "@/assets/services-hero.png";
-import ringImage from "@/assets/ring.jpg";
-import matrimonyImage from "@/assets/matrimonial-service.jpg";
-import astrologyImage from "@/assets/astrology-service.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeInUp = {
     initial: { opacity: 0, y: 30 },
@@ -18,7 +17,52 @@ const staggerContainer = {
     animate: { transition: { staggerChildren: 0.1 } }
 };
 
+
+// Map string names to Lucide components
+const IconMap: any = {
+    // Kept for reference or future use if needed, but not used in render loop anymore
+    Gem, Heart, Users, PenTool, RefreshCw, ShieldCheck, Sparkles, Moon, Star, Sun, Cloud, Music, Camera, Gift
+};
+
+interface Service {
+    id: string;
+    title: string;
+    description: string;
+    image_url: string;
+    features: string[];
+}
+
 const Services = () => {
+    const [services, setServices] = useState<Service[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                // Fetch public services (active only) via our PHP API wrapper logic which we know supports filters
+                // Actually supabase client here calls the PHP endpoint.
+                // Our PHP endpoint `api/services.php` handles filtering if we pass query params.
+                // The supabase client `from('services')` is mapped to GET `api/services.php`
+                // `eq('is_active', true)` maps to `?is_active=true`
+
+                const { data, error } = await supabase
+                    .from("services")
+                    .select("*")
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: true }); // We created display_order but didn't expose it in Admin yet, default to created_at or just order by ID
+
+                if (error) throw error;
+                setServices(data || []);
+            } catch (error) {
+                console.error("Error fetching services:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchServices();
+    }, []);
+
     return (
         <MainLayout>
             {/* Hero Section */}
@@ -78,164 +122,71 @@ const Services = () => {
             {/* Main Services List */}
             <section className="py-20 bg-background relative overflow-hidden">
                 <div className="container mx-auto px-4">
-                    <motion.div
-                        className="grid gap-16"
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                        variants={staggerContainer}
-                    >
-                        {/* Service 1: Jewelry Collections */}
-                        <motion.div variants={fadeInUp} className="group grid md:grid-cols-2 gap-8 items-center bg-card/30 rounded-3xl p-8 border border-border/50 hover:border-gold/30 transition-all duration-500">
-                            <div className="order-2 md:order-1 space-y-6">
-                                <div className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center shadow-gold">
-                                    <Gem className="w-8 h-8 text-primary-foreground" />
-                                </div>
-                                <h2 className="text-3xl font-serif font-bold text-foreground">Exquisite Jewelry Collections</h2>
-                                <p className="text-muted-foreground text-lg leading-relaxed">
-                                    Discover our curated selection of Gold, Diamond, and Platinum jewelry. Each piece is a masterpiece, crafted with precision and passion to adorn your special moments.
-                                </p>
-                                <ul className="space-y-3">
-                                    {['BIS Hallmarked Gold', 'Certified Diamonds', 'Platinum Guild Authorized'].map((item) => (
-                                        <li key={item} className="flex items-center gap-3 text-foreground/80">
-                                            <ShieldCheck className="w-5 h-5 text-gold" />
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Link to="/products">
-                                    <Button className="mt-4 gold-gradient text-primary-foreground">
-                                        View Collections <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
-                                </Link>
-                            </div>
-                            <div className="order-1 md:order-2 h-[300px] md:h-[400px] rounded-2xl overflow-hidden relative">
-                                <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-transparent mix-blend-overlay z-10" />
-                                <img
-                                    src={ringImage}
-                                    alt="Exquisite Jewelry Ring"
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                                />
-                            </div>
+                    {loading ? (
+                        <div className="text-center text-gold py-20">Loading our services...</div>
+                    ) : services.length === 0 ? (
+                        <div className="text-center text-muted-foreground py-20">No active services at the moment.</div>
+                    ) : (
+                        <motion.div
+                            className="grid gap-16"
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            variants={staggerContainer}
+                        >
+                            {services.map((service, index) => {
+                                const isEven = index % 2 === 0;
+
+                                // Alternate layout for large feature blocks
+                                // We can use a simpler grid for items without images or specific ones
+                                // For now, let's use a consistent rich card layout
+
+                                return (
+                                    <motion.div
+                                        key={service.id}
+                                        variants={fadeInUp}
+                                        className="group grid md:grid-cols-2 gap-8 items-center bg-card/30 rounded-3xl p-8 border border-border/50 hover:border-gold/30 transition-all duration-500"
+                                    >
+                                        <div className={`space-y-6 ${!isEven ? "md:order-2" : "md:order-1"}`}>
+                                            <h2 className="text-3xl font-serif font-bold text-foreground">{service.title}</h2>
+                                            <p className="text-muted-foreground text-lg leading-relaxed">
+                                                {service.description}
+                                            </p>
+
+                                            {service.features && service.features.length > 0 && (
+                                                <ul className="space-y-3">
+                                                    {service.features.map((feature, idx) => (
+                                                        <li key={idx} className="flex items-center gap-3 text-foreground/80">
+                                                            <ShieldCheck className="w-5 h-5 text-gold" />
+                                                            {feature}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+
+                                        </div>
+
+                                        <div className={`${!isEven ? "md:order-1" : "md:order-2"} h-[300px] md:h-[400px] rounded-2xl overflow-hidden relative bg-black/20`}>
+                                            {service.image_url ? (
+                                                <>
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-transparent mix-blend-overlay z-10" />
+                                                    <img
+                                                        src={service.image_url}
+                                                        alt={service.title}
+                                                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                                    />
+                                                </>
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-charcoal/50">
+                                                    <span className="text-gold/20 font-serif text-4xl">{service.title.charAt(0)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
                         </motion.div>
-
-                        {/* Service 2: Matrimony */}
-                        <motion.div variants={fadeInUp} className="group grid md:grid-cols-2 gap-8 items-center bg-card/30 rounded-3xl p-8 border border-border/50 hover:border-gold/30 transition-all duration-500">
-                            <div className="h-[300px] md:h-[400px] rounded-2xl overflow-hidden relative">
-                                <div className="absolute inset-0 bg-gradient-to-br from-rose-gold/20 to-transparent mix-blend-overlay z-10" />
-                                <img
-                                    src={matrimonyImage}
-                                    alt="Trusted Matrimony Services"
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                                />
-                            </div>
-                            <div className="space-y-6">
-                                <div className="w-16 h-16 bg-gradient-to-br from-rose-gold to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-900/20">
-                                    <Heart className="w-8 h-8 text-white" />
-                                </div>
-                                <h2 className="text-3xl font-serif font-bold text-foreground">Trusted Matrimony Services</h2>
-                                <p className="text-muted-foreground text-lg leading-relaxed">
-                                    We bring families together. Our personalized matchmaking service respects tradition while embracing modern compatibility, helping you find your perfect life partner.
-                                </p>
-                                <ul className="space-y-3">
-                                    {['Verified Profiles', 'Privacy Protected', 'Personalized Assistance'].map((item) => (
-                                        <li key={item} className="flex items-center gap-3 text-foreground/80">
-                                            <ShieldCheck className="w-5 h-5 text-rose-gold" />
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Link to="/matrimony">
-                                    <Button variant="outline" className="mt-4 border-rose-gold/50 text-rose-gold hover:bg-rose-gold/10">
-                                        Find Your Match <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
-                                </Link>
-                            </div>
-                        </motion.div>
-
-
-                        {/* Service 3: Astrology */}
-                        <motion.div variants={fadeInUp} className="group grid md:grid-cols-2 gap-8 items-center bg-card/30 rounded-3xl p-8 border border-border/50 hover:border-gold/30 transition-all duration-500">
-                            <div className="order-2 md:order-1 space-y-6">
-                                <div className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center shadow-gold">
-                                    <Moon className="w-8 h-8 text-primary-foreground" />
-                                </div>
-                                <h2 className="text-3xl font-serif font-bold text-foreground">Astrology & Horoscope</h2>
-                                <p className="text-muted-foreground text-lg leading-relaxed">
-                                    Align your stars for a blissful future. Our expert astrologers provide comprehensive horoscope matching and consultation services to ensure cosmic harmony in your relationships.
-                                </p>
-                                <ul className="space-y-3">
-                                    {['Horoscope Matching', 'Kundli Generation', 'Dosha Nivarana'].map((item) => (
-                                        <li key={item} className="flex items-center gap-3 text-foreground/80">
-                                            <Sparkles className="w-5 h-5 text-gold" />
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Link to="/contact">
-                                    <Button className="mt-4 gold-gradient text-primary-foreground">
-                                        Book Consultation <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
-                                </Link>
-                            </div>
-                            <div className="order-1 md:order-2 h-[300px] md:h-[400px] rounded-2xl overflow-hidden relative">
-                                <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-transparent mix-blend-overlay z-10" />
-                                <img
-                                    src={astrologyImage}
-                                    alt="Astrology Services"
-                                    className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700"
-                                />
-                            </div>
-                        </motion.div>
-
-                        {/* Service 4: Custom Design & Membership */}
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <motion.div variants={fadeInUp} className="bg-card p-8 rounded-2xl border border-border hover:border-gold/30 transition-all hover:-translate-y-1">
-                                <PenTool className="w-12 h-12 text-gold mb-6" />
-                                <h3 className="text-2xl font-serif font-bold text-foreground mb-4">Bespoke Custom Design</h3>
-                                <p className="text-muted-foreground mb-6">
-                                    Have a dream design in mind? Our master artisans can bring your vision to life. From engagement rings to heirloom remodeling, we create jewelry that is uniquely yours.
-                                </p>
-                                <Button variant="link" className="text-gold p-0 h-auto font-semibold">
-                                    Book Consultation <ArrowRight className="ml-2 w-4 h-4" />
-                                </Button>
-                            </motion.div>
-
-                            <motion.div variants={fadeInUp} className="bg-card p-8 rounded-2xl border border-border hover:border-gold/30 transition-all hover:-translate-y-1">
-                                <Users className="w-12 h-12 text-gold mb-6" />
-                                <h3 className="text-2xl font-serif font-bold text-foreground mb-4">Elite Membership</h3>
-                                <p className="text-muted-foreground mb-6">
-                                    Join our exclusive circle for special privileges, early access to new collections, birthday rewards, and lifetime maintenance services for your jewelry.
-                                </p>
-                                <Link to="/members">
-                                    <Button variant="link" className="text-gold p-0 h-auto font-semibold">
-                                        View Benefits <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
-                                </Link>
-                            </motion.div>
-                        </div>
-
-                        {/* Service 4: Gold Exchange */}
-                        <motion.div variants={fadeInUp} className="bg-gradient-to-r from-charcoal to-black p-8 md:p-12 rounded-3xl border border-gold/20 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div>
-                                <div className="flex items-center gap-4 mb-4">
-                                    <div className="p-3 bg-gold/10 rounded-full">
-                                        <RefreshCw className="w-8 h-8 text-gold" />
-                                    </div>
-                                    <h3 className="text-2xl md:text-3xl font-serif font-bold text-champagne">Gold Exchange Program</h3>
-                                </div>
-                                <p className="text-champagne/70 max-w-xl">
-                                    Upgrade your old gold jewelry for brand new designs. We offer the best exchange rates and 100% value on gold weight for your old jewelry.
-                                </p>
-                            </div>
-                            <Link to="/contact">
-                                <Button size="lg" className="bg-white text-black hover:bg-gray-200 min-w-[150px]">
-                                    Inquire Now
-                                </Button>
-                            </Link>
-                        </motion.div>
-
-                    </motion.div>
+                    )}
                 </div>
             </section>
         </MainLayout>
@@ -243,3 +194,4 @@ const Services = () => {
 };
 
 export default Services;
+

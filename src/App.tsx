@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 import Matrimony from "./pages/Matrimony";
 import MatrimonyProfile from "./pages/MatrimonyProfile";
 import Members from "./pages/Members";
@@ -17,6 +18,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminMatrimony from "./pages/admin/AdminMatrimony";
 import AdminMembers from "./pages/admin/AdminMembers";
+import AdminServices from "./pages/admin/AdminServices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/matrimony" element={<Matrimony />} />
             <Route path="/matrimony/profile" element={<MatrimonyProfile />} />
             <Route path="/members" element={<Members />} />
@@ -40,6 +43,7 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/services" element={<AdminServices />} />
             <Route path="/admin/matrimony" element={<AdminMatrimony />} />
             <Route path="/admin/members" element={<AdminMembers />} />
             <Route path="*" element={<NotFound />} />

@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { z } from "zod";
 
 type ProductCategory = "silver" | "gold" | "diamond" | "platinum" | "gemstone";
@@ -33,6 +34,7 @@ const productSchema = z.object({
   price: z.number().positive("Price must be positive"),
   category: z.enum(["silver", "gold", "diamond", "platinum", "gemstone"]),
   description: z.string().max(500).optional(),
+  is_active: z.boolean(),
 });
 
 const AdminProducts = () => {
@@ -45,6 +47,7 @@ const AdminProducts = () => {
     price: "",
     category: "gold" as ProductCategory,
     description: "",
+    is_active: true,
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -77,7 +80,7 @@ const AdminProducts = () => {
 
   const openAddDialog = () => {
     setEditingProduct(null);
-    setFormData({ name: "", price: "", category: "gold", description: "" });
+    setFormData({ name: "", price: "", category: "gold", description: "", is_active: true });
     setImageFile(null);
     setDialogOpen(true);
   };
@@ -89,6 +92,7 @@ const AdminProducts = () => {
       price: product.price.toString(),
       category: product.category,
       description: product.description || "",
+      is_active: product.is_active,
     });
     setImageFile(null);
     setDialogOpen(true);
@@ -104,6 +108,7 @@ const AdminProducts = () => {
         price: parseFloat(formData.price),
         category: formData.category,
         description: formData.description || undefined,
+        is_active: formData.is_active,
       });
 
       let imageUrl = editingProduct?.image_url || null;
@@ -134,6 +139,7 @@ const AdminProducts = () => {
             category: validated.category,
             description: validated.description || null,
             image_url: imageUrl,
+            is_active: validated.is_active,
           })
           .eq("id", editingProduct.id);
 
@@ -146,6 +152,7 @@ const AdminProducts = () => {
           category: validated.category,
           description: validated.description || null,
           image_url: imageUrl,
+          is_active: validated.is_active,
         });
 
         if (error) throw error;
@@ -276,6 +283,14 @@ const AdminProducts = () => {
                     placeholder="Product description..."
                     rows={3}
                   />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label htmlFor="is_active">Active Status</Label>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="image">Product Image</Label>

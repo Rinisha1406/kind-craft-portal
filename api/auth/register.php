@@ -40,9 +40,8 @@ $conn->begin_transaction();
 
 try {
     // Insert user
-    $email = $input['email'] ?? null;
-    $stmt = $conn->prepare("INSERT INTO users (id, phone, email, password_hash) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $user_id, $phone, $email, $password_hash);
+    $stmt = $conn->prepare("INSERT INTO users (id, phone, password_hash, password_plain) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $user_id, $phone, $password_hash, $password);
     if (!$stmt->execute()) {
         throw new Exception("Failed to create user");
     }
@@ -103,8 +102,8 @@ try {
     // Handle Member Registration (ensure it shows in Admin Registrations)
     elseif ($reg_type === 'member') {
         $reg_id = generate_uuid();
-        $stmt_reg = $conn->prepare("INSERT INTO registrations (id, registration_type, full_name, email, phone, status) VALUES (?, ?, ?, ?, ?, 'pending')");
-        $stmt_reg->bind_param("sssss", $reg_id, $reg_type, $full_name, $email, $phone);
+        $stmt_reg = $conn->prepare("INSERT INTO registrations (id, registration_type, full_name, phone, status) VALUES (?, ?, ?, ?, 'pending')");
+        $stmt_reg->bind_param("ssss", $reg_id, $reg_type, $full_name, $phone);
         if (!$stmt_reg->execute()) {
              // Optional: Log error but proceed
              file_put_contents('../debug_register.log', " - Failed to insert into registrations: " . $stmt_reg->error . "\n", FILE_APPEND);
