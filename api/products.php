@@ -5,6 +5,12 @@ require_once 'utils.php';
 
 $conn = getDBConnection();
 
+file_put_contents('../debug_products.log', date('Y-m-d H:i:s') . " - " . $_SERVER['REQUEST_METHOD'] . " " . $_SERVER['REQUEST_URI'] . "\n", FILE_APPEND);
+if ($_SERVER['REQUEST_METHOD'] === 'PUT' || $_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    file_put_contents('../debug_products.log', " - GET params: " . json_encode($_GET) . "\n", FILE_APPEND);
+    file_put_contents('../debug_products.log', " - Input: " . file_get_contents('php://input') . "\n", FILE_APPEND);
+}
+
 function is_admin($conn, $user) {
     if (!$user) return false;
     $stmt = $conn->prepare("SELECT role FROM user_roles WHERE user_id = ? AND role = 'admin'");

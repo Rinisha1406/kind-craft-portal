@@ -53,35 +53,56 @@ const AdminMessages = () => {
 
   return (
     <AdminLayout title="Messages">
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
+      <div className="bg-gradient-to-br from-emerald-950 to-black rounded-xl border border-gold/20 overflow-hidden shadow-xl">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>From</TableHead>
-              <TableHead>Subject</TableHead>
-              <TableHead>Message</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+          <TableHeader className="bg-black/40">
+            <TableRow className="border-gold/10 hover:bg-transparent">
+              <TableHead className="text-gold font-serif">From</TableHead>
+              <TableHead className="text-gold font-serif">Subject</TableHead>
+              <TableHead className="text-gold font-serif">Message</TableHead>
+              <TableHead className="text-gold font-serif">Date</TableHead>
+              <TableHead className="text-gold font-serif">Status</TableHead>
+              <TableHead className="text-right text-gold font-serif">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gold" /></TableCell></TableRow>
             ) : messages.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No messages</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-emerald-100/50 font-serif italic">No messages</TableCell></TableRow>
             ) : (
               messages.map((msg) => (
-                <TableRow key={msg.id} className={!msg.is_read ? "bg-primary/5" : ""}>
-                  <TableCell><div className="font-medium">{msg.name}</div><div className="text-sm text-muted-foreground">{msg.email}</div></TableCell>
-                  <TableCell>{msg.subject || "-"}</TableCell>
-                  <TableCell className="max-w-xs truncate">{msg.message}</TableCell>
-                  <TableCell>{new Date(msg.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell><Badge className={msg.is_read ? "bg-muted text-muted-foreground" : "bg-primary/20 text-primary"}>{msg.is_read ? "Read" : "New"}</Badge></TableCell>
+                <TableRow key={msg.id} className={`${!msg.is_read ? "bg-emerald-900/10" : ""} border-gold/10 hover:bg-emerald-900/20 transition-colors`}>
+                  <TableCell>
+                    <div className="font-medium text-emerald-100">{msg.name}</div>
+                    <div className="text-sm text-emerald-100/60">{msg.email}</div>
+                  </TableCell>
+                  <TableCell className="text-emerald-100/80">{msg.subject || "-"}</TableCell>
+                  <TableCell className="max-w-xs truncate text-emerald-100/70">{msg.message}</TableCell>
+                  <TableCell className="text-emerald-100/60">{new Date(msg.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Badge className={msg.is_read ? "bg-emerald-900/20 text-emerald-100/50 border-emerald-500/10" : "bg-gold/20 text-gold border-gold/30"}>
+                      {msg.is_read ? "Read" : "New"}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => toggleRead(msg.id, msg.is_read)}>{msg.is_read ? <Mail className="w-4 h-4" /> : <MailOpen className="w-4 h-4" />}</Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(msg.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleRead(msg.id, msg.is_read)}
+                        className="hover:bg-gold/10 hover:text-gold text-emerald-100/50"
+                      >
+                        {msg.is_read ? <Mail className="w-4 h-4" /> : <MailOpen className="w-4 h-4" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(msg.id)}
+                        className="hover:bg-red-500/10 hover:text-red-400 text-emerald-100/50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

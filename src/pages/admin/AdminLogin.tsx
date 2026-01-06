@@ -44,7 +44,7 @@ const AdminLogin = () => {
         // If user doesn't exist, show appropriate message
         toast({
           title: "Login Failed",
-          description: error.message || "Invalid credentials. Please check your email and password.",
+          description: error.message || "Invalid credentials. Please check.",
           variant: "destructive",
         });
         return;

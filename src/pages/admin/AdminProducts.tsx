@@ -165,7 +165,7 @@ const AdminProducts = () => {
         console.error("Error saving product:", error);
         toast({
           title: "Error",
-          description: "Failed to save product",
+          description: error.message || "Failed to save product",
           variant: "destructive",
         });
       }
@@ -186,7 +186,7 @@ const AdminProducts = () => {
       console.error("Error deleting product:", error);
       toast({
         title: "Error",
-        description: "Failed to delete product",
+        description: error.message || "Failed to delete product",
         variant: "destructive",
       });
     }
@@ -302,53 +302,56 @@ const AdminProducts = () => {
           </Dialog>
         </div>
 
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-gradient-to-br from-emerald-950 to-black rounded-xl border border-gold/20 overflow-hidden shadow-xl">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+            <TableHeader className="bg-black/40">
+              <TableRow className="border-gold/10 hover:bg-transparent">
+                <TableHead className="text-gold font-serif">Image</TableHead>
+                <TableHead className="text-gold font-serif">Name</TableHead>
+                <TableHead className="text-gold font-serif">Price</TableHead>
+                <TableHead className="text-gold font-serif">Category</TableHead>
+                <TableHead className="text-gold font-serif">Status</TableHead>
+                <TableHead className="text-right text-gold font-serif">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gold" />
                   </TableCell>
                 </TableRow>
               ) : products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-emerald-100/50 font-serif italic">
                     No products found. Add your first product!
                   </TableCell>
                 </TableRow>
               ) : (
                 products.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product.id} className="border-gold/10 hover:bg-emerald-900/20 transition-colors">
                     <TableCell>
-                      <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
+                      <div className="w-12 h-12 bg-black/40 rounded-lg overflow-hidden border border-gold/10">
                         {product.image_url ? (
                           <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">✦</div>
+                          <div className="w-full h-full flex items-center justify-center text-emerald-100/30">✦</div>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>₹{product.price.toLocaleString("en-IN")}</TableCell>
+                    <TableCell className="font-medium text-emerald-100">{product.name}</TableCell>
+                    <TableCell className="text-gold font-medium">₹{product.price.toLocaleString("en-IN")}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize">
+                      <Badge variant="outline" className="capitalize border-gold/30 text-gold bg-gold/5">
                         {product.category}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={product.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                        className={`border ${product.is_active
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                          }`}
                         onClick={() => toggleActive(product.id, product.is_active)}
                         style={{ cursor: "pointer" }}
                       >
@@ -357,11 +360,21 @@ const AdminProducts = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEditDialog(product)}
+                          className="hover:bg-gold/10 hover:text-gold text-emerald-100/50"
+                        >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(product.id)}
+                          className="hover:bg-red-500/10 hover:text-red-400 text-emerald-100/50"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </TableCell>

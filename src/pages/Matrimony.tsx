@@ -291,7 +291,7 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
   );
 };
 
-const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
+const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () => void, onForgotClick?: () => void }) => {
   const [formData, setFormData] = useState({
     phone: "",
     password: "",
@@ -374,9 +374,9 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
               Remember me
             </label>
           </div>
-          <a href="#" onClick={(e) => e.preventDefault()} className="text-sm font-medium text-gold hover:text-gold-light hover:underline">
+          <button type="button" onClick={onForgotClick} className="text-sm font-medium text-gold hover:text-gold-light hover:underline">
             Forgot password?
-          </a>
+          </button>
         </div>
 
         <Button type="submit" className="w-1/2 mx-auto flex h-10 text-lg gold-gradient text-primary-foreground shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
@@ -398,12 +398,115 @@ const SignInForm = ({ onRegisterClick }: { onRegisterClick?: () => void }) => {
   );
 };
 
+const ForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void }) => {
+  const [formData, setFormData] = useState({
+    phone: "",
+    dob: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost/kind-craft-portal/api/auth/reset_matrimony_password.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formData.phone,
+          dob: formData.dob,
+          new_password: formData.newPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || "Reset failed");
+
+      toast({ title: "Success", description: "Password reset successful! Please login." });
+      onBackToLogin();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleReset} className="space-y-5 mt-4">
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Mobile Number</Label>
+        <Input
+          required
+          value={formData.phone}
+          onChange={e => setFormData({ ...formData, phone: e.target.value })}
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          placeholder="Enter registered mobile"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Date of Birth (Verification)</Label>
+        <div className="relative">
+          <Input
+            required
+            type="date"
+            value={formData.dob}
+            onChange={e => setFormData({ ...formData, dob: e.target.value })}
+            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl [color-scheme:dark] pr-10"
+          />
+          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-champagne/50 pointer-events-none" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">New Password</Label>
+        <Input
+          required
+          type="password"
+          value={formData.newPassword}
+          onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          placeholder="Enter new password"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Confirm New Password</Label>
+        <Input
+          required
+          type="password"
+          value={formData.confirmPassword}
+          onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          placeholder="Confirm new password"
+        />
+      </div>
+
+      <Button type="submit" disabled={loading} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold rounded-xl">
+        {loading ? "Resetting..." : "Reset Password"}
+      </Button>
+
+      <div className="text-center pt-2">
+        <button type="button" onClick={onBackToLogin} className="text-gold hover:underline text-sm font-medium">
+          Back to Login
+        </button>
+      </div>
+    </form>
+  );
+};
+
 const Matrimony = () => {
   const [profiles, setProfiles] = useState<MatrimonyProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [genderFilter, setGenderFilter] = useState("all");
-  const [activeTab, setActiveTab] = useState("register");
+  const [activeTab, setActiveTab] = useState<"register" | "signin" | "forgot-password">("signin");
 
 
   useEffect(() => {
@@ -491,10 +594,10 @@ const Matrimony = () => {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className={`w-full ml-auto h-full flex flex-col justify-center lg:col-span-3 ${activeTab === "signin" ? "items-end lg:pr-10" : "items-center"}`}
+              className={`w-full ml-auto h-full flex flex-col justify-center lg:col-span-3 ${activeTab === "signin" || activeTab === "forgot-password" ? "items-end lg:pr-10" : "items-center"}`}
             >
               <motion.div
-                className={`bg-transparent backdrop-blur-xl border border-gold/20 rounded-3xl shadow-2xl w-auto h-auto flex flex-col justify-center overflow-hidden ${activeTab === "signin" ? "p-10" : "p-6"}`}
+                className={`bg-transparent backdrop-blur-xl border border-gold/20 rounded-3xl shadow-2xl w-auto h-auto flex flex-col justify-center overflow-hidden ${activeTab === "signin" || activeTab === "forgot-password" ? "p-10" : "p-6"}`}
               >
                 <AnimatePresence mode="wait">
                   {activeTab === "register" ? (
@@ -510,7 +613,7 @@ const Matrimony = () => {
                       </div>
                       <RegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
                     </motion.div>
-                  ) : (
+                  ) : activeTab === "signin" ? (
                     <motion.div
                       key="signin"
                       initial={{ opacity: 0, x: 20 }}
@@ -521,7 +624,24 @@ const Matrimony = () => {
                       <div className="text-center mb-6">
                         <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
                       </div>
-                      <SignInForm onRegisterClick={() => setActiveTab("register")} />
+                      <SignInForm
+                        onRegisterClick={() => setActiveTab("register")}
+                        onForgotClick={() => setActiveTab("forgot-password")}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="forgot-password"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl font-serif font-bold text-champagne">Reset Password</h3>
+                        <p className="text-champagne/60 text-sm mt-2">Verify details to set new password</p>
+                      </div>
+                      <ForgotPasswordForm onBackToLogin={() => setActiveTab("signin")} />
                     </motion.div>
                   )}
                 </AnimatePresence>

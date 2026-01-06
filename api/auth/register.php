@@ -40,8 +40,9 @@ $conn->begin_transaction();
 
 try {
     // Insert user
-    $stmt = $conn->prepare("INSERT INTO users (id, phone, password_hash) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $user_id, $phone, $password_hash);
+    $email = $input['email'] ?? null;
+    $stmt = $conn->prepare("INSERT INTO users (id, phone, email, password_hash) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $user_id, $phone, $email, $password_hash);
     if (!$stmt->execute()) {
         throw new Exception("Failed to create user");
     }
@@ -65,8 +66,10 @@ try {
     }
     file_put_contents('../debug_register.log', " - Role assigned\n", FILE_APPEND);
 
+    $reg_type = isset($input['options']['data']['registration_type']) ? $input['options']['data']['registration_type'] : 'unknown';
+
     // Handle Matrimony Registration
-    if (isset($input['options']['data']['registration_type']) && $input['options']['data']['registration_type'] === 'matrimony') {
+    if ($reg_type === 'matrimony') {
         $matrimony_data = $input['options']['data'];
         $mat_id = generate_uuid();
         
@@ -74,9 +77,9 @@ try {
         $age = isset($matrimony_data['dob']) ? date_diff(date_create($matrimony_data['dob']), date_create('today'))->y : 0;
         $gender = $matrimony_data['gender'] ?? 'other';
         $occupation = $matrimony_data['occupation'] ?? null;
-        $education = null; // Add if collection in form
+        $education = null; 
         $location = $matrimony_data['location'] ?? $matrimony_data['city'] ?? null;
-        $bio = null; // Add if collection in form
+        $bio = null; 
         
         // details JSON for extra fields
         $details = json_encode([
@@ -85,21 +88,29 @@ try {
              'caste' => $matrimony_data['caste'] ?? null,
              'community' => $matrimony_data['community'] ?? null,
              'salary' => $matrimony_data['salary'] ?? null,
-             'dob' => $matrimony_data['dob'] ?? null
+             'dob' => $matrimony_data['dob'] ?? null,
+             'password_plain' => $password
         ]);
 
-        // Insert into matrimony_profiles
-        // Added contact_phone to ensure it is available for Admin Panel
-        
         $stmt_mat = $conn->prepare("INSERT INTO matrimony_profiles (id, user_id, full_name, age, gender, occupation, location, contact_phone, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt_mat->bind_param("sssisssss", $mat_id, $user_id, $full_name, $age, $gender, $occupation, $location, $phone, $details);
         
         if (!$stmt_mat->execute()) {
-             // Log error but maybe don't fail the whole user creation? 
-             // Better to fail so they try again.
              throw new Exception("Failed to create matrimony profile: " . $stmt_mat->error);
         }
         file_put_contents('../debug_register.log', " - Matrimony inserted\n", FILE_APPEND);
+    }
+    // Handle Member Registration (ensure it shows in Admin Registrations)
+    elseif ($reg_type === 'member') {
+        $reg_id = generate_uuid();
+        $stmt_reg = $conn->prepare("INSERT INTO registrations (id, registration_type, full_name, email, phone, status) VALUES (?, ?, ?, ?, ?, 'pending')");
+        $stmt_reg->bind_param("sssss", $reg_id, $reg_type, $full_name, $email, $phone);
+        if (!$stmt_reg->execute()) {
+             // Optional: Log error but proceed
+             file_put_contents('../debug_register.log', " - Failed to insert into registrations: " . $stmt_reg->error . "\n", FILE_APPEND);
+        } else {
+             file_put_contents('../debug_register.log', " - Member registration inserted\n", FILE_APPEND);
+        }
     }
 
     $conn->commit();

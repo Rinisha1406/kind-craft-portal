@@ -62,4 +62,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     }
     send_json_response(['error' => null]);
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $user = verify_auth_token($conn);
+    if (!is_admin($conn, $user)) send_json_response(['error' => 'Forbidden'], 403);
+    
+    $id = $_GET['id'] ?? null;
+    if (!$id) send_json_response(['error' => 'Missing ID'], 400);
+
+    $stmt = $conn->prepare("DELETE FROM registrations WHERE id = ?");
+    $stmt->bind_param("s", $id);
+    
+    if ($stmt->execute()) {
+        send_json_response(['message' => 'Registration deleted']);
+    } else {
+        send_json_response(['error' => 'Delete failed: ' . $stmt->error], 500);
+    }
+}
 ?>

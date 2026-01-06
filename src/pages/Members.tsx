@@ -1,65 +1,270 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Crown, Star, Award, Sparkles, Gift, Percent, Users, Calendar, ArrowRight } from "lucide-react";
+import { Crown, ArrowRight, Mail, Phone, Lock } from "lucide-react";
 import { z } from "zod";
 import membersHero from "@/assets/members-hero.png";
-
-const membershipPlans = [
-  {
-    name: "Basic",
-    price: "Free",
-    priceValue: 0,
-    icon: Star,
-    color: "from-silver to-platinum",
-    features: ["Browse all products", "View matrimony profiles", "Community access", "Newsletter updates"],
-    popular: false,
-  },
-  {
-    name: "Premium",
-    price: "₹999",
-    period: "/year",
-    priceValue: 999,
-    icon: Crown,
-    color: "from-gold to-gold-dark",
-    features: ["All Basic features", "Priority matrimony listing", "10% discount on products", "Dedicated support", "Exclusive events access", "Early collection previews"],
-    popular: true,
-  },
-  {
-    name: "Elite",
-    price: "₹2,499",
-    period: "/year",
-    priceValue: 2499,
-    icon: Award,
-    color: "from-rose-gold to-accent",
-    features: ["All Premium features", "20% discount on products", "Personal matchmaking", "VIP event access", "Free home delivery", "Custom jewelry orders", "Priority support 24/7"],
-    popular: false,
-  },
-];
-
-const benefits = [
-  { icon: Percent, title: "Exclusive Discounts", desc: "Up to 20% off on all purchases" },
-  { icon: Gift, title: "Special Gifts", desc: "Birthday & anniversary surprises" },
-  { icon: Calendar, title: "VIP Events", desc: "Invitation to exclusive showcases" },
-  { icon: Users, title: "Priority Matching", desc: "Featured matrimony profiles" },
-];
 
 const registrationSchema = z.object({
   fullName: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().trim().email("Please enter a valid email").max(255),
-  phone: z.string().trim().min(10, "Please enter a valid phone number").max(15).optional(),
+  phone: z.string().trim().min(10, "Please enter a valid phone number").max(15),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const Members = () => {
-  const [selectedPlan, setSelectedPlan] = useState("Premium");
-  const [formData, setFormData] = useState({ fullName: "", email: "", phone: "" });
+// --- Auth Components ---
+
+const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onSignInClick: () => void }) => {
+  const [formData, setFormData] = useState({ fullName: "", email: "", phone: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const validated = registrationSchema.parse(formData);
+      setSubmitting(true);
+
+      const { data, error } = await supabase.auth.signUp({
+        phone: validated.phone,
+        password: validated.password,
+        options: {
+          data: {
+            registration_type: "member", // This triggers the backend logic to insert into `registrations` too
+            full_name: validated.fullName,
+            email: validated.email,
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Registration Successful! 🎉",
+        description: "Your membership account has been created.",
+      });
+      onClose();
+      onSignInClick();
+      setFormData({ fullName: "", email: "", phone: "", password: "" });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
+      } else {
+        toast({ title: "Registration Failed", description: error.message || "Failed to create account.", variant: "destructive" });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleRegister} className="space-y-4 mt-2 w-full">
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Full Name</Label>
+        <Input
+          value={formData.fullName}
+          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+          placeholder="Enter your name"
+          required
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Email Address</Label>
+        <Input
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="Enter your email"
+          required
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Phone Number</Label>
+        <Input
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          placeholder="Enter phone number"
+          required
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Password</Label>
+        <Input
+          type="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          placeholder="Create password"
+          required
+          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+        />
+      </div>
+
+      <Button type="submit" disabled={submitting} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold hover:scale-[1.02] transition-transform rounded-xl mt-2">
+        {submitting ? "Processing..." : "Join Now"}
+      </Button>
+
+      <div className="text-center text-sm text-champagne/60 pt-2">
+        Already a member?{" "}
+        <button type="button" onClick={onSignInClick} className="text-gold hover:underline font-medium">
+          Sign In
+        </button>
+      </div>
+    </form>
+  );
+};
+
+const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick: () => void, onForgotClick: () => void }) => {
+  const [formData, setFormData] = useState({ identifier: "", password: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        phone: formData.identifier,
+        password: formData.password,
+      });
+
+      if (error) throw error;
+
+      toast({ title: "Welcome back!", description: "Successfully signed in." });
+      window.location.reload();
+    } catch (error: any) {
+      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSignIn} className="space-y-5 mt-4">
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Phone or Email</Label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/50" />
+          <Input
+            value={formData.identifier}
+            onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
+            placeholder="Enter phone or email"
+            required
+            className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between">
+          <Label className="text-champagne/90 font-serif">Password</Label>
+        </div>
+        <div className="relative">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/50" />
+          <Input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            placeholder="Enter password"
+            required
+            className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button type="button" onClick={onForgotClick} className="text-sm font-medium text-gold hover:text-gold-light hover:underline">
+          Forgot password?
+        </button>
+      </div>
+
+      <Button type="submit" disabled={submitting} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold hover:scale-[1.02] transition-transform rounded-xl">
+        {submitting ? "Signing In..." : "Sign In"}
+      </Button>
+
+      <div className="text-center text-sm text-champagne/60 pt-2">
+        Not a member yet?{" "}
+        <button type="button" onClick={onRegisterClick} className="text-gold hover:underline font-medium">
+          Register for free
+        </button>
+      </div>
+    </form>
+  );
+};
+
+const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void }) => {
+  const [formData, setFormData] = useState({ email: "", phone: "", newPassword: "", confirmPassword: "" });
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost/kind-craft-portal/api/auth/reset_member_password.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formData.phone,
+          email: formData.email,
+          new_password: formData.newPassword
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Reset failed");
+
+      toast({ title: "Success", description: "Password reset successful! Please login." });
+      onBackToLogin();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleReset} className="space-y-4 mt-4">
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Registered Email</Label>
+        <Input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Registered Phone</Label>
+        <Input required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">New Password</Label>
+        <Input required type="password" value={formData.newPassword} onChange={e => setFormData({ ...formData, newPassword: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+      </div>
+      <div className="space-y-2">
+        <Label className="text-champagne/90 font-serif">Confirm Password</Label>
+        <Input required type="password" value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+      </div>
+      <Button type="submit" disabled={loading} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold rounded-xl mt-2">
+        {loading ? "Resetting..." : "Reset Password"}
+      </Button>
+      <div className="text-center pt-2">
+        <button type="button" onClick={onBackToLogin} className="text-gold hover:underline text-sm font-medium">Back to Login</button>
+      </div>
+    </form>
+  );
+};
+
+
+const Members = () => {
+  const [activeTab, setActiveTab] = useState<"register" | "signin" | "forgot-password">("register");
 
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
@@ -71,283 +276,122 @@ const Members = () => {
     animate: { transition: { staggerChildren: 0.1 } }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const validated = registrationSchema.parse(formData);
-      setSubmitting(true);
-
-      const { error } = await supabase.from("registrations").insert({
-        full_name: validated.fullName,
-        email: validated.email,
-        phone: validated.phone || null,
-        registration_type: "member",
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Welcome to the Family! 🎉",
-        description: `You've registered for ${selectedPlan} membership. We'll contact you soon.`,
-      });
-      setFormData({ fullName: "", email: "", phone: "" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
-      } else {
-        toast({ title: "Error", description: "Failed to submit registration.", variant: "destructive" });
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <MainLayout>
-      {/* Hero */}
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
+      {/* Hero Section with Auth Tabs */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden py-8">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img src={membersHero} alt="Exclusive Membership" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/80 to-transparent" />
         </div>
 
         {/* Animated decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-20"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
+            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-10"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
             transition={{ duration: 4, repeat: Infinity }}
           />
-          <motion.div
-            className="absolute bottom-32 right-1/3 w-48 h-48 bg-rose-gold rounded-full blur-3xl opacity-20"
-            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.25, 0.2] }}
-            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-          />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="max-w-3xl"
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
-            >
-              <Crown className="w-4 h-4" />
-              Exclusive Membership
-            </motion.span>
+        <div className="container mx-auto px-4 relative z-10 h-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center h-full">
 
-            <motion.h1
-              variants={fadeInUp}
-              className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
-            >
-              Join Our
-              <span className="block text-gold-gradient">Elite Community</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
-            >
-              Become a member and unlock exclusive benefits, premium discounts, and personalized services
-              that make every moment special.
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="py-12 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {benefits.map((benefit, i) => (
-              <motion.div
-                key={benefit.title}
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <motion.div
-                  className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-gold"
-                  whileHover={{ rotate: 5, scale: 1.1 }}
-                >
-                  <benefit.icon className="w-8 h-8 text-primary-foreground" />
-                </motion.div>
-                <h3 className="font-semibold text-foreground mb-1">{benefit.title}</h3>
-                <p className="text-sm text-muted-foreground">{benefit.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Plans */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-serif font-bold text-foreground mb-4">Choose Your Plan</h2>
-            <p className="text-muted-foreground">Select the membership that suits your needs</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {membershipPlans.map((plan, index) => (
-              <motion.div
-                key={plan.name}
-                onClick={() => setSelectedPlan(plan.name)}
-                className={`relative p-8 rounded-3xl border-2 cursor-pointer transition-all duration-500 ${selectedPlan === plan.name
-                  ? "border-primary shadow-gold bg-card scale-105 z-10"
-                  : "border-border hover:border-primary/50 bg-card"
-                  }`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                {plan.popular && (
-                  <motion.div
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 gold-gradient text-primary-foreground text-sm font-medium rounded-full shadow-gold"
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Sparkles className="w-4 h-4 inline mr-1" />
-                    Most Popular
-                  </motion.div>
-                )}
-
-                <div className="text-center mb-8">
-                  <motion.div
-                    className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center bg-gradient-to-br ${plan.color} shadow-lg`}
-                    whileHover={{ rotate: 5, scale: 1.1 }}
-                  >
-                    <plan.icon className="w-10 h-10 text-primary-foreground" />
-                  </motion.div>
-                  <h3 className="text-2xl font-serif font-bold text-foreground mb-3">{plan.name}</h3>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                    {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
-                  </div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm">
-                      <div className="w-5 h-5 rounded-full gold-gradient flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3 h-3 text-primary-foreground" />
-                      </div>
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  className={`w-full ${selectedPlan === plan.name ? "gold-gradient text-primary-foreground shadow-gold" : ""}`}
-                  variant={selectedPlan === plan.name ? "default" : "outline"}
-                >
-                  {selectedPlan === plan.name ? "Selected" : "Select Plan"}
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Registration Form */}
-      <section className="py-24 bg-charcoal relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_hsl(38_70%_45%_/_0.1),_transparent_50%)]" />
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-lg mx-auto">
+            {/* Left Column: Text */}
             <motion.div
-              className="text-center mb-10"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-2xl"
             >
-              <Crown className="w-12 h-12 text-gold mx-auto mb-4" />
-              <h2 className="text-4xl font-serif font-bold text-champagne mb-2">Complete Registration</h2>
-              <p className="text-champagne/70">
-                Selected: <span className="text-gold font-semibold">{selectedPlan} Membership</span>
-              </p>
+              <motion.span
+                variants={fadeInUp}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
+              >
+                <Crown className="w-4 h-4" />
+                Exclusive Membership
+              </motion.span>
+
+              <motion.h1
+                variants={fadeInUp}
+                className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
+              >
+                Join Our
+                <span className="block text-gold-gradient">Elite Community</span>
+              </motion.h1>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
+              >
+                Become a member and unlock exclusive benefits, premium discounts, and personalized services
+                that make every moment special.
+              </motion.p>
             </motion.div>
 
-            <motion.form
-              onSubmit={handleSubmit}
-              className="bg-card p-10 rounded-3xl shadow-gold border border-gold/20"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+            {/* Right Column: Auth Forms */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full max-w-md ml-auto"
             >
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-foreground font-medium">Full Name *</Label>
-                  <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="Enter your full name"
-                    required
-                    className="h-14 rounded-xl border-border focus:border-primary text-base"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground font-medium">Email Address *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Enter your email"
-                    required
-                    className="h-14 rounded-xl border-border focus:border-primary text-base"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-foreground font-medium">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter your phone number"
-                    className="h-14 rounded-xl border-border focus:border-primary text-base"
-                  />
-                </div>
-              </div>
-
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="mt-8">
-                <Button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full h-14 gold-gradient text-primary-foreground shadow-gold text-lg font-semibold rounded-xl"
-                >
-                  {submitting ? "Processing..." : (
-                    <>
-                      Complete Registration
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </>
+              <div className="bg-charcoal/40 backdrop-blur-xl border border-gold/20 rounded-3xl shadow-2xl p-8">
+                <AnimatePresence mode="wait">
+                  {activeTab === "register" ? (
+                    <motion.div
+                      key="register"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl font-serif font-bold text-champagne">Create Account</h3>
+                        <p className="text-champagne/60 text-sm">Join the family today</p>
+                      </div>
+                      <MemberRegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
+                    </motion.div>
+                  ) : activeTab === "signin" ? (
+                    <motion.div
+                      key="signin"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
+                        <p className="text-champagne/60 text-sm">Sign in to your account</p>
+                      </div>
+                      <MemberSignInForm onRegisterClick={() => setActiveTab("register")} onForgotClick={() => setActiveTab("forgot-password")} />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="forgot-password"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl font-serif font-bold text-champagne">Reset Password</h3>
+                        <p className="text-champagne/60 text-sm">Verify details to continue</p>
+                      </div>
+                      <MemberForgotPasswordForm onBackToLogin={() => setActiveTab("signin")} />
+                    </motion.div>
                   )}
-                </Button>
-              </motion.div>
+                </AnimatePresence>
+              </div>
+            </motion.div>
 
-              <p className="text-center text-sm text-muted-foreground mt-6">
-                By registering, you agree to our Terms of Service and Privacy Policy
-              </p>
-            </motion.form>
           </div>
         </div>
       </section>
+
+
+
     </MainLayout>
   );
 };
