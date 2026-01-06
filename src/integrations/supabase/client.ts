@@ -5,7 +5,7 @@ const API_URL = 'http://localhost/kind-craft-portal/api'; // Adjust if needed
 
 // Helper to make requests
 async function apiRequest(endpoint: string, method: string, body?: any) {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('sb-access-token');
   const headers: Record<string, string> = {};
 
   // Note: FormData handles its own Content-Type boundary
@@ -25,6 +25,11 @@ async function apiRequest(endpoint: string, method: string, body?: any) {
     });
     // Check if response is JSON (DELETE might return empty)
     const text = await res.text();
+    // basic check if text is html error
+    if (text.trim().startsWith('<')) {
+      console.error('API Returned HTML instead of JSON:', text);
+      return { error: { message: 'Server error: Invalid response format' } };
+    }
     return text ? JSON.parse(text) : {};
   } catch (error) {
     console.error('API Request Error:', error);
@@ -57,12 +62,12 @@ class SupabaseCompat {
       return res;
     },
     signOut: async () => {
-      localStorage.removeItem('auth_token');
+      localStorage.removeItem('sb-access-token');
       this._notifyAuthListeners('SIGNED_OUT', null);
       return { error: null };
     },
     getSession: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('sb-access-token');
       if (!token) return { data: { session: null } };
 
       // Verify token with /me
@@ -220,7 +225,9 @@ class QueryBuilder {
   }
 
   async insert(data: any) {
-    const res = await apiRequest(`/${this.table}.php`, 'POST', data);
+    // Unwrap array if it's a single item (PHP API expects object, Supabase sends array)
+    const payload = Array.isArray(data) && data.length === 1 ? data[0] : data;
+    const res = await apiRequest(`/${this.table}.php`, 'POST', payload);
     return res;
   }
 }
