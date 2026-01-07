@@ -48,21 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         send_json_response(['error' => 'Unauthorized'], 401);
     }
     
-    $input = get_json_input();
     $full_name = $input['full_name'];
-    $email = $input['email'];
     $phone = $input['phone'] ?? '';
     $address = $input['address'] ?? '';
+    $member_details = isset($input['member_details']) ? json_encode($input['member_details']) : null;
     
     $id = generate_uuid();
     
-    $stmt = $conn->prepare("INSERT INTO members (id, user_id, full_name, email, phone, address) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $id, $user['id'], $full_name, $email, $phone, $address);
+    $stmt = $conn->prepare("INSERT INTO members (id, user_id, full_name, phone, address, member_details) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $id, $user['id'], $full_name, $phone, $address, $member_details);
     
     if ($stmt->execute()) {
         send_json_response(['error' => null, 'data' => ['id' => $id]]);
     } else {
-        send_json_response(['error' => 'Failed to add member'], 500);
+        send_json_response(['error' => 'Failed to add member: ' . $stmt->error], 500);
     }
 }
 
@@ -98,13 +97,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $types = "";
     $params = [];
     
-    $allowed = ['full_name', 'email', 'phone', 'address', 'membership_type', 'is_active'];
+    $allowed = ['full_name', 'phone', 'address', 'membership_type', 'is_active', 'member_details', 'password_hash', 'password_plain'];
     foreach ($input as $key => $val) {
         if (in_array($key, $allowed)) {
             $updates[] = "$key = ?";
             if (is_bool($val)) {
                 $val = $val ? 1 : 0;
                 $types .= "i";
+            } elseif (is_array($val)) {
+                $val = json_encode($val);
+                $types .= "s";
             } else {
                 $types .= "s";
             }

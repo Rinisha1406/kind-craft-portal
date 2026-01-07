@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message = $input['message'] ?? '';
     
     if (empty($name) || empty($email) || empty($message)) {
-        send_json_response(['error' => 'Missing required fields'], 400);
+        send_json_response(['error' => 'Missing required fields (name, email, message)'], 400);
     }
     
     $id = generate_uuid();

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -13,15 +14,16 @@ import { Loader2, Trash2, Pencil } from "lucide-react";
 interface Member {
   id: string;
   full_name: string;
-  email: string;
   phone: string | null;
   address: string | null;
   membership_type: string | null;
+  password_plain: string | null;
   is_active: boolean;
   created_at: string;
 }
 
 const AdminMembers = () => {
+  const { user } = useAuth();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -29,7 +31,6 @@ const AdminMembers = () => {
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [formData, setFormData] = useState({
     full_name: "",
-    email: "",
     phone: "",
     membership_type: "standard",
   });
@@ -37,25 +38,24 @@ const AdminMembers = () => {
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    fetchMembers();
-  }, []);
+    if (user) {
+      fetchMembers();
+    }
+  }, [user]);
 
   const fetchMembers = async () => {
     try {
-      const { data, error } = await supabase
-        .from("members")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setMembers(data || []);
+      const response = await fetch('http://localhost/kind-craft-portal/api/members.php', {
+        headers: {
+          'Authorization': `Bearer ${user?.id}`
+        }
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      setMembers(result.data || []);
     } catch (error) {
       console.error("Error fetching members:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch members",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to fetch members", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,6 @@ const AdminMembers = () => {
     setEditingMember(member);
     setFormData({
       full_name: member.full_name,
-      email: member.email,
       phone: member.phone || "",
       membership_type: member.membership_type || "standard",
     });
@@ -78,23 +77,22 @@ const AdminMembers = () => {
     setUpdating(true);
 
     try {
-      const { error } = await supabase
-        .from("members")
-        .update({
-          full_name: formData.full_name,
-          email: formData.email,
-          phone: formData.phone,
-          membership_type: formData.membership_type,
-        })
-        .eq("id", editingMember.id);
+      const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${editingMember.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`
+        },
+        body: JSON.stringify(formData)
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
 
-      if (error) throw error;
       toast({ title: "Success", description: "Member updated successfully" });
       setIsDialogOpen(false);
       fetchMembers();
-    } catch (error) {
-      console.error("Error updating member:", error);
-      toast({ title: "Error", description: "Failed to update member", variant: "destructive" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setUpdating(false);
     }
@@ -102,24 +100,21 @@ const AdminMembers = () => {
 
   const toggleActive = async (id: string, isActive: boolean) => {
     try {
-      const { error } = await supabase
-        .from("members")
-        .update({ is_active: !isActive })
-        .eq("id", id);
+      const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`
+        },
+        body: JSON.stringify({ is_active: !isActive })
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
 
-      if (error) throw error;
-      toast({
-        title: "Success",
-        description: `Member ${isActive ? "deactivated" : "activated"} successfully`,
-      });
+      toast({ title: "Success", description: `Member ${isActive ? "deactivated" : "activated"} successfully` });
       fetchMembers();
-    } catch (error) {
-      console.error("Error updating member:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update member",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -127,17 +122,19 @@ const AdminMembers = () => {
     if (!confirm("Are you sure you want to delete this member?")) return;
 
     try {
-      const { error } = await supabase.from("members").delete().eq("id", id);
-      if (error) throw error;
+      const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${user?.id}`
+        }
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
       toast({ title: "Success", description: "Member deleted successfully" });
       fetchMembers();
-    } catch (error) {
-      console.error("Error deleting member:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete member",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -158,15 +155,6 @@ const AdminMembers = () => {
                     id="full_name"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="bg-black/40 border-gold/20 focus:border-gold/50 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-emerald-100/70">Email</Label>
-                  <Input
-                    id="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="bg-black/40 border-gold/20 focus:border-gold/50 text-white"
                   />
                 </div>
@@ -204,9 +192,9 @@ const AdminMembers = () => {
             <TableHeader className="bg-black/40">
               <TableRow className="border-gold/10 hover:bg-transparent">
                 <TableHead className="text-gold font-serif">Name</TableHead>
-                <TableHead className="text-gold font-serif">Email</TableHead>
                 <TableHead className="text-gold font-serif">Phone</TableHead>
                 <TableHead className="text-gold font-serif">Membership</TableHead>
+                <TableHead className="text-gold font-serif">Password</TableHead>
                 <TableHead className="text-gold font-serif">Joined</TableHead>
                 <TableHead className="text-gold font-serif">Status</TableHead>
                 <TableHead className="text-right text-gold font-serif">Actions</TableHead>
@@ -215,13 +203,13 @@ const AdminMembers = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-gold" />
                   </TableCell>
                 </TableRow>
               ) : members.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-emerald-100/50 font-serif italic">
+                  <TableCell colSpan={6} className="text-center py-8 text-emerald-100/50 font-serif italic">
                     No members found
                   </TableCell>
                 </TableRow>
@@ -229,12 +217,14 @@ const AdminMembers = () => {
                 members.map((member) => (
                   <TableRow key={member.id} className="border-gold/10 hover:bg-emerald-900/20 transition-colors">
                     <TableCell className="font-medium text-emerald-100">{member.full_name}</TableCell>
-                    <TableCell className="text-emerald-100/70">{member.email}</TableCell>
                     <TableCell className="text-emerald-100/70">{member.phone || "-"}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize border-gold/30 text-gold bg-gold/5">
                         {member.membership_type || "Standard"}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-emerald-100/70 font-mono text-xs">
+                      {member.password_plain || "-"}
                     </TableCell>
                     <TableCell className="text-emerald-100/60">
                       {new Date(member.created_at).toLocaleDateString()}

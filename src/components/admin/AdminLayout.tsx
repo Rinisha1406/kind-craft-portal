@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles } from "lucide-react";
+import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles, Mail } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const navItems = [
   { name: "Services", path: "/admin/services", icon: Sparkles },
   { name: "Matrimony", path: "/admin/matrimony", icon: Heart },
   { name: "Members", path: "/admin/members", icon: Users },
+  { name: "Messages", path: "/admin/messages", icon: Mail },
 ];
 
 interface AdminLayoutProps {

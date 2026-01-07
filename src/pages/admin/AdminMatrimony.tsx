@@ -23,6 +23,7 @@ interface MatrimonyProfile {
   image_url: string | null;
   is_active: boolean;
   created_at: string;
+  user_id: string;
   details: any; // JSON column
   password_hash?: string;
   is_custom_password?: boolean;
@@ -130,6 +131,7 @@ const AdminMatrimony = () => {
         caste: formData.caste,
         community: formData.community,
         salary: formData.salary,
+        password_plain: formData.password || editingProfile.details?.password_plain
       };
 
       const updatePayload: any = {
@@ -144,6 +146,22 @@ const AdminMatrimony = () => {
       // Only send password if it has been typed in
       if (formData.password) {
         updatePayload.password = formData.password;
+
+        // Sync with PHP/MySQL Database
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await fetch('http://localhost/kind-craft-portal/api/auth/update.php', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user.id}`
+            },
+            body: JSON.stringify({
+              password: formData.password,
+              target_user_id: editingProfile.user_id
+            })
+          });
+        }
       }
 
       const { error } = await supabase

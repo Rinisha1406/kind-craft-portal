@@ -99,16 +99,20 @@ try {
         }
         file_put_contents('../debug_register.log', " - Matrimony inserted\n", FILE_APPEND);
     }
-    // Handle Member Registration (ensure it shows in Admin Registrations)
+    // Handle Member Registration (ensure it shows in Admin Members and is editable)
     elseif ($reg_type === 'member') {
-        $reg_id = generate_uuid();
-        $stmt_reg = $conn->prepare("INSERT INTO registrations (id, registration_type, full_name, phone, status) VALUES (?, ?, ?, ?, 'pending')");
-        $stmt_reg->bind_param("ssss", $reg_id, $reg_type, $full_name, $phone);
-        if (!$stmt_reg->execute()) {
-             // Optional: Log error but proceed
-             file_put_contents('../debug_register.log', " - Failed to insert into registrations: " . $stmt_reg->error . "\n", FILE_APPEND);
+        $member_data = $input['options']['data'] ?? [];
+        $address = $member_data['address'] ?? '';
+        
+        // Insert into members table
+        $member_id = generate_uuid();
+        $stmt_member = $conn->prepare("INSERT INTO members (id, user_id, full_name, phone, password_hash, password_plain, address, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+        $stmt_member->bind_param("sssssss", $member_id, $user_id, $full_name, $phone, $password_hash, $password, $address);
+        
+        if (!$stmt_member->execute()) {
+             file_put_contents('../debug_register.log', " - Failed to insert into members: " . $stmt_member->error . "\n", FILE_APPEND);
         } else {
-             file_put_contents('../debug_register.log', " - Member registration inserted\n", FILE_APPEND);
+             file_put_contents('../debug_register.log', " - Member profile created successfully\n", FILE_APPEND);
         }
     }
 

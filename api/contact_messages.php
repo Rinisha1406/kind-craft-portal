@@ -5,13 +5,6 @@ require_once 'utils.php';
 
 $conn = getDBConnection();
 
-function is_admin($conn, $user) {
-    if (!$user) return false;
-    $stmt = $conn->prepare("SELECT role FROM user_roles WHERE user_id = ? AND role = 'admin'");
-    $stmt->bind_param("s", $user['id']);
-    $stmt->execute();
-    return $stmt->get_result()->num_rows > 0;
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $user = verify_auth_token($conn);

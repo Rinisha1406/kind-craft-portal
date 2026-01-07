@@ -13,18 +13,28 @@ import membersHero from "@/assets/members-hero.png";
 const registrationSchema = z.object({
   fullName: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   phone: z.string().trim().min(10, "Please enter a valid phone number").max(15),
+  address: z.string().trim().min(1, "Address is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 // --- Auth Components ---
 
 import { useAuth } from "@/hooks/useAuth";
+import { Search, MapPin as MapPinIcon, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onSignInClick: () => void }) => {
-  const [formData, setFormData] = useState({ fullName: "", phone: "", password: "" });
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phone: "",
+    address: "",
+    password: "",
+  });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,20 +44,23 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
 
       const { error } = await signUp(validated.phone, validated.password, validated.fullName, {
         data: {
-          registration_type: "member", // This triggers the backend logic to insert into `registrations` too
+          registration_type: "member",
           full_name: validated.fullName,
+          phone: validated.phone,
+          address: validated.address,
         }
       });
 
       if (error) throw error;
 
       toast({
-        title: "Registration Successful! 🎉",
+        title: "Welcome to the Community! 🎉",
         description: "Your membership account has been created.",
       });
-      onClose();
-      onSignInClick();
-      setFormData({ fullName: "", phone: "", password: "" });
+
+      setTimeout(() => {
+        navigate("/member/dashboard");
+      }, 500);
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
@@ -60,45 +73,58 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
   };
 
   return (
-    <form onSubmit={handleRegister} className="space-y-4 mt-2 w-full">
+    <form onSubmit={handleRegister} className="space-y-4 mt-2 w-full max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
       <div className="space-y-2">
         <Label className="text-champagne/90 font-serif">Full Name</Label>
         <Input
           value={formData.fullName}
           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-          placeholder="Enter your name"
+          placeholder="John Doe"
           required
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Phone Number</Label>
-        <Input
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          placeholder="Enter phone number"
-          required
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
-        />
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label className="text-champagne/90 font-serif">Phone Number</Label>
+          <Input
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            placeholder="Enter phone number"
+            required
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-champagne/90 font-serif">Create Password</Label>
+          <Input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            placeholder="Min 6 characters"
+            required
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          />
+        </div>
       </div>
+
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Password</Label>
+        <Label className="text-champagne/90 font-serif">Personal Address</Label>
         <Input
-          type="password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          placeholder="Create password"
+          value={formData.address}
+          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          placeholder="Enter your complete address"
           required
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
         />
       </div>
 
-      <Button type="submit" disabled={submitting} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold hover:scale-[1.02] transition-transform rounded-xl mt-2">
-        {submitting ? "Processing..." : "Join Now"}
+      <Button type="submit" disabled={submitting} className="w-full h-12 gold-gradient text-emerald-950 font-black shadow-gold hover:scale-[1.02] transition-transform rounded-xl mt-4">
+        {submitting ? "Creating Membership..." : "Confirm & Join Now"}
       </Button>
 
-      <div className="text-center text-sm text-champagne/60 pt-2">
+      <div className="text-center text-sm text-champagne/60 py-2">
         Already a member?{" "}
         <button type="button" onClick={onSignInClick} className="text-gold hover:underline font-medium">
           Sign In
@@ -113,6 +139,7 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +150,12 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
       if (error) throw error;
 
       toast({ title: "Welcome back!", description: "Successfully signed in." });
-      window.location.reload();
+
+      // Delay navigation slightly to let state update if needed, but navigate ensures no full reload if possible
+      setTimeout(() => {
+        navigate("/member/dashboard");
+      }, 500);
+
     } catch (error: any) {
       toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
     } finally {

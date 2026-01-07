@@ -3,17 +3,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Gem, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Services", path: "/services" },
   { name: "Products", path: "/products" },
   { name: "Matrimony", path: "/matrimony" },
+  { name: "Marketplace", path: "/community-services" },
   { name: "Members", path: "/members" },
   { name: "Contact", path: "/contact" },
 ];
 
 const Navbar = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -69,6 +72,18 @@ const Navbar = () => {
                 )}
               </Link>
             ))}
+
+            <div className="ml-4 pl-4 border-l border-border/50">
+              {user ? (
+                <Button asChild variant="outline" className="border-gold/30 text-gold hover:bg-gold/10 rounded-xl px-6">
+                  <Link to="/member/dashboard">Dashboard</Link>
+                </Button>
+              ) : (
+                <Button asChild className="gold-gradient text-emerald-950 font-bold rounded-xl px-6">
+                  <Link to="/members">Join Us</Link>
+                </Button>
+              )}
+            </div>
           </div>
 
 

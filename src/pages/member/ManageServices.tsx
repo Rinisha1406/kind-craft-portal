@@ -1,0 +1,349 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import MainLayout from "@/components/layout/MainLayout";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import {
+    Plus,
+    Pencil,
+    Trash2,
+    ExternalLink,
+    Loader2,
+    Package,
+    Search,
+    CheckCircle2,
+    XCircle,
+    PlusCircle,
+    Briefcase
+} from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+
+interface MemberService {
+    id: string;
+    title: string;
+    description: string;
+    price: string;
+    category: string;
+    image_url: string;
+    is_active: number;
+}
+
+const ManageServices = () => {
+    const { user } = useAuth();
+    const { toast } = useToast();
+    const [services, setServices] = useState<MemberService[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [editingService, setEditingService] = useState<MemberService | null>(null);
+
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        price: "",
+        category: "",
+        image_url: ""
+    });
+
+    useEffect(() => {
+        if (user) {
+            fetchMyServices();
+        }
+    }, [user]);
+
+    const fetchMyServices = async () => {
+        try {
+            const response = await fetch(`http://localhost/kind-craft-portal/api/member_services.php?mine=true`, {
+                headers: {
+                    'Authorization': `Bearer ${user?.id}`
+                }
+            });
+            const result = await response.json();
+            if (result.data) {
+                setServices(result.data);
+            }
+        } catch (error) {
+            console.error("Error fetching services:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            const url = editingService
+                ? `http://localhost/kind-craft-portal/api/member_services.php?id=${editingService.id}`
+                : `http://localhost/kind-craft-portal/api/member_services.php`;
+
+            const response = await fetch(url, {
+                method: editingService ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.id}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+
+            toast({
+                title: editingService ? "Service Updated" : "Service Added",
+                description: `Your service "${formData.title}" is now live!`,
+            });
+
+            setIsDialogOpen(false);
+            setEditingService(null);
+            setFormData({ title: "", description: "", price: "", category: "", image_url: "" });
+            fetchMyServices();
+        } catch (error: any) {
+            toast({
+                title: "Action Failed",
+                description: error.message,
+                variant: "destructive"
+            });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleEdit = (service: MemberService) => {
+        setEditingService(service);
+        setFormData({
+            title: service.title,
+            description: service.description || "",
+            price: service.price || "",
+            category: service.category || "",
+            image_url: service.image_url || ""
+        });
+        setIsDialogOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this service?")) return;
+        try {
+            const response = await fetch(`http://localhost/kind-craft-portal/api/member_services.php?id=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${user?.id}`
+                }
+            });
+            fetchMyServices();
+            toast({ title: "Deleted", description: "Service removed successfully." });
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to delete service", variant: "destructive" });
+        }
+    };
+
+    const toggleStatus = async (service: MemberService) => {
+        try {
+            await fetch(`http://localhost/kind-craft-portal/api/member_services.php?id=${service.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.id}`
+                },
+                body: JSON.stringify({ is_active: !service.is_active })
+            });
+            fetchMyServices();
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
+        }
+    };
+
+    return (
+        <MainLayout>
+            <div className="min-h-screen bg-zinc-950 pt-24 pb-12 px-4">
+                <div className="container mx-auto max-w-6xl">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                        >
+                            <div className="flex items-center gap-3 text-gold mb-2">
+                                <Briefcase className="w-5 h-5" />
+                                <span className="font-serif font-bold uppercase tracking-widest text-xs">Professional Portal</span>
+                            </div>
+                            <h1 className="text-4xl font-serif font-bold text-champagne">Manage My Services</h1>
+                            <p className="text-champagne/50 mt-2">Create and manage the services you offer to the community.</p>
+                        </motion.div>
+
+                        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                            setIsDialogOpen(open);
+                            if (!open) {
+                                setEditingService(null);
+                                setFormData({ title: "", description: "", price: "", category: "", image_url: "" });
+                            }
+                        }}>
+                            <DialogTrigger asChild>
+                                <Button className="gold-gradient text-emerald-950 font-black h-12 px-8 rounded-xl shadow-gold hover:scale-[1.02] transition-transform">
+                                    <PlusCircle className="mr-2 w-5 h-5" /> Add New Service
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-charcoal border-gold/20 text-champagne max-w-xl rounded-[2rem]">
+                                <DialogHeader>
+                                    <DialogTitle className="text-2xl font-serif font-bold text-gold">
+                                        {editingService ? "Edit Service" : "Register a New Service"}
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit} className="space-y-5 mt-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-champagne/70 font-serif">Service Title*</Label>
+                                        <Input
+                                            required
+                                            value={formData.title}
+                                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                            placeholder="e.g. Premium Wedding Photography"
+                                            className="bg-white/5 border-gold/20 text-champagne rounded-xl h-12"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-champagne/70 font-serif">Category</Label>
+                                            <Input
+                                                value={formData.category}
+                                                onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                                placeholder="e.g. Photography"
+                                                className="bg-white/5 border-gold/20 text-champagne rounded-xl h-11"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-champagne/70 font-serif">Price (Optional)</Label>
+                                            <Input
+                                                value={formData.price}
+                                                onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                                placeholder="e.g. ₹15,000 / day"
+                                                className="bg-white/5 border-gold/20 text-champagne rounded-xl h-11"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-champagne/70 font-serif">Detailed Description</Label>
+                                        <textarea
+                                            value={formData.description}
+                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Describe your service in detail..."
+                                            className="w-full min-h-[120px] bg-white/5 border border-gold/20 rounded-xl px-4 py-3 text-champagne outline-none transition-all focus:border-gold/50"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-champagne/70 font-serif">Image URL (Optional)</Label>
+                                        <Input
+                                            value={formData.image_url}
+                                            onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                                            placeholder="https://..."
+                                            className="bg-white/5 border-gold/20 text-champagne rounded-xl h-11"
+                                        />
+                                    </div>
+                                    <Button disabled={submitting} type="submit" className="w-full h-12 gold-gradient text-emerald-950 font-black rounded-xl mt-4">
+                                        {submitting ? <Loader2 className="animate-spin" /> : (editingService ? "Save Changes" : "List This Service")}
+                                    </Button>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24">
+                            <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
+                            <p className="text-champagne/40">Loading your services...</p>
+                        </div>
+                    ) : services.length === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white/5 border border-dashed border-gold/20 rounded-[2rem] py-20 text-center"
+                        >
+                            <div className="w-20 h-20 bg-gold/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Package className="w-10 h-10 text-gold/30" />
+                            </div>
+                            <h3 className="text-2xl font-serif font-bold text-champagne mb-2">No active listings</h3>
+                            <p className="text-champagne/40 max-w-sm mx-auto mb-8">
+                                You haven't added any services yet. Start listing your expertise to reach the Kind Craft community.
+                            </p>
+                            <Button variant="outline" className="border-gold/30 text-gold hover:bg-gold/10 rounded-xl px-8" onClick={() => setIsDialogOpen(true)}>
+                                Get Started
+                            </Button>
+                        </motion.div>
+                    ) : (
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {services.map((service, index) => (
+                                <motion.div
+                                    key={service.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="bg-white/5 border border-white/10 rounded-3xl p-6 group hover:border-gold/40 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden"
+                                >
+                                    {/* Background Decor */}
+                                    <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl ${service.is_active ? 'from-emerald-500/10' : 'from-red-500/10'} rounded-bl-full pointer-events-none`} />
+
+                                    <div className="w-full md:w-32 h-32 bg-charcoal rounded-2xl border border-white/5 overflow-hidden shrink-0">
+                                        <img
+                                            src={service.image_url || "https://images.unsplash.com/photo-1454165833767-027eeef1526e?w=200"}
+                                            alt={service.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[10px] uppercase tracking-widest font-bold text-gold/60">{service.category || "General"}</span>
+                                            <button
+                                                onClick={() => toggleStatus(service)}
+                                                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors ${service.is_active
+                                                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                                        : "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                                    }`}
+                                            >
+                                                {service.is_active ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                                                {service.is_active ? "Live" : "Paused"}
+                                            </button>
+                                        </div>
+                                        <h3 className="text-xl font-serif font-bold text-champagne mb-1">{service.title}</h3>
+                                        <p className="text-gold font-medium mb-3">{service.price || "Contact for pricing"}</p>
+                                        <p className="text-champagne/40 text-sm line-clamp-2 mb-6">
+                                            {service.description || "No description provided."}
+                                        </p>
+
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                className="bg-white/5 hover:bg-white/10 text-champagne rounded-lg border border-white/10 h-9"
+                                                onClick={() => handleEdit(service)}
+                                            >
+                                                <Pencil className="w-3.5 h-3.5 mr-2" /> Edit
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg h-9"
+                                                onClick={() => handleDelete(service.id)}
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </MainLayout>
+    );
+};
+
+export default ManageServices;
