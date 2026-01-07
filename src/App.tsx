@@ -16,7 +16,6 @@ import Contact from "./pages/Contact";
 import MemberProfile from "./pages/MemberProfile";
 import MemberDashboard from "./pages/MemberDashboard";
 import ManageServices from "./pages/member/ManageServices";
-import CommunityServices from "./pages/CommunityServices";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -48,7 +47,6 @@ const App = () => (
             <Route path="/member/profile" element={<MemberProfile />} />
             <Route path="/member/dashboard" element={<MemberDashboard />} />
             <Route path="/member/manage-services" element={<ManageServices />} />
-            <Route path="/community-services" element={<CommunityServices />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />

@@ -3,18 +3,17 @@ import { Link } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
-    User,
-    Settings,
-    Crown,
-    ShieldCheck,
-    Gift,
-    Star,
-    ArrowRight,
-    Sparkles,
     Heart,
     Layout,
     Briefcase,
-    ShoppingBag
+    Gift,
+    Star,
+    ShieldCheck,
+    Settings,
+    User,
+    Crown,
+    Sparkles,
+    ArrowRight
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -52,10 +51,10 @@ const MemberDashboard = () => {
         },
         {
             title: "Community Market",
-            description: "Explore services offered by other community members",
-            icon: ShoppingBag,
-            link: "/community-services",
-            color: "from-cyan-500/20 to-cyan-500/5"
+            description: "Check out your exclusive discounts and special offers",
+            icon: Gift,
+            link: "#",
+            color: "from-purple-500/20 to-purple-500/5"
         }
     ];
 

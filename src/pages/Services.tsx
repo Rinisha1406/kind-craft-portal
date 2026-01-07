@@ -30,6 +30,9 @@ interface Service {
     description: string;
     image_url: string;
     features: string[];
+    price?: string;
+    category?: string;
+    provider_name?: string;
 }
 
 const Services = () => {
@@ -47,12 +50,17 @@ const Services = () => {
 
                 const { data, error } = await supabase
                     .from("services")
-                    .select("*")
+                    .select("*, members(full_name)")
                     .eq('is_active', true)
-                    .order('created_at', { ascending: true }); // We created display_order but didn't expose it in Admin yet, default to created_at or just order by ID
+                    .order('created_at', { ascending: true });
 
                 if (error) throw error;
-                setServices(data || []);
+
+                const mappedData = data?.map((s: any) => ({
+                    ...s,
+                    provider_name: s.members?.full_name || "Official"
+                }));
+                setServices(mappedData || []);
             } catch (error) {
                 console.error("Error fetching services:", error);
             } finally {
@@ -164,9 +172,18 @@ const Services = () => {
 
                                     {/* Content Section */}
                                     <div className="p-8 flex flex-col flex-grow">
-                                        <h2 className="text-2xl font-serif font-bold text-foreground mb-4 group-hover:text-gold transition-colors">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gold/60">{service.category || "General"}</span>
+                                            {service.provider_name && (
+                                                <span className="text-[10px] bg-gold/10 text-gold px-2 py-0.5 rounded-full font-bold">
+                                                    {service.provider_name}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h2 className="text-2xl font-serif font-bold text-foreground mb-1 group-hover:text-gold transition-colors">
                                             {service.title}
                                         </h2>
+                                        <p className="text-gold font-bold mb-4">{service.price || "Price on Request"}</p>
 
                                         <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
                                             {service.description}

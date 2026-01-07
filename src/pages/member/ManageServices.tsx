@@ -62,7 +62,7 @@ const ManageServices = () => {
 
     const fetchMyServices = async () => {
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/member_services.php?mine=true`, {
+            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?mine=true`, {
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
                 }
@@ -83,8 +83,8 @@ const ManageServices = () => {
         setSubmitting(true);
         try {
             const url = editingService
-                ? `http://localhost/kind-craft-portal/api/member_services.php?id=${editingService.id}`
-                : `http://localhost/kind-craft-portal/api/member_services.php`;
+                ? `http://localhost/kind-craft-portal/api/services.php?id=${editingService.id}`
+                : `http://localhost/kind-craft-portal/api/services.php`;
 
             const response = await fetch(url, {
                 method: editingService ? 'PUT' : 'POST',
@@ -133,7 +133,7 @@ const ManageServices = () => {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this service?")) return;
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/member_services.php?id=${id}`, {
+            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
@@ -148,7 +148,7 @@ const ManageServices = () => {
 
     const toggleStatus = async (service: MemberService) => {
         try {
-            await fetch(`http://localhost/kind-craft-portal/api/member_services.php?id=${service.id}`, {
+            await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${service.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -303,8 +303,8 @@ const ManageServices = () => {
                                             <button
                                                 onClick={() => toggleStatus(service)}
                                                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors ${service.is_active
-                                                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                                                        : "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                                    ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                                    : "bg-red-500/10 text-red-400 hover:bg-red-500/20"
                                                     }`}
                                             >
                                                 {service.is_active ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}

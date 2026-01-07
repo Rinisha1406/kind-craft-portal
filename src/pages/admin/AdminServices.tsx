@@ -27,11 +27,15 @@ import { Plus, Edit, Trash2, Link as LinkIcon, Eye, EyeOff, Check, X, ImageIcon,
 
 interface Service {
     id: string;
+    user_id: string | null;
     title: string;
     description: string;
+    price: string;
+    category: string;
     image_url: string;
     features: string[];
     is_active: boolean;
+    provider_name?: string;
 }
 
 const AdminServices = () => {
@@ -57,9 +61,13 @@ const AdminServices = () => {
     const fetchServices = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase.from("services").select("*").order("created_at", { ascending: true });
+            const { data, error } = await supabase.from("services").select("*, members(full_name)").order("created_at", { ascending: true });
             if (error) throw error;
-            setServices(data || []);
+            const mappedData = data?.map((s: any) => ({
+                ...s,
+                provider_name: s.members?.full_name || "Platform"
+            }));
+            setServices(mappedData || []);
         } catch (error: any) {
             toast({
                 title: "Error fetching services",
@@ -215,7 +223,8 @@ const AdminServices = () => {
                             <TableRow className="hover:bg-transparent border-gold/10">
                                 <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Image</TableHead>
                                 <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Title</TableHead>
-                                <TableHead className="text-gold font-serif whitespace-nowrap">Description</TableHead>
+                                <TableHead className="text-gold font-serif whitespace-nowrap">Provider</TableHead>
+                                <TableHead className="text-gold font-serif whitespace-nowrap text-center">Price</TableHead>
                                 <TableHead className="text-gold font-serif whitespace-nowrap text-center">Visible</TableHead>
                                 <TableHead className="text-right text-gold font-serif whitespace-nowrap">Actions</TableHead>
                             </TableRow>
@@ -244,7 +253,10 @@ const AdminServices = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell className="font-medium text-white group-hover:text-gold transition-colors whitespace-nowrap">{service.title}</TableCell>
-                                        <TableCell className="max-w-xs truncate text-emerald-100/70" title={service.description}>{service.description}</TableCell>
+                                        <TableCell className="text-emerald-100/70 whitespace-nowrap">
+                                            {service.provider_name}
+                                        </TableCell>
+                                        <TableCell className="text-center text-blue-300 font-bold">{service.price || "-"}</TableCell>
                                         <TableCell className="text-center">
                                             <Switch
                                                 checked={String(service.is_active) === "1" || service.is_active === true}
@@ -338,6 +350,16 @@ const AdminServices = () => {
                             </div>
 
 
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Price</Label>
+                                    <Input value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="e.g. ₹5,000" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Category</Label>
+                                    <Input value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g. Consulting" />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
