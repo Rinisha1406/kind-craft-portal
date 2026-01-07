@@ -171,7 +171,6 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             <option value="" className="bg-charcoal text-gray-400">Gender</option>
             <option value="male" className="bg-charcoal">Male</option>
             <option value="female" className="bg-charcoal">Female</option>
-            <option value="other" className="bg-charcoal">Other</option>
           </select>
         </div>
       </div>

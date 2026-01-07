@@ -42,7 +42,7 @@ if ($method === 'GET') {
                 }
             }
             // Explicitly cast is_active to boolean for proper frontend handling
-            $row['is_active'] = (bool) $row['is_active'];
+            $row['is_active'] = (bool) ($row['is_active'] ?? false);
 
             // Check if password is custom or default (DOB)
             // Note: password_verify can be slow on large datasets, consider paging or optimize later
