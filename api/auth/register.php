@@ -91,8 +91,8 @@ try {
              'password_plain' => $password
         ]);
 
-        $stmt_mat = $conn->prepare("INSERT INTO matrimony_profiles (id, user_id, full_name, age, gender, occupation, location, contact_phone, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt_mat->bind_param("sssisssss", $mat_id, $user_id, $full_name, $age, $gender, $occupation, $location, $phone, $details);
+        $stmt_mat = $conn->prepare("INSERT INTO matrimony_profiles (user_id, full_name, age, gender, occupation, location, contact_phone, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt_mat->bind_param("ssisssss", $user_id, $full_name, $age, $gender, $occupation, $location, $phone, $details);
         
         if (!$stmt_mat->execute()) {
              throw new Exception("Failed to create matrimony profile: " . $stmt_mat->error);
