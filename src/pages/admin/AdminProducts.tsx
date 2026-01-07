@@ -23,6 +23,7 @@ interface Product {
   category: ProductCategory;
   description: string | null;
   image_url: string | null;
+  images?: string[];
   is_active: boolean;
   created_at: string;
 }
@@ -49,7 +50,8 @@ const AdminProducts = () => {
     description: "",
     is_active: true,
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -81,7 +83,8 @@ const AdminProducts = () => {
   const openAddDialog = () => {
     setEditingProduct(null);
     setFormData({ name: "", price: "", category: "gold", description: "", is_active: true });
-    setImageFile(null);
+    setImageFiles([]);
+    setExistingImages([]);
     setDialogOpen(true);
   };
 
@@ -92,10 +95,28 @@ const AdminProducts = () => {
       price: product.price.toString(),
       category: product.category,
       description: product.description || "",
-      is_active: product.is_active,
+      is_active: String(product.is_active) === "1" || product.is_active === true,
     });
-    setImageFile(null);
+    // Use images array if available, otherwise fallback to image_url or empty
+    const imgs = product.images && Array.isArray(product.images) ? product.images : (product.image_url ? [product.image_url] : []);
+    setExistingImages(imgs);
+    setImageFiles([]);
     setDialogOpen(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setImageFiles((prev) => [...prev, ...files]);
+    }
+  };
+
+  const removeImage = (index: number, isExisting: boolean) => {
+    if (isExisting) {
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,15 +132,15 @@ const AdminProducts = () => {
         is_active: formData.is_active,
       });
 
-      let imageUrl = editingProduct?.image_url || null;
+      let finalImages = [...existingImages];
 
-      // Upload image if provided
-      if (imageFile) {
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+      // Upload new images
+      for (const file of imageFiles) {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("products")
-          .upload(fileName, imageFile);
+          .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
@@ -127,33 +148,32 @@ const AdminProducts = () => {
           .from("products")
           .getPublicUrl(uploadData.path);
 
-        imageUrl = publicUrl;
+        finalImages.push(publicUrl);
       }
+
+      // Main image is the first one
+      const mainImageUrl = finalImages.length > 0 ? finalImages[0] : null;
+
+      const payload = {
+        name: validated.name,
+        price: validated.price,
+        category: validated.category,
+        description: validated.description || null,
+        image_url: mainImageUrl, // Backward compatibility
+        images: finalImages,
+        is_active: validated.is_active,
+      };
 
       if (editingProduct) {
         const { error } = await supabase
           .from("products")
-          .update({
-            name: validated.name,
-            price: validated.price,
-            category: validated.category,
-            description: validated.description || null,
-            image_url: imageUrl,
-            is_active: validated.is_active,
-          })
+          .update(payload)
           .eq("id", editingProduct.id);
 
         if (error) throw error;
         toast({ title: "Success", description: "Product updated successfully" });
       } else {
-        const { error } = await supabase.from("products").insert({
-          name: validated.name,
-          price: validated.price,
-          category: validated.category,
-          description: validated.description || null,
-          image_url: imageUrl,
-          is_active: validated.is_active,
-        });
+        const { error } = await supabase.from("products").insert(payload);
 
         if (error) throw error;
         toast({ title: "Success", description: "Product created successfully" });
@@ -199,17 +219,23 @@ const AdminProducts = () => {
     }
   };
 
-  const toggleActive = async (id: string, isActive: boolean) => {
+  const handleToggleActive = async (product: Product) => {
     try {
+      const currentStatus = String(product.is_active) === "1" || product.is_active === true;
       const { error } = await supabase
         .from("products")
-        .update({ is_active: !isActive })
-        .eq("id", id);
+        .update({ is_active: !currentStatus })
+        .eq("id", product.id);
 
       if (error) throw error;
       fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating product:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
     }
   };
 
@@ -293,16 +319,45 @@ const AdminProducts = () => {
                   <Label htmlFor="is_active">Active Status</Label>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="image">Product Image</Label>
+                  <Label htmlFor="images">Product Images</Label>
                   <Input
-                    id="image"
+                    id="images"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                    multiple
+                    onChange={handleImageChange}
+                    className="cursor-pointer"
                   />
-                  {editingProduct?.image_url && !imageFile && (
-                    <p className="text-sm text-muted-foreground">Current image will be kept if no new image is selected</p>
-                  )}
+
+                  {/* Image Previews */}
+                  <div className="grid grid-cols-4 gap-4 mt-4">
+                    {existingImages.map((url, idx) => (
+                      <div key={`existing-${idx}`} className="relative group aspect-square rounded-lg overflow-hidden border border-border">
+                        <img src={url} alt={`Existing ${idx}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx, true)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {imageFiles.map((file, idx) => (
+                      <div key={`new-${idx}`} className="relative group aspect-square rounded-lg overflow-hidden border border-border">
+                        <img src={URL.createObjectURL(file)} alt={`New ${idx}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx, false)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 text-center">New</div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">First image will be the primary display image.</p>
                 </div>
                 <div className="flex gap-3 pt-4">
                   <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
@@ -325,7 +380,7 @@ const AdminProducts = () => {
                 <TableHead className="text-gold font-serif">Name</TableHead>
                 <TableHead className="text-gold font-serif">Price</TableHead>
                 <TableHead className="text-gold font-serif">Category</TableHead>
-                <TableHead className="text-gold font-serif">Status</TableHead>
+                <TableHead className="text-gold font-serif">Visible</TableHead>
                 <TableHead className="text-right text-gold font-serif">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -362,16 +417,11 @@ const AdminProducts = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        className={`border ${product.is_active
-                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
-                          }`}
-                        onClick={() => toggleActive(product.id, product.is_active)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {product.is_active ? "Active" : "Inactive"}
-                      </Badge>
+                      <Switch
+                        checked={String(product.is_active) === "1" || product.is_active === true}
+                        onCheckedChange={() => handleToggleActive(product)}
+                        className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

@@ -100,7 +100,7 @@ const AdminServices = () => {
                         description: formData.description,
                         image_url: formData.image_url,
                         features: formData.features,
-                        is_active: formData.is_active
+                        is_active: String(formData.is_active) === "1" || formData.is_active === true
                     })
                     .eq("id", editingService.id);
 
@@ -145,9 +145,10 @@ const AdminServices = () => {
 
     const handleToggleActive = async (service: Service) => {
         try {
+            const currentStatus = String(service.is_active) === "1" || service.is_active === true;
             const { error } = await supabase
                 .from("services")
-                .update({ is_active: !service.is_active })
+                .update({ is_active: !currentStatus })
                 .eq("id", service.id);
             if (error) throw error;
             fetchServices();
@@ -246,8 +247,9 @@ const AdminServices = () => {
                                         <TableCell className="max-w-xs truncate text-emerald-100/70" title={service.description}>{service.description}</TableCell>
                                         <TableCell className="text-center">
                                             <Switch
-                                                checked={service.is_active}
+                                                checked={String(service.is_active) === "1" || service.is_active === true}
                                                 onCheckedChange={() => handleToggleActive(service)}
+                                                className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
                                             />
                                         </TableCell>
                                         <TableCell className="text-right">

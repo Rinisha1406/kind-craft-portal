@@ -6,7 +6,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingBag, Sparkles, Filter, ChevronRight, Star, Shield, RefreshCw, ArrowRight } from "lucide-react";
+import { ShoppingBag, Sparkles, Filter, ChevronRight, Star, Shield, RefreshCw, ArrowRight, MessageCircle } from "lucide-react";
 import productsHero from "@/assets/products-hero.jpg";
 
 const categories = ["all", "gold", "silver", "diamond", "platinum", "gemstone"];
@@ -26,6 +26,7 @@ interface Product {
   category: string;
   description: string | null;
   image_url: string | null;
+  images?: string[];
   is_active: boolean;
 }
 
@@ -63,6 +64,7 @@ const Products = () => {
       const { data, error } = await supabase
         .from("products")
         .select("*")
+        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -271,7 +273,23 @@ const Products = () => {
                         <p className="text-primary font-bold text-2xl">
                           ₹{product.price.toLocaleString("en-IN")}
                         </p>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                        <motion.button
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="h-10 w-10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center relative overflow-hidden group border border-emerald-400/20"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const phoneNumber = "919876543210";
+                            const message = encodeURIComponent(
+                              `Hi, I am interested in buying the following product:\n\n*${product.name}*\nPrice: ₹${product.price}\nCategory: ${product.category}\nLink: ${window.location.origin}/product/${product.id}`
+                            );
+                            window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+                          }}
+                          title="Buy on WhatsApp"
+                        >
+                          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                          <MessageCircle className="w-5 h-5 relative z-10" />
+                        </motion.button>
                       </div>
                     </div>
                   </motion.div>

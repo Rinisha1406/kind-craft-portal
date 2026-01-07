@@ -128,63 +128,65 @@ const Services = () => {
                         <div className="text-center text-muted-foreground py-20">No active services at the moment.</div>
                     ) : (
                         <motion.div
-                            className="grid gap-16"
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                             initial="initial"
                             whileInView="animate"
                             viewport={{ once: true }}
                             variants={staggerContainer}
                         >
-                            {services.map((service, index) => {
-                                const isEven = index % 2 === 0;
+                            {services.map((service) => (
+                                <motion.div
+                                    key={service.id}
+                                    variants={fadeInUp}
+                                    className="group bg-card/30 rounded-3xl overflow-hidden border border-border/50 hover:border-gold/30 transition-all duration-500 hover:shadow-2xl hover:shadow-gold/5 flex flex-col h-full"
+                                >
+                                    {/* Image Section */}
+                                    <div className="h-64 overflow-hidden relative bg-black/20">
+                                        {service.image_url ? (
+                                            <>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10 opacity-60 transition-opacity duration-500 group-hover:opacity-40" />
+                                                <img
+                                                    src={service.image_url}
+                                                    alt={service.title}
+                                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                                />
+                                            </>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-charcoal/50 group-hover:bg-charcoal/40 transition-colors">
+                                                <Sparkles className="w-12 h-12 text-gold/20" />
+                                            </div>
+                                        )}
+                                        {/* Icon Overlay (Optional decoration) */}
+                                        <div className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-gold/20 flex items-center justify-center">
+                                            <ShieldCheck className="w-5 h-5 text-gold" />
+                                        </div>
+                                    </div>
 
-                                // Alternate layout for large feature blocks
-                                // We can use a simpler grid for items without images or specific ones
-                                // For now, let's use a consistent rich card layout
+                                    {/* Content Section */}
+                                    <div className="p-8 flex flex-col flex-grow">
+                                        <h2 className="text-2xl font-serif font-bold text-foreground mb-4 group-hover:text-gold transition-colors">
+                                            {service.title}
+                                        </h2>
 
-                                return (
-                                    <motion.div
-                                        key={service.id}
-                                        variants={fadeInUp}
-                                        className="group grid md:grid-cols-2 gap-8 items-center bg-card/30 rounded-3xl p-8 border border-border/50 hover:border-gold/30 transition-all duration-500"
-                                    >
-                                        <div className={`space-y-6 ${!isEven ? "md:order-2" : "md:order-1"}`}>
-                                            <h2 className="text-3xl font-serif font-bold text-foreground">{service.title}</h2>
-                                            <p className="text-muted-foreground text-lg leading-relaxed">
-                                                {service.description}
-                                            </p>
+                                        <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
+                                            {service.description}
+                                        </p>
 
-                                            {service.features && service.features.length > 0 && (
+                                        {service.features && service.features.length > 0 && (
+                                            <div className="pt-6 border-t border-border/10">
                                                 <ul className="space-y-3">
                                                     {service.features.map((feature, idx) => (
-                                                        <li key={idx} className="flex items-center gap-3 text-foreground/80">
-                                                            <ShieldCheck className="w-5 h-5 text-gold" />
+                                                        <li key={idx} className="flex items-start gap-3 text-sm text-foreground/80">
+                                                            <div className="min-w-[5px] h-[5px] rounded-full bg-gold mt-2" />
                                                             {feature}
                                                         </li>
                                                     ))}
                                                 </ul>
-                                            )}
-
-                                        </div>
-
-                                        <div className={`${!isEven ? "md:order-1" : "md:order-2"} h-[300px] md:h-[400px] rounded-2xl overflow-hidden relative bg-black/20`}>
-                                            {service.image_url ? (
-                                                <>
-                                                    <div className="absolute inset-0 bg-gradient-to-br from-gold/20 to-transparent mix-blend-overlay z-10" />
-                                                    <img
-                                                        src={service.image_url}
-                                                        alt={service.title}
-                                                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                                                    />
-                                                </>
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-charcoal/50">
-                                                    <span className="text-gold/20 font-serif text-4xl">{service.title.charAt(0)}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            ))}
                         </motion.div>
                     )}
                 </div>

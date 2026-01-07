@@ -15,6 +15,7 @@ interface Product {
     category: string;
     description: string | null;
     image_url: string | null;
+    images?: string[];
     is_active: boolean;
 }
 
@@ -22,6 +23,7 @@ const ProductDetails = () => {
     const { id } = useParams<{ id: string }>();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     useEffect(() => {
         if (id) {
@@ -40,6 +42,11 @@ const ProductDetails = () => {
 
             if (error) throw error;
             setProduct(data);
+            // Set initial selected image to image_url or first image in array
+            if (data) {
+                const initialImage = data.image_url || (data.images && data.images.length > 0 ? data.images[0] : null);
+                setSelectedImage(initialImage);
+            }
         } catch (error) {
             console.error("Error fetching product:", error);
             toast.error("Failed to load product details");
@@ -92,6 +99,11 @@ const ProductDetails = () => {
         );
     }
 
+    // Prepare images array for gallery
+    const galleryImages = product.images && product.images.length > 0
+        ? product.images
+        : (product.image_url ? [product.image_url] : []);
+
     return (
         <MainLayout>
             <div className="container mx-auto px-4 py-8">
@@ -102,24 +114,44 @@ const ProductDetails = () => {
 
                 <div className="grid md:grid-cols-2 gap-12 items-start">
                     {/* Image Section */}
-                    <div className="relative aspect-square bg-muted rounded-2xl overflow-hidden border border-border shadow-card">
-                        {product.image_url ? (
-                            <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
-                                <span className="text-6xl">✦</span>
-                            </div>
-                        )}
+                    <div className="space-y-4">
+                        <div className="relative aspect-square bg-muted rounded-2xl overflow-hidden border border-border shadow-card">
+                            {selectedImage ? (
+                                <img
+                                    src={selectedImage}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
+                                    <span className="text-6xl">✦</span>
+                                </div>
+                            )}
 
-                        {!product.is_active && (
-                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[2px]">
-                                <Badge variant="destructive" className="text-2xl px-6 py-3 border-2 border-red-200">
-                                    Sold Out
-                                </Badge>
+                            {!product.is_active && (
+                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[2px]">
+                                    <Badge variant="destructive" className="text-2xl px-6 py-3 border-2 border-red-200">
+                                        Sold Out
+                                    </Badge>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Thumbnails */}
+                        {galleryImages.length > 1 && (
+                            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                                {galleryImages.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setSelectedImage(img)}
+                                        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${selectedImage === img
+                                                ? "border-primary shadow-lg ring-2 ring-primary/20"
+                                                : "border-transparent opacity-70 hover:opacity-100"
+                                            }`}
+                                    >
+                                        <img src={img} alt={`${product.name} view ${idx + 1}`} className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>
