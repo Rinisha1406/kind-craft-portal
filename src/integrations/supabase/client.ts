@@ -129,7 +129,15 @@ class SupabaseCompat {
       getPublicUrl: (path: string) => {
         // Assuming logic returns full or relative path that works
         // Verify if path already has /uploads prefix (from upload response) or needs it
-        const publicUrl = path.startsWith('/uploads/') ? path : `/uploads/${path}`;
+        // If path already has /uploads (anywhere) or /public/uploads, assume it's good or relative to root
+        let publicUrl = path;
+        if (!path.startsWith('/') && !path.startsWith('http')) {
+          // If it's just a filename "foo.jpg"
+          publicUrl = `/public/uploads/${path}`;
+        } else if (path.startsWith('/uploads/')) {
+          // Legacy fix: if it starts with /uploads/, map to /public/uploads/
+          publicUrl = `/public${path}`;
+        }
         return { data: { publicUrl } };
       }
     })

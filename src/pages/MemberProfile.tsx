@@ -126,27 +126,6 @@ const MemberProfile = () => {
                                     </Button>
                                 </div>
                             </div>
-
-                            <div className="bg-emerald-950/20 border border-gold/20 rounded-3xl p-6">
-                                <h3 className="text-gold font-serif font-bold mb-4 flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4" />
-                                    Membership Perks
-                                </h3>
-                                <ul className="space-y-3 text-sm text-champagne/70">
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                        Exclusive Event Invitations
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                        Priority Customer Support
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 bg-gold rounded-full" />
-                                        Personal Service Concierge
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
 
                         {/* Main Content / Edit Form */}

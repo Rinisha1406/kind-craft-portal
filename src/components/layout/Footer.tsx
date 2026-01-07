@@ -20,7 +20,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <Link to="/" className="flex items-center gap-3 mb-6">
+            <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 gold-gradient rounded-xl flex items-center justify-center shadow-gold">
                 <Gem className="w-6 h-6 text-primary-foreground" />
               </div>
@@ -61,14 +61,16 @@ const Footer = () => {
             <ul className="space-y-3">
               {[
                 { name: "Home", path: "/" },
+                { name: "Services", path: "/services" },
                 { name: "Products", path: "/products" },
                 { name: "Matrimony", path: "/matrimony" },
-                { name: "Membership", path: "/members" },
-                { name: "Contact Us", path: "/contact" },
+                { name: "Members", path: "/members" },
+                { name: "Contact", path: "/contact" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
+                    onClick={() => window.scrollTo(0, 0)}
                     className="group flex items-center gap-2 text-champagne/60 text-sm hover:text-gold transition-colors"
                   >
                     <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -88,10 +90,11 @@ const Footer = () => {
           >
             <h4 className="font-serif text-lg font-semibold text-champagne mb-6">Collections</h4>
             <ul className="space-y-3">
-              {["Gold Jewelry", "Diamond Collection", "Silver Pieces", "Platinum Range", "Bridal Sets", "Gemstone Jewelry"].map((cat) => (
+              {["Gold Jewelry", "Diamond Collection", "Silver Pieces", "Platinum Range", "Gemstone Jewelry"].map((cat) => (
                 <li key={cat}>
                   <Link
                     to="/products"
+                    onClick={() => window.scrollTo(0, 0)}
                     className="group flex items-center gap-2 text-champagne/60 text-sm hover:text-gold transition-colors"
                   >
                     <span className="w-1.5 h-1.5 bg-gold/50 rounded-full" />

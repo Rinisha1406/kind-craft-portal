@@ -21,14 +21,18 @@ $stmt = $conn->prepare("SELECT id, phone, password_hash FROM users WHERE phone =
 $stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
+file_put_contents('../debug_login_v2.log', date('Y-m-d H:i:s') . " - Login Phone: $phone\n", FILE_APPEND);
 
 if ($result->num_rows === 0) {
+    file_put_contents('../debug_login_v2.log', " - User NOT found\n", FILE_APPEND);
     send_json_response(['error' => 'Invalid credentials'], 401);
 }
 
 $user = $result->fetch_assoc();
+file_put_contents('../debug_login_v2.log', " - Found User ID: " . $user['id'] . "\n", FILE_APPEND);
 
 if (password_verify($password, $user['password_hash'])) {
+    file_put_contents('../debug_login_v2.log', " - Verify SUCCESS\n", FILE_APPEND);
     // Determine Role
     $role_stmt = $conn->prepare("SELECT role FROM user_roles WHERE user_id = ?");
     $role_stmt->bind_param("s", $user['id']);
@@ -59,6 +63,7 @@ if (password_verify($password, $user['password_hash'])) {
         'error' => null
     ]);
 } else {
+    file_put_contents('../debug_login_v2.log', " - Verify FAILED. Hash: " . substr($user['password_hash'], 0, 10) . "...\n", FILE_APPEND);
     send_json_response(['error' => 'Invalid credentials'], 401);
 }
 

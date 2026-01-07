@@ -11,14 +11,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     $mine = isset($_GET['mine']) && $_GET['mine'] === 'true';
     
-    if ($mine) {
+    $admin_view = isset($_GET['admin']) && $_GET['admin'] === 'true';
+    
+    if ($admin_view) {
+        // Admin view: Fetch ALL services
+        if (!is_admin($conn, $user)) send_json_response(['error' => 'Unauthorized'], 403);
+        
+        $sql = "SELECT s.*, m.full_name as provider_name 
+                FROM services s 
+                LEFT JOIN members m ON s.user_id = m.user_id 
+                ORDER BY s.created_at DESC";
+        $result = $conn->query($sql);
+    } elseif ($mine) {
         if (!$user) send_json_response(['error' => 'Unauthorized'], 401);
         $stmt = $conn->prepare("SELECT * FROM services WHERE user_id = ? ORDER BY created_at DESC");
         $stmt->bind_param("s", $user['id']);
         $stmt->execute();
         $result = $stmt->get_result();
     } else {
-        // Public marketplace view (all active)
+        // Public marketplace view (only active)
         // Show Platform services first, then Community services
         $sql = "SELECT s.*, m.full_name as provider_name 
                 FROM services s 
@@ -70,7 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $provider_id = $user['id'];
     } else {
         // Admin can specify a provider or leave it NULL
-        $provider_id = $input['user_id'] ?? null;
+        // If no user_id is provided in input, default to the admin's own ID so they can create services as themselves
+        $provider_id = $input['user_id'] ?? $user['id'];
     }
     
     $stmt = $conn->prepare("INSERT INTO services (id, user_id, title, description, price, category, image_url, features, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");

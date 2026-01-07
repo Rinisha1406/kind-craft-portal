@@ -276,6 +276,8 @@ const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void
 
 
 const Members = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"register" | "signin" | "forgot-password">("register");
 
   const fadeInUp = {
@@ -342,7 +344,7 @@ const Members = () => {
               </motion.p>
             </motion.div>
 
-            {/* Right Column: Auth Forms */}
+            {/* Right Column: Auth Forms or Dashboard Access */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -350,51 +352,69 @@ const Members = () => {
               className="w-full max-w-md ml-auto"
             >
               <div className="bg-charcoal/40 backdrop-blur-xl border border-gold/20 rounded-3xl shadow-2xl p-8">
-                <AnimatePresence mode="wait">
-                  {activeTab === "register" ? (
-                    <motion.div
-                      key="register"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.3 }}
+                {user ? (
+                  <div className="text-center space-y-6 py-8">
+                    <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gold/20">
+                      <Crown className="w-10 h-10 text-gold" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back!</h3>
+                      <p className="text-champagne/60 mt-2">You are currently signed in.</p>
+                    </div>
+                    <Button
+                      onClick={() => navigate("/member/dashboard")}
+                      className="w-full h-12 gold-gradient text-emerald-950 font-black shadow-gold hover:scale-[1.02] transition-transform rounded-xl"
                     >
-                      <div className="text-center mb-6">
-                        <h3 className="text-2xl font-serif font-bold text-champagne">Create Account</h3>
-                        <p className="text-champagne/60 text-sm">Join the family today</p>
-                      </div>
-                      <MemberRegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
-                    </motion.div>
-                  ) : activeTab === "signin" ? (
-                    <motion.div
-                      key="signin"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="text-center mb-6">
-                        <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
-                        <p className="text-champagne/60 text-sm">Sign in to your account</p>
-                      </div>
-                      <MemberSignInForm onRegisterClick={() => setActiveTab("register")} onForgotClick={() => setActiveTab("forgot-password")} />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="forgot-password"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="text-center mb-6">
-                        <h3 className="text-2xl font-serif font-bold text-champagne">Reset Password</h3>
-                        <p className="text-champagne/60 text-sm">Verify details to continue</p>
-                      </div>
-                      <MemberForgotPasswordForm onBackToLogin={() => setActiveTab("signin")} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      Go to Dashboard <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                ) : (
+                  <AnimatePresence mode="wait">
+                    {activeTab === "register" ? (
+                      <motion.div
+                        key="register"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="text-center mb-6">
+                          <h3 className="text-2xl font-serif font-bold text-champagne">Create Account</h3>
+                          <p className="text-champagne/60 text-sm">Join the family today</p>
+                        </div>
+                        <MemberRegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
+                      </motion.div>
+                    ) : activeTab === "signin" ? (
+                      <motion.div
+                        key="signin"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="text-center mb-6">
+                          <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
+                          <p className="text-champagne/60 text-sm">Sign in to your account</p>
+                        </div>
+                        <MemberSignInForm onRegisterClick={() => setActiveTab("register")} onForgotClick={() => setActiveTab("forgot-password")} />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="forgot-password"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div className="text-center mb-6">
+                          <h3 className="text-2xl font-serif font-bold text-champagne">Reset Password</h3>
+                          <p className="text-champagne/60 text-sm">Verify details to continue</p>
+                        </div>
+                        <MemberForgotPasswordForm onBackToLogin={() => setActiveTab("signin")} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
               </div>
             </motion.div>
 
