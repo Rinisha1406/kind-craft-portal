@@ -33,7 +33,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename="/kind-craft-portal">
+        <BrowserRouter basename="/">
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />

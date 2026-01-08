@@ -73,15 +73,7 @@ const Navbar = () => {
             ))}
 
             <div className="ml-4 pl-4 border-l border-border/50">
-              {user ? (
-                <Button asChild variant="outline" className="border-gold/30 text-gold hover:bg-gold/10 rounded-xl px-6">
-                  <Link to="/member/dashboard">Dashboard</Link>
-                </Button>
-              ) : (
-                <Button asChild className="gold-gradient text-emerald-950 font-bold rounded-xl px-6">
-                  <Link to="/members">Join Us</Link>
-                </Button>
-              )}
+              {/* Auth buttons removed as per request */}
             </div>
           </div>
 

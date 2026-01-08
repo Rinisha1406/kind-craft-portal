@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $target_path = $upload_dir . $new_filename;
     
     if (move_uploaded_file($file['tmp_name'], $target_path)) {
-        $public_url = '/uploads/' . $new_filename; // Relative URL
+        $public_url = '/public/uploads/' . $new_filename; // Relative URL
         send_json_response(['data' => ['publicUrl' => $public_url], 'error' => null]);
     } else {
         send_json_response(['error' => 'Failed to move uploaded file'], 500);

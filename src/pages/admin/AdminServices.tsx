@@ -14,16 +14,15 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, Link as LinkIcon, Eye, EyeOff, Check, X, ImageIcon, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, X, Loader2 } from "lucide-react";
 
 interface Service {
     id: string;
@@ -34,11 +33,13 @@ interface Service {
     category: string;
     image_url: string;
     features: string[];
-    is_active: boolean;
+    is_active: number; // API uses number (1/0)
     provider_name?: string;
+    created_at?: string;
 }
 
 const AdminServices = () => {
+    const { user } = useAuth();
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -48,26 +49,34 @@ const AdminServices = () => {
         description: "",
         image_url: "",
         features: [],
-        is_active: true,
+        is_active: 1,
+        price: "",
+        category: ""
     });
     const [featureInput, setFeatureInput] = useState("");
     const { toast } = useToast();
     const [uploading, setUploading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        fetchServices();
-    }, []);
+        if (user) {
+            fetchServices();
+        }
+    }, [user]);
 
     const fetchServices = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase.from("services").select("*, members(full_name)").order("created_at", { ascending: true });
-            if (error) throw error;
-            const mappedData = data?.map((s: any) => ({
-                ...s,
-                provider_name: s.members?.full_name || "Platform"
-            }));
-            setServices(mappedData || []);
+            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?admin=true`, {
+                headers: {
+                    'Authorization': `Bearer ${user?.id}`
+                }
+            });
+            const result = await response.json();
+
+            if (result.error) throw new Error(result.error);
+
+            setServices(result.data || []);
         } catch (error: any) {
             toast({
                 title: "Error fetching services",
@@ -82,7 +91,10 @@ const AdminServices = () => {
     const handleOpenDialog = (service?: Service) => {
         if (service) {
             setEditingService(service);
-            setFormData({ ...service });
+            setFormData({
+                ...service,
+                features: Array.isArray(service.features) ? service.features : []
+            });
         } else {
             setEditingService(null);
             setFormData({
@@ -90,7 +102,9 @@ const AdminServices = () => {
                 description: "",
                 image_url: "",
                 features: [],
-                is_active: true,
+                is_active: 1,
+                price: "",
+                category: ""
             });
         }
         setIsDialogOpen(true);
@@ -98,35 +112,32 @@ const AdminServices = () => {
 
     const handleSave = async () => {
         try {
+            setSubmitting(true);
             if (!formData.title) return toast({ title: "Title is required", variant: "destructive" });
 
-            if (editingService) {
-                const { error } = await supabase
-                    .from("services")
-                    .update({
-                        title: formData.title,
-                        description: formData.description,
-                        image_url: formData.image_url,
-                        features: formData.features,
-                        is_active: String(formData.is_active) === "1" || formData.is_active === true
-                    })
-                    .eq("id", editingService.id);
+            const url = editingService
+                ? `http://localhost/kind-craft-portal/api/services.php?id=${editingService.id}`
+                : `http://localhost/kind-craft-portal/api/services.php`;
 
-                if (error) throw error;
-                toast({ title: "Service updated successfully" });
-            } else {
-                const { error } = await supabase.from("services").insert([{
-                    title: formData.title,
-                    description: formData.description,
-                    image_url: formData.image_url,
-                    features: formData.features,
-                    is_active: true
-                }]);
+            const method = editingService ? 'PUT' : 'POST';
 
-                if (error) throw error;
-                toast({ title: "Service created successfully" });
-            }
+            // Ensure user_id is passed if creating and not editing (though API handles provider)
+            // For admin creating platform services, user_id should be null or special handling?
+            // API: if admin, provider_id = input['user_id'] ?? null. So null is platform.
 
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.id}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+
+            toast({ title: editingService ? "Service updated" : "Service created" });
             setIsDialogOpen(false);
             fetchServices();
         } catch (error: any) {
@@ -136,14 +147,23 @@ const AdminServices = () => {
                 description: error.message || "Something went wrong",
                 variant: "destructive",
             });
+        } finally {
+            setSubmitting(false);
         }
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this service?")) return;
         try {
-            const { error } = await supabase.from("services").delete().eq("id", id);
-            if (error) throw error;
+            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${user?.id}`
+                }
+            });
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+
             toast({ title: "Service deleted" });
             fetchServices();
         } catch (error: any) {
@@ -153,12 +173,19 @@ const AdminServices = () => {
 
     const handleToggleActive = async (service: Service) => {
         try {
-            const currentStatus = String(service.is_active) === "1" || service.is_active === true;
-            const { error } = await supabase
-                .from("services")
-                .update({ is_active: !currentStatus })
-                .eq("id", service.id);
-            if (error) throw error;
+            const newStatus = service.is_active ? 0 : 1;
+            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${service.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?.id}`
+                },
+                body: JSON.stringify({ is_active: newStatus })
+            });
+
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+
             fetchServices();
         } catch (error: any) {
             toast({ title: "Error updating status", description: error.message, variant: "destructive" });
@@ -167,7 +194,10 @@ const AdminServices = () => {
 
     const addFeature = () => {
         if (!featureInput.trim()) return;
-        setFormData(prev => ({ ...prev, features: [...(prev.features || []), featureInput] }));
+        setFormData(prev => ({
+            ...prev,
+            features: [...(prev.features || []), featureInput]
+        }));
         setFeatureInput("");
     };
 
@@ -184,18 +214,21 @@ const AdminServices = () => {
         try {
             setUploading(true);
             const file = e.target.files[0];
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `${fileName}`;
+            const uploadData = new FormData();
+            uploadData.append('file', file);
 
-            const { error: uploadError } = await supabase.storage
-                .from('service-images') // Ensure this bucket exists or use 'product-images' if needed
-                .upload(filePath, file);
+            const response = await fetch('http://localhost/kind-craft-portal/api/upload.php', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${user?.id}`
+                },
+                body: uploadData
+            });
 
-            if (uploadError) throw uploadError;
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
 
-            const { data } = supabase.storage.from('service-images').getPublicUrl(filePath);
-            setFormData({ ...formData, image_url: data.publicUrl });
+            setFormData({ ...formData, image_url: result.data.publicUrl });
             toast({ title: "Image uploaded successfully" });
         } catch (error: any) {
             toast({ title: "Upload failed", description: error.message, variant: "destructive" });
@@ -223,6 +256,7 @@ const AdminServices = () => {
                             <TableRow className="hover:bg-transparent border-gold/10">
                                 <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Image</TableHead>
                                 <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Title</TableHead>
+                                <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Date Added</TableHead>
                                 <TableHead className="text-gold font-serif whitespace-nowrap">Provider</TableHead>
                                 <TableHead className="text-gold font-serif whitespace-nowrap text-center">Price</TableHead>
                                 <TableHead className="text-gold font-serif whitespace-nowrap text-center">Visible</TableHead>
@@ -232,13 +266,13 @@ const AdminServices = () => {
                         <TableBody>
                             {loading ? (
                                 <TableRow className="hover:bg-transparent border-gold/10">
-                                    <TableCell colSpan={5} className="text-center py-12">
+                                    <TableCell colSpan={6} className="text-center py-12">
                                         <Loader2 className="w-8 h-8 animate-spin mx-auto text-gold" />
                                     </TableCell>
                                 </TableRow>
                             ) : services.length === 0 ? (
                                 <TableRow className="hover:bg-transparent border-gold/10">
-                                    <TableCell colSpan={5} className="text-center py-12 text-zinc-500 font-serif italic">No services found.</TableCell>
+                                    <TableCell colSpan={6} className="text-center py-12 text-zinc-500 font-serif italic">No services found.</TableCell>
                                 </TableRow>
                             ) : (
                                 services.map((service) => (
@@ -253,13 +287,16 @@ const AdminServices = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell className="font-medium text-white group-hover:text-gold transition-colors whitespace-nowrap">{service.title}</TableCell>
+                                        <TableCell className="text-zinc-400 whitespace-nowrap text-sm">
+                                            {service.created_at ? new Date(service.created_at).toLocaleDateString() : "-"}
+                                        </TableCell>
                                         <TableCell className="text-emerald-100/70 whitespace-nowrap">
-                                            {service.provider_name}
+                                            {service.provider_name || "Platform"}
                                         </TableCell>
                                         <TableCell className="text-center text-blue-300 font-bold">{service.price || "-"}</TableCell>
                                         <TableCell className="text-center">
                                             <Switch
-                                                checked={String(service.is_active) === "1" || service.is_active === true}
+                                                checked={!!service.is_active}
                                                 onCheckedChange={() => handleToggleActive(service)}
                                                 className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
                                             />
@@ -365,7 +402,8 @@ const AdminServices = () => {
 
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={uploading}>
+                        <Button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={submitting || uploading}>
+                            {submitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
                             {editingService ? "Update Service" : "Create Service"}
                         </Button>
                     </DialogFooter>
