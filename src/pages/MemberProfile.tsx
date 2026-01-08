@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import MainLayout from "@/components/layout/MainLayout";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,8 @@ const MemberProfile = () => {
 
     const fetchMemberData = async () => {
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/members.php`, {
+            // Sync with PHP/MySQL Database
+            const response = await fetch(`${API_URL}/members.php`, {
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
                 }
@@ -57,7 +59,7 @@ const MemberProfile = () => {
         if (!member) return;
         setSaving(true);
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${member.id}`, {
+            const response = await fetch(`${API_URL}/members.php?id=${member.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -78,7 +80,7 @@ const MemberProfile = () => {
 
     if (loading) {
         return (
-            <MainLayout>
+            <MainLayout showFooter={false}>
                 <div className="min-h-screen flex items-center justify-center">
                     <Loader2 className="w-10 h-10 animate-spin text-gold" />
                 </div>
@@ -87,7 +89,7 @@ const MemberProfile = () => {
     }
 
     return (
-        <MainLayout>
+        <MainLayout showFooter={false}>
             <div className="min-h-screen bg-zinc-950 py-20 px-4">
                 <div className="container mx-auto max-w-4xl">
                     <motion.div

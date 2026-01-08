@@ -26,14 +26,13 @@ const Footer = () => {
               </div>
               <div>
                 <span className="text-xl font-serif font-bold text-champagne">
-                  Golden<span className="text-gold">Legacy</span>
+                  GOLD<span className="text-gold">JEWELTECH</span>
                 </span>
-                <span className="block text-xs text-champagne/60">Since 1974</span>
               </div>
             </Link>
             <p className="text-champagne/60 text-sm leading-relaxed mb-6">
               Premium jewelry and trusted matrimony services for our cherished community.
-              Building legacies for over 50 years.
+              Excellence in craftsmanship for over 50 years.
             </p>
             <div className="flex gap-3">
               {[Instagram, Facebook, Twitter, Youtube].map((Icon, i) => (
@@ -116,7 +115,7 @@ const Footer = () => {
             <ul className="space-y-4">
               {[
                 { icon: Phone, text: "+91 98765 43210" },
-                { icon: Mail, text: "info@goldenlegacy.com" },
+                { icon: Mail, text: "info@goldjeweltech.com" },
                 { icon: MapPin, text: "123 Jewelry Street, Mumbai, Maharashtra 400001" },
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 text-champagne/60 text-sm">
@@ -134,7 +133,7 @@ const Footer = () => {
         <div className="border-t border-champagne/10 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-champagne/40 text-sm">
-              © {currentYear} Golden Legacy. All rights reserved.
+              © {currentYear} GOLDJEWELTECH. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-champagne/40">
               <a href="#" className="hover:text-gold transition-colors">Privacy Policy</a>

@@ -40,7 +40,7 @@ const MemberDashboard = () => {
     ];
 
     return (
-        <MainLayout>
+        <MainLayout showFooter={false}>
             <div className="min-h-screen bg-zinc-950 pt-24 pb-12 px-4">
                 <div className="container mx-auto max-w-6xl">
                     <motion.div
@@ -58,7 +58,7 @@ const MemberDashboard = () => {
                             </h1>
                             <p className="text-champagne/60 text-lg max-w-2xl leading-relaxed">
                                 We're glad to have you here. This is your personal hub to access all elite membership benefits
-                                and manage your experience with Kind Craft.
+                                and manage your experience with GOLDJEWELTECH.
                             </p>
                         </div>
                         <Button

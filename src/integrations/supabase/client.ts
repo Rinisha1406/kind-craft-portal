@@ -1,7 +1,13 @@
 // Compat layer to replace Supabase with PHP API
 // This mimics the Supabase client interface used in the app
 
-const API_URL = 'http://localhost/kind-craft-portal/api'; // Adjust if needed
+// Dynamically determine API URL
+// If running on the live hostinger site, use the absolute URL or relative /api
+// For local XAMPP, use the subfolder path
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+export const API_URL = isLocal
+  ? 'http://localhost/kind-craft-portal/api'
+  : 'https://darkseagreen-ram-733578.hostingersite.com/api';
 
 // Helper to make requests
 async function apiRequest(endpoint: string, method: string, body?: any) {
@@ -162,12 +168,18 @@ class QueryBuilder {
   private filters: Record<string, any> = {};
   private _updateData: any = null;
   private _delete: boolean = false;
+  private _countOption: string | null = null;
+  private _headOption: boolean = false;
 
   constructor(table: string) {
     this.table = table;
   }
 
-  select(columns = '*') { return this; }
+  select(columns = '*', options?: { count?: string, head?: boolean }) {
+    if (options?.count) this._countOption = options.count;
+    if (options?.head) this._headOption = options.head;
+    return this;
+  }
 
   eq(column: string, value: any) {
     this.filters[column] = value;
@@ -237,6 +249,18 @@ class QueryBuilder {
     }
 
     const res = await apiRequest(endpoint, method, body);
+
+    // Support for count/head options used in dashboard
+    if (this._countOption || this._headOption) {
+      const dataLen = Array.isArray(res.data) ? res.data.length : 0;
+      const countRes = {
+        data: this._headOption ? null : res.data,
+        count: dataLen,
+        error: res.error
+      };
+      return resolve(countRes);
+    }
+
     return resolve(res);
   }
 

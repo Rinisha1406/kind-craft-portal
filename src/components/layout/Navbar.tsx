@@ -39,12 +39,9 @@ const Navbar = () => {
             >
               <Gem className="w-6 h-6 text-primary-foreground" />
             </motion.div>
-            <div className="hidden sm:block">
-              <span className="text-xl font-serif font-bold text-foreground">
-                Golden<span className="text-primary">Legacy</span>
-              </span>
-              <span className="block text-xs text-muted-foreground -mt-1">Since 1974</span>
-            </div>
+            <span className="text-xl font-serif font-bold text-foreground">
+              GOLD<span className="text-primary">JEWELTECH</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

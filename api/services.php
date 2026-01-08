@@ -10,41 +10,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $user = verify_auth_token($conn);
     
     $mine = isset($_GET['mine']) && $_GET['mine'] === 'true';
-    
     $admin_view = isset($_GET['admin']) && $_GET['admin'] === 'true';
+    $id_filter = $_GET['id'] ?? null;
     
-    if ($admin_view) {
-        // Admin view: Fetch ALL services
+    // Support is_active filter from SupabaseCompat (.eq('is_active', true))
+    // Default to true (1) for public view, but allow admin/mine to see all unless specified
+    $is_active_filter = isset($_GET['is_active']) ? ($_GET['is_active'] === 'true' || $_GET['is_active'] === '1' ? 1 : 0) : null;
+    
+    if ($id_filter) {
+        $stmt = $conn->prepare("SELECT s.*, m.full_name as provider_name FROM services s LEFT JOIN members m ON s.user_id = m.user_id WHERE s.id = ?");
+        $stmt->bind_param("s", $id_filter);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } elseif ($admin_view) {
+        // Admin view: Fetch ALL services (or filtered by is_active if param provided)
         if (!is_admin($conn, $user)) send_json_response(['error' => 'Unauthorized'], 403);
         
         $sql = "SELECT s.*, m.full_name as provider_name 
                 FROM services s 
-                LEFT JOIN members m ON s.user_id = m.user_id 
-                ORDER BY s.created_at DESC";
+                LEFT JOIN members m ON s.user_id = m.user_id";
+        if ($is_active_filter !== null) $sql .= " WHERE s.is_active = $is_active_filter";
+        $sql .= " ORDER BY s.created_at DESC";
         $result = $conn->query($sql);
     } elseif ($mine) {
         if (!$user) send_json_response(['error' => 'Unauthorized'], 401);
-        $stmt = $conn->prepare("SELECT * FROM services WHERE user_id = ? ORDER BY created_at DESC");
+        $sql = "SELECT s.*, m.full_name as provider_name FROM services s LEFT JOIN members m ON s.user_id = m.user_id WHERE s.user_id = ?";
+        if ($is_active_filter !== null) $sql .= " AND s.is_active = $is_active_filter";
+        $sql .= " ORDER BY s.created_at DESC";
+        
+        $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $user['id']);
         $stmt->execute();
         $result = $stmt->get_result();
     } else {
-        // Public marketplace view (only active)
-        // Show Platform services first, then Community services
+        // Public marketplace view (only active by default)
+        $active_val = ($is_active_filter !== null) ? $is_active_filter : 1;
         $sql = "SELECT s.*, m.full_name as provider_name 
                 FROM services s 
                 LEFT JOIN members m ON s.user_id = m.user_id 
-                WHERE s.is_active = 1 
+                WHERE s.is_active = $active_val 
                 ORDER BY (s.user_id IS NULL) DESC, s.created_at DESC";
         $result = $conn->query($sql);
     }
     
     $services = [];
     while ($row = $result->fetch_assoc()) {
+        // Convert is_active to integer for consistency
+        $row['is_active'] = (int)$row['is_active'];
+        
         // Decode features if it's a string
         if (isset($row['features']) && is_string($row['features'])) {
             $row['features'] = json_decode($row['features'], true) ?: [];
         }
+        
+        // Nest members object for frontend compatibility (matches supabase .select("*, members(...)"))
+        $row['members'] = [
+            'full_name' => $row['provider_name'] ?? 'Official'
+        ];
+        
         $services[] = $row;
     }
     send_json_response(['data' => $services, 'error' => null]);
@@ -127,6 +150,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             if ($key === 'features') {
                 $val = json_encode($val);
                 $types .= "s";
+            } elseif ($key === 'is_active') {
+                $val = (int)$val;
+                $types .= "i";
             } elseif (is_bool($val)) {
                 $val = $val ? 1 : 0;
                 $types .= "i";

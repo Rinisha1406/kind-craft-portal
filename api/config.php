@@ -1,9 +1,18 @@
 <?php
-// Database Configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'u891495087_kind_craft');
-define('DB_PASS', 'KindCraft8@');
-define('DB_NAME', 'u891495087_kind_craft');
+// Environment Detection & Database Configuration
+$is_local = ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['REMOTE_ADDR'] === '127.0.0.1');
+
+if ($is_local) {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_NAME', 'kind_craft_portal');
+} else {
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'u891495087_kind_craft');
+    define('DB_PASS', 'KindCraft8@');
+    define('DB_NAME', 'u891495087_kind_craft');
+}
 
 function getDBConnection() {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);

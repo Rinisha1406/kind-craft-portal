@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Edit, Trash2, X, Loader2 } from "lucide-react";
@@ -67,7 +68,7 @@ const AdminServices = () => {
     const fetchServices = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?admin=true`, {
+            const response = await fetch(`${API_URL}/services.php?admin=true`, {
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
                 }
@@ -116,8 +117,8 @@ const AdminServices = () => {
             if (!formData.title) return toast({ title: "Title is required", variant: "destructive" });
 
             const url = editingService
-                ? `http://localhost/kind-craft-portal/api/services.php?id=${editingService.id}`
-                : `http://localhost/kind-craft-portal/api/services.php`;
+                ? `${API_URL}/services.php?id=${editingService.id}`
+                : `${API_URL}/services.php`;
 
             const method = editingService ? 'PUT' : 'POST';
 
@@ -155,7 +156,7 @@ const AdminServices = () => {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this service?")) return;
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${id}`, {
+            const response = await fetch(`${API_URL}/services.php?id=${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
@@ -173,8 +174,11 @@ const AdminServices = () => {
 
     const handleToggleActive = async (service: Service) => {
         try {
-            const newStatus = service.is_active ? 0 : 1;
-            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${service.id}`, {
+            // Handle both string "0"/"1" and number 0/1 from API
+            const currentStatus = Number(service.is_active);
+            const newStatus = currentStatus === 1 ? 0 : 1;
+
+            const response = await fetch(`${API_URL}/services.php?id=${service.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -217,7 +221,7 @@ const AdminServices = () => {
             const uploadData = new FormData();
             uploadData.append('file', file);
 
-            const response = await fetch('http://localhost/kind-craft-portal/api/upload.php', {
+            const response = await fetch(`${API_URL}/upload.php`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
@@ -296,7 +300,7 @@ const AdminServices = () => {
                                         <TableCell className="text-center text-blue-300 font-bold">{service.price || "-"}</TableCell>
                                         <TableCell className="text-center">
                                             <Switch
-                                                checked={!!service.is_active}
+                                                checked={Number(service.is_active) === 1}
                                                 onCheckedChange={() => handleToggleActive(service)}
                                                 className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
                                             />

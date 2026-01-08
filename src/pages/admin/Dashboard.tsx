@@ -9,6 +9,7 @@ interface Stats {
   products: number;
   matrimony: number;
   members: number;
+  messages: number;
 }
 
 const Dashboard = () => {
@@ -16,28 +17,32 @@ const Dashboard = () => {
     products: 0,
     matrimony: 0,
     members: 0,
+    messages: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats()
+    fetchData()
   }, []);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      const [products, matrimony, members] = await Promise.all([
+      setLoading(true);
+      const [products, matrimony, members, messages] = await Promise.all([
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("matrimony_profiles").select("id", { count: "exact", head: true }),
         supabase.from("members").select("id", { count: "exact", head: true }),
+        supabase.from("contact_messages").select("id", { count: "exact", head: true }),
       ]);
 
       setStats({
         products: products.count || 0,
         matrimony: matrimony.count || 0,
         members: members.count || 0,
+        messages: messages.count || 0,
       });
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -47,6 +52,7 @@ const Dashboard = () => {
     { title: "Total Products", value: stats.products, icon: Package, color: "from-gold to-yellow-600", change: "+12%" },
     { title: "Matrimony Profiles", value: stats.matrimony, icon: Heart, color: "from-emerald-500 to-emerald-700", change: "+8%" },
     { title: "Active Members", value: stats.members, icon: Users, color: "from-rose-500 to-pink-600", change: "+5%" },
+    { title: "Total Messages", value: stats.messages, icon: Mail, color: "from-blue-500 to-cyan-600", change: "+10%" },
   ];
 
   return (
@@ -106,62 +112,42 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="bg-black/40 border-gold/20 backdrop-blur-sm shadow-xl h-full">
-              <CardHeader className="border-b border-gold/10 pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-xl text-gold">
-                  <UserCheck className="w-5 h-5 text-emerald-500" />
-                  Recent Registrations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <p className="text-emerald-100/40 text-center py-8 italic font-serif">No recent registrations</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="bg-black/40 border-gold/20 backdrop-blur-sm shadow-xl h-full">
-              <CardHeader className="border-b border-gold/10 pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-xl text-gold">
-                  <TrendingUp className="w-5 h-5 text-emerald-500" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                {[
-                  { label: "Add New Product", desc: "Create a new jewelry item", href: "/admin/products" },
-                  { label: "Review Messages", desc: "Check customer inquiries", href: "/admin/messages" },
-                  { label: "Manage Registrations", desc: "Approve or reject requests", href: "/admin/registrations" },
-                  { label: "View Matrimony Profiles", desc: "Manage profile listings", href: "/admin/matrimony" },
-                ].map((action, i) => (
-                  <motion.a
-                    key={action.label}
-                    href={action.href}
-                    className="flex items-center justify-between p-4 bg-emerald-900/10 border border-gold/5 rounded-xl hover:bg-emerald-900/30 hover:border-gold/30 transition-all duration-300 group"
-                    whileHover={{ x: 5 }}
-                  >
-                    <div>
-                      <p className="font-medium text-emerald-100 group-hover:text-gold transition-colors">{action.label}</p>
-                      <p className="text-sm text-emerald-100/50">{action.desc}</p>
-                    </div>
-                    <ArrowUpRight className="w-5 h-5 text-emerald-100/30 group-hover:text-gold transition-colors" />
-                  </motion.a>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+        {/* Quick Actions (Full Width now) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="bg-black/40 border-gold/20 backdrop-blur-sm shadow-xl">
+            <CardHeader className="border-b border-gold/10 pb-4">
+              <CardTitle className="flex items-center gap-2 font-serif text-xl text-gold">
+                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-6">
+              {[
+                { label: "Add New Product", desc: "Create a new jewelry item", href: "/admin/products" },
+                { label: "Review Messages", desc: "Check customer inquiries", href: "/admin/messages" },
+                { label: "Manage Registrations", desc: "Approve or reject requests", href: "/admin/registrations" },
+                { label: "View Matrimony Profiles", desc: "Manage profile listings", href: "/admin/matrimony" },
+              ].map((action, i) => (
+                <motion.a
+                  key={action.label}
+                  href={action.href}
+                  className="flex items-center justify-between p-4 bg-emerald-900/10 border border-gold/5 rounded-xl hover:bg-emerald-900/30 hover:border-gold/30 transition-all duration-300 group"
+                  whileHover={{ x: 5 }}
+                >
+                  <div>
+                    <p className="font-medium text-emerald-100 group-hover:text-gold transition-colors">{action.label}</p>
+                    <p className="text-sm text-emerald-100/50">{action.desc}</p>
+                  </div>
+                  <ArrowUpRight className="w-5 h-5 text-emerald-100/30 group-hover:text-gold transition-colors" />
+                </motion.a>
+              ))}
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </AdminLayout>
   );

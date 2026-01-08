@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,8 +66,8 @@ const Contact = () => {
       if (error) throw error;
 
       // 2. Sync with PHP/MySQL Database
-      await fetch('http://localhost/kind-craft-portal/api/contact_messages.php', {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/contact_messages.php`, {
+        method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validated)
       });
@@ -91,7 +91,7 @@ const Contact = () => {
   return (
     <MainLayout>
       {/* Hero */}
-      <section className="relative min-h-[50vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[40vh] flex items-center overflow-hidden">
         {/* Background Image with Parallax effect simulation */}
         <div className="absolute inset-0 z-0">
           <img src={contactHero} alt="Contact Us" className="w-full h-full object-cover scale-110" />
@@ -131,7 +131,7 @@ const Contact = () => {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-6xl md:text-8xl font-sans font-black text-white mb-8 tracking-tighter leading-[0.9] drop-shadow-2xl"
+              className="text-5xl md:text-6xl font-sans font-black text-white mb-8 tracking-tighter leading-[0.9] drop-shadow-2xl"
             >
               Let's craft <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">Something Beautiful</span>
@@ -141,7 +141,7 @@ const Contact = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-24 -mt-32 relative z-20">
+      <section className="py-16 -mt-20 relative z-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 max-w-7xl mx-auto items-start">
             {/* Form Side */}
@@ -151,22 +151,22 @@ const Contact = () => {
               viewport={{ once: true }}
               className="lg:col-span-7"
             >
-              <div className="bg-white/90 backdrop-blur-2xl p-10 md:p-14 rounded-[3.5rem] border border-white/50 shadow-[0_40px_100px_rgba(0,0,0,0.1)] relative overflow-hidden group">
+              <div className="bg-white/90 backdrop-blur-2xl p-8 md:p-10 rounded-[2.5rem] border border-white/50 shadow-[0_40px_100px_rgba(0,0,0,0.1)] relative overflow-hidden group">
                 {/* Internal decorative blobs */}
                 <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-1000" />
                 <div className="absolute bottom-0 right-0 w-64 h-64 bg-amber-500/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-amber-500/10 transition-colors duration-1000" />
 
                 <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row items-center gap-8 mb-16">
+                  <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
                     <motion.div
-                      className="w-24 h-24 bg-gradient-to-tr from-emerald-600 to-amber-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)]"
+                      className="w-16 h-16 bg-gradient-to-tr from-emerald-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)]"
                       whileHover={{ rotate: 10, scale: 1.1 }}
                     >
-                      <Send className="w-10 h-10 text-white" />
+                      <Send className="w-6 h-6 text-white" />
                     </motion.div>
                     <div className="text-center md:text-left">
-                      <h3 className="text-5xl font-sans font-black text-zinc-900 tracking-tighter mb-2">Send a Message</h3>
-                      <p className="text-xl text-zinc-500 font-medium">We typically respond within 24 hours</p>
+                      <h3 className="text-3xl font-sans font-black text-zinc-900 tracking-tighter mb-2">Send a Message</h3>
+                      <p className="text-base text-zinc-500 font-medium">We typically respond within 24 hours</p>
                     </div>
                   </div>
 
@@ -230,7 +230,7 @@ const Contact = () => {
                         placeholder="Tell us about your inquiry..."
                         rows={6}
                         required
-                        className="rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-lg p-6 resize-none"
+                        className="rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-base p-4 resize-none"
                       />
                     </motion.div>
 
@@ -242,7 +242,7 @@ const Contact = () => {
                       <Button
                         type="submit"
                         disabled={submitting}
-                        className="w-full h-20 bg-gradient-to-tr from-emerald-600 to-amber-500 text-white hover:opacity-95 px-12 rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center gap-4 transition-all"
+                        className="w-full h-14 bg-gradient-to-tr from-emerald-600 to-amber-500 text-white hover:opacity-95 px-12 rounded-2xl font-black uppercase tracking-widest text-sm shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center gap-4 transition-all"
                       >
                         {submitting ? "Sending..." : (
                           <>
@@ -302,19 +302,19 @@ const Contact = () => {
               </div>
 
               {/* Status Hub (Redesigned Map Placeholder) */}
-              <div className="relative h-[450px] rounded-[3.5rem] overflow-hidden border border-zinc-200 shadow-2xl group flex flex-col">
+              <div className="relative h-[350px] rounded-[2.5rem] overflow-hidden border border-zinc-200 shadow-2xl group flex flex-col">
                 <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 to-emerald-50/50" />
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
 
-                <div className="flex-1 flex flex-col items-center justify-center p-12 relative z-10 text-center">
+                <div className="flex-1 flex flex-col items-center justify-center p-8 relative z-10 text-center">
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
-                    className="w-24 h-24 bg-white rounded-[2rem] shadow-2xl border border-zinc-100 flex items-center justify-center mb-8 group-hover:rotate-6 transition-all duration-700"
+                    className="w-16 h-16 bg-white rounded-2xl shadow-2xl border border-zinc-100 flex items-center justify-center mb-8 group-hover:rotate-6 transition-all duration-700"
                   >
-                    <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center relative">
+                    <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center relative">
                       <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full" />
-                      <Globe className="w-8 h-8 text-emerald-600 relative z-10" />
+                      <Globe className="w-6 h-6 text-emerald-600 relative z-10" />
                     </div>
                   </motion.div>
 
@@ -322,17 +322,17 @@ const Contact = () => {
                     Global Headquarters
                   </Badge>
 
-                  <h3 className="text-4xl font-sans font-black text-zinc-900 tracking-tighter mb-4 leading-none">
+                  <h3 className="text-2xl font-sans font-black text-zinc-900 tracking-tighter mb-4 leading-none">
                     Mumbai <span className="text-emerald-600">Luxury Hub</span>
                   </h3>
 
-                  <p className="text-zinc-500 font-bold max-w-[280px] leading-relaxed">
+                  <p className="text-zinc-500 font-medium text-sm max-w-[280px] leading-relaxed">
                     10th Floor, Marina Tower,<br />
                     Nariman Point, Mumbai 400021
                   </p>
                 </div>
 
-                <div className="bg-white border-t border-zinc-100 p-8 flex items-center justify-between mt-auto">
+                <div className="bg-white border-t border-zinc-100 p-6 flex items-center justify-between mt-auto">
                   <div className="flex items-center gap-4">
                     <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                     <span className="text-xs font-black text-zinc-900 uppercase tracking-widest">Systems Active</span>

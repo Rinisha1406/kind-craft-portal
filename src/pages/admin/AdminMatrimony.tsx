@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -150,7 +150,7 @@ const AdminMatrimony = () => {
         // Sync with PHP/MySQL Database
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          await fetch('http://localhost/kind-craft-portal/api/auth/update.php', {
+          await fetch(`${API_URL}/auth/update.php`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',

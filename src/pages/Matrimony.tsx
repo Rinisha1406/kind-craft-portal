@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -410,7 +410,7 @@ const ForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void }) =>
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost/kind-craft-portal/api/auth/reset_matrimony_password.php', {
+      const response = await fetch(`${API_URL}/auth/reset_matrimony_password.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -453,7 +453,7 @@ const ForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void }) =>
             type="date"
             value={formData.dob}
             onChange={e => setFormData({ ...formData, dob: e.target.value })}
-            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl [color-scheme:dark] pr-10"
+            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10"
           />
           <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-champagne/50 pointer-events-none" />
         </div>
@@ -544,7 +544,7 @@ const Matrimony = () => {
   };
 
   return (
-    <MainLayout showFooter={true}>
+    <MainLayout showFooter={false}>
       {/* Hero Section */}
       <section className="relative h-[90vh] flex items-center overflow-hidden py-8">
         {/* Background Image */}

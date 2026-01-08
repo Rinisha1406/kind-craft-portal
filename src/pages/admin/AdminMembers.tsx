@@ -5,10 +5,11 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trash2, Pencil } from "lucide-react";
 
 interface Member {
@@ -45,7 +46,7 @@ const AdminMembers = () => {
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch('http://localhost/kind-craft-portal/api/members.php', {
+      const response = await fetch(`${API_URL}/members.php`, {
         headers: {
           'Authorization': `Bearer ${user?.id}`
         }
@@ -55,7 +56,7 @@ const AdminMembers = () => {
       setMembers(result.data || []);
     } catch (error) {
       console.error("Error fetching members:", error);
-      toast({ title: "Error", description: "Failed to fetch members", variant: "destructive" });
+      // toast({ title: "Error", description: "Failed to fetch members", variant: "destructive" }); // Removed as per instruction
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,7 @@ const AdminMembers = () => {
     setUpdating(true);
 
     try {
-      const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${editingMember.id}`, {
+      const response = await fetch(`${API_URL}/members.php?id=${editingMember.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -88,11 +89,11 @@ const AdminMembers = () => {
       const result = await response.json();
       if (result.error) throw new Error(result.error);
 
-      toast({ title: "Success", description: "Member updated successfully" });
+      // toast({ title: "Success", description: "Member updated successfully" }); // Removed as per instruction
       setIsDialogOpen(false);
       fetchMembers();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      // toast({ title: "Error", description: error.message, variant: "destructive" }); // Removed as per instruction
     } finally {
       setUpdating(false);
     }
@@ -100,7 +101,8 @@ const AdminMembers = () => {
 
   const toggleActive = async (id: string, isActive: boolean) => {
     try {
-      const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${id}`, {
+      // Sync with PHP/MySQL Database
+      const response = await fetch(`${API_URL}/auth/update.php`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +124,7 @@ const AdminMembers = () => {
     if (!confirm("Are you sure you want to delete this member?")) return;
 
     try {
-      const response = await fetch(`http://localhost/kind-craft-portal/api/members.php?id=${id}`, {
+      const response = await fetch(`${API_URL}/members.php?id=${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${user?.id}`

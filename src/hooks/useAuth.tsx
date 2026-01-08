@@ -1,4 +1,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 
 // Types
 interface User {
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       try {
-        const response = await fetch("http://localhost/kind-craft-portal/api/auth/me.php", {
+        const response = await fetch(`${API_URL}/auth/me.php`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }
@@ -85,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (phone: string, password: string) => {
     try {
-      const response = await fetch("http://localhost/kind-craft-portal/api/auth/login.php", {
+      const response = await fetch(`${API_URL}/auth/login.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, password }),
@@ -131,7 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       };
 
-      const response = await fetch("http://localhost/kind-craft-portal/api/auth/register.php", {
+      const response = await fetch(`${API_URL}/auth/register.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

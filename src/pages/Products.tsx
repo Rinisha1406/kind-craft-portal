@@ -341,10 +341,13 @@ const Products = () => {
               We create custom jewelry designs tailored to your vision. Let our master craftsmen
               bring your dream piece to life.
             </p>
-            <Button size="lg" className="gold-gradient text-primary-foreground shadow-gold hover:scale-105 transition-transform">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-yellow-600 text-charcoal px-8 py-4 rounded-xl font-bold hover:scale-105 transition-transform"
+            >
               Request Custom Design
               <ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
+            </Link>
           </motion.div>
         </div>
       </section>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import {
     Plus,
     Pencil,
@@ -71,7 +72,7 @@ const ManageServices = () => {
     const fetchMyServices = async () => {
         if (!user?.id) return;
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?mine=true`, {
+            const response = await fetch(`${API_URL}/services.php?mine=true`, {
                 headers: {
                     'Authorization': `Bearer ${user.id}`
                 }
@@ -92,8 +93,8 @@ const ManageServices = () => {
         setSubmitting(true);
         try {
             const url = editingService
-                ? `http://localhost/kind-craft-portal/api/services.php?id=${editingService.id}`
-                : `http://localhost/kind-craft-portal/api/services.php`;
+                ? `${API_URL}/services.php?id=${editingService.id}`
+                : `${API_URL}/services.php`;
 
             const response = await fetch(url, {
                 method: editingService ? 'PUT' : 'POST',
@@ -143,8 +144,9 @@ const ManageServices = () => {
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this service?")) return;
+        setLoading(true);
         try {
-            const response = await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${id}`, {
+            const response = await fetch(`${API_URL}/services.php?id=${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
@@ -159,13 +161,16 @@ const ManageServices = () => {
 
     const toggleStatus = async (service: MemberService) => {
         try {
-            await fetch(`http://localhost/kind-craft-portal/api/services.php?id=${service.id}`, {
+            const currentStatus = Number(service.is_active);
+            const newStatus = currentStatus === 1 ? 0 : 1;
+
+            await fetch(`${API_URL}/services.php?id=${service.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user?.id}`
                 },
-                body: JSON.stringify({ is_active: !service.is_active })
+                body: JSON.stringify({ is_active: newStatus })
             });
             await fetchMyServices();
         } catch (error) {
@@ -198,7 +203,7 @@ const ManageServices = () => {
             const uploadData = new FormData();
             uploadData.append('file', file);
 
-            const response = await fetch('http://localhost/kind-craft-portal/api/upload.php', {
+            const response = await fetch(`${API_URL}/upload.php`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${user?.id}`
@@ -219,7 +224,7 @@ const ManageServices = () => {
     };
 
     return (
-        <MainLayout>
+        <MainLayout showFooter={false}>
             <div className="min-h-screen bg-zinc-950 pt-24 pb-12">
                 <div className="container mx-auto max-w-6xl">
                     <div className="mb-6">
@@ -240,7 +245,7 @@ const ManageServices = () => {
                             </div>
                             <h1 className="text-4xl md:text-5xl font-serif font-bold text-champagne mb-3">Manage My Services</h1>
                             <p className="text-champagne/60 text-lg max-w-2xl leading-relaxed">
-                                Create and manage the services you offer to the Kind Craft community.
+                                Create and manage the services you offer to the GOLDJEWELTECH community.
                             </p>
                         </motion.div>
 
@@ -367,89 +372,90 @@ const ManageServices = () => {
                             </DialogContent>
                         </Dialog>
                     </div>
-                </div>
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-24">
-                        <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
-                        <p className="text-champagne/40">Loading your services...</p>
-                    </div>
-                ) : services.length === 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white/5 border border-dashed border-gold/20 rounded-[2rem] py-12 text-center"
-                    >
-                        <div className="w-16 h-16 bg-gold/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Package className="w-8 h-8 text-gold/30" />
+
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24">
+                            <Loader2 className="w-12 h-12 text-gold animate-spin mb-4" />
+                            <p className="text-champagne/40">Loading your services...</p>
                         </div>
-                        <h3 className="text-xl font-serif font-bold text-champagne mb-2">No active listings</h3>
-                        <p className="text-champagne/40 max-w-sm mx-auto mb-6">
-                            You haven't added any services yet. Start listing your expertise to reach the community.
-                        </p>
-                        <Button variant="outline" className="border-gold/30 text-gold hover:bg-gold/10 rounded-xl px-8" onClick={() => setIsDialogOpen(true)}>
-                            Get Started
-                        </Button>
-                    </motion.div>
-                ) : (
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {services.map((service, index) => (
-                            <motion.div
-                                key={service.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-3xl p-6 group hover:border-gold/40 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden hover:shadow-2xl hover:shadow-black/50"
-                            >
-                                {/* Background Decor */}
-                                <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl ${service.is_active ? 'from-emerald-500/10' : 'from-red-500/10'} rounded-bl-full pointer-events-none`} />
+                    ) : services.length === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white/5 border border-dashed border-gold/20 rounded-[2rem] py-12 text-center"
+                        >
+                            <div className="w-16 h-16 bg-gold/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Package className="w-8 h-8 text-gold/30" />
+                            </div>
+                            <h3 className="text-xl font-serif font-bold text-champagne mb-2">No active listings</h3>
+                            <p className="text-champagne/40 max-w-sm mx-auto mb-6">
+                                You haven't added any services yet. Start listing your expertise to reach the community.
+                            </p>
+                            <Button variant="outline" className="border-gold/30 text-gold hover:bg-gold/10 rounded-xl px-8" onClick={() => setIsDialogOpen(true)}>
+                                Get Started
+                            </Button>
+                        </motion.div>
+                    ) : (
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {services.map((service, index) => (
+                                <motion.div
+                                    key={service.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-3xl p-6 group hover:border-gold/40 transition-all flex flex-col md:flex-row gap-6 relative overflow-hidden hover:shadow-2xl hover:shadow-black/50"
+                                >
+                                    {/* Background Decor */}
+                                    <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl ${Number(service.is_active) === 1 ? 'from-emerald-500/10' : 'from-red-500/10'} rounded-bl-full pointer-events-none`} />
 
-                                <div className="w-full md:w-32 h-32 bg-charcoal rounded-2xl border border-white/5 overflow-hidden shrink-0">
-                                    <img
-                                        src={service.image_url || "https://images.unsplash.com/photo-1454165833767-027eeef1526e?w=200"}
-                                        alt={service.title}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                    />
-                                </div>
-
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-[10px] uppercase tracking-widest font-bold text-gold/60">{service.category || "General"}</span>
-                                        <Switch
-                                            checked={!!service.is_active}
-                                            onCheckedChange={() => toggleStatus(service)}
-                                            className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
+                                    <div className="w-full md:w-32 h-32 bg-charcoal rounded-2xl border border-white/5 overflow-hidden shrink-0">
+                                        <img
+                                            src={service.image_url || "https://images.unsplash.com/photo-1454165833767-027eeef1526e?w=200"}
+                                            alt={service.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
                                     </div>
-                                    <h3 className="text-xl font-serif font-bold text-champagne mb-1">{service.title}</h3>
-                                    <p className="text-gold font-medium mb-3">{service.price || "Contact for pricing"}</p>
-                                    <p className="text-champagne/40 text-sm line-clamp-2 mb-6">
-                                        {service.description || "No description provided."}
-                                    </p>
 
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            className="bg-white/5 hover:bg-white/10 text-champagne rounded-lg border border-white/10 h-9"
-                                            onClick={() => handleEdit(service)}
-                                        >
-                                            <Pencil className="w-3.5 h-3.5 mr-2" /> Edit
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg h-9"
-                                            onClick={() => handleDelete(service.id)}
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove
-                                        </Button>
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[10px] uppercase tracking-widest font-bold text-gold/60">{service.category || "General"}</span>
+                                            <Switch
+                                                checked={Number(service.is_active) === 1}
+                                                onCheckedChange={() => toggleStatus(service)}
+                                                className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
+                                            />
+                                        </div>
+                                        <h3 className="text-xl font-serif font-bold text-champagne mb-1">{service.title}</h3>
+                                        <p className="text-gold font-medium mb-3">{service.price || "Contact for pricing"}</p>
+                                        <p className="text-champagne/40 text-sm line-clamp-2 mb-6">
+                                            {service.description || "No description provided."}
+                                        </p>
+
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                className="bg-white/5 hover:bg-white/10 text-champagne rounded-lg border border-white/10 h-9"
+                                                onClick={() => handleEdit(service)}
+                                            >
+                                                <Pencil className="w-3.5 h-3.5 mr-2" /> Edit
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg h-9"
+                                                onClick={() => handleDelete(service.id)}
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                )}
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
         </MainLayout >

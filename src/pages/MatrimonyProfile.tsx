@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,7 +84,7 @@ const MatrimonyProfile = () => {
             // Fetch Matches (Opposite Gender)
             if (data.gender) {
                 try {
-                    const response = await fetch(`http://localhost/kind-craft-portal/api/matches.php?gender=${data.gender}&exclude_id=${data.id}`);
+                    const response = await fetch(`${API_URL}/matches.php?gender=${data.gender}&exclude_id=${data.id}`);
                     const matchesData = await response.json();
 
                     if (Array.isArray(matchesData)) {
@@ -115,7 +114,7 @@ const MatrimonyProfile = () => {
 
         try {
             // 1. Upload Image
-            const uploadResponse = await fetch('http://localhost/kind-craft-portal/api/upload.php', {
+            const uploadResponse = await fetch(`${API_URL}/upload.php`, {
                 method: 'POST',
                 body: formData
             });
@@ -126,12 +125,11 @@ const MatrimonyProfile = () => {
             const publicUrl = uploadResult.data.publicUrl; // e.g. /uploads/filename.jpg
 
             // Adjust URL to be absolute if needed, or keep relative if <img src> handles it.
-            // Assuming localhost root for now.
-            const fullImageUrl = `http://localhost/kind-craft-portal${publicUrl}`;
+            const fullImageUrl = `${API_URL}${publicUrl}`;
 
             // 2. Update Profile in DB
             if (profile?.id) {
-                const updateResponse = await fetch(`http://localhost/kind-craft-portal/api/matrimony_profiles.php?id=${profile.id}`, {
+                const updateResponse = await fetch(`${API_URL}/matrimony_profiles.php?id=${profile.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image_url: fullImageUrl })
@@ -201,34 +199,38 @@ const MatrimonyProfile = () => {
             // 2. Sync with PHP/MySQL Database
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const response = await fetch('http://localhost/kind-craft-portal/api/auth/update.php', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${user.id}`
-                    },
-                    body: JSON.stringify({ password: passwordData.new })
-                });
+                try {
+                    const response = await fetch(`${API_URL}/auth/reset_matrimony_password.php`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${user.id}`
+                        },
+                        body: JSON.stringify({ password: passwordData.new })
+                    });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to sync password with database');
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to sync password with database');
+                    }
+
+                    // 3. Update Supabase Profile Details JSON
+                    await supabase
+                        .from('matrimony_profiles')
+                        .update({
+                            details: {
+                                ...profile?.details,
+                                password_plain: passwordData.new
+                            }
+                        })
+                        .eq('user_id', user.id);
+                } catch (err: any) {
+                    console.error("Database sync error:", err);
                 }
 
-                // 3. Update Supabase Profile Details JSON
-                await supabase
-                    .from('matrimony_profiles')
-                    .update({
-                        details: {
-                            ...profile?.details,
-                            password_plain: passwordData.new
-                        }
-                    })
-                    .eq('user_id', user.id);
+                toast({ title: "Success", description: "Password updated successfully across all systems!" });
+                setPasswordData({ current: "", new: "", confirm: "" });
             }
-
-            toast({ title: "Success", description: "Password updated successfully across all systems!" });
-            setPasswordData({ current: "", new: "", confirm: "" });
         } catch (error: any) {
             console.error("Password change error:", error);
             toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -281,7 +283,7 @@ const MatrimonyProfile = () => {
     );
 
     return (
-        <MainLayout showFooter={true}>
+        <MainLayout showFooter={false}>
             <div className="min-h-screen bg-white text-zinc-900 relative font-sans selection:bg-emerald-500/10">
                 {/* Animated Background Elements */}
                 <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -797,7 +799,7 @@ const MatrimonyProfile = () => {
                                                 onClick={() => handleDismissMatch(selectedMatch.id)}
                                                 className="w-16 h-16 border border-zinc-200 rounded-2xl text-zinc-500 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-500 transition-all flex items-center justify-center"
                                             >
-                                                <X className="w-6 h-6" />
+                                                <X className="w-5 h-5" />
                                             </Button>
                                         </div>
                                     </div>

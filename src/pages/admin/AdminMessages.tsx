@@ -3,11 +3,11 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Loader2, Trash2, Mail, MailOpen } from "lucide-react";
+import { supabase, API_URL } from "@/integrations/supabase/client";
+import { Loader2, Trash2, Mail, MailOpen, Search, Calendar as CalendarIcon, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
-import { Search, Calendar as CalendarIcon, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
@@ -34,8 +34,9 @@ const AdminMessages = () => {
   }, [user]);
 
   const fetchMessages = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost/kind-craft-portal/api/contact_messages.php', {
+      const response = await fetch(`${API_URL}/contact_messages.php`, {
         headers: {
           'Authorization': `Bearer ${user?.id}`
         }
@@ -53,7 +54,7 @@ const AdminMessages = () => {
 
   const toggleRead = async (id: string, isRead: boolean) => {
     try {
-      const response = await fetch(`http://localhost/kind-craft-portal/api/contact_messages.php?id=${id}`, {
+      const response = await fetch(`${API_URL}/contact_messages.php?id=${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ const AdminMessages = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this message?")) return;
     try {
-      const response = await fetch(`http://localhost/kind-craft-portal/api/contact_messages.php?id=${id}`, {
+      const response = await fetch(`${API_URL}/contact_messages.php?id=${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${user?.id}`

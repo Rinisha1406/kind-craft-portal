@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, API_URL } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -229,7 +229,7 @@ const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost/kind-craft-portal/api/auth/reset_member_password.php', {
+      const response = await fetch(`${API_URL}/auth/reset_password.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -291,7 +291,7 @@ const Members = () => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout showFooter={false}>
       {/* Hero Section with Auth Tabs */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden py-8">
         {/* Background Image */}
