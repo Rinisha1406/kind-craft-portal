@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Gem, Heart, Users, Star, Shield, Award, Sparkles, Quote, Crown, Search, MessageCircle } from "lucide-react";
+import { ArrowRight, Gem, Heart, Users, Star, Shield, Award, Sparkles, Quote, Crown, Search, MessageCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
 import heroImage from "@/assets/hero-jewelry.jpg";
 import collectionGold from "@/assets/collection-gold.png";
 import collectionDiamond from "@/assets/collection-diamond.png";
 import collectionPlatinum from "@/assets/collection-platinum.png";
+import goldAppraiserCourse from "@/assets/gold-appraiser-course.png";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -288,6 +289,103 @@ const Index = () => {
           </motion.div>
         </div>
       </section >
+
+      {/* Gold Appraiser Course Featured Section */}
+      <section className="py-24 bg-background relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative order-2 lg:order-1"
+            >
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-gold/20 border border-gold/20 group">
+                <img
+                  src={goldAppraiserCourse}
+                  alt="Gold Appraiser Course"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent opacity-60" />
+
+                {/* Floating Badge */}
+                <motion.div
+                  className="absolute top-6 left-6 bg-gold text-primary-foreground px-4 py-2 rounded-full font-bold text-sm shadow-lg flex items-center gap-2"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <Award className="w-4 h-4" />
+                  Professional Certification
+                </motion.div>
+              </div>
+
+              {/* Decorative elements */}
+              <div className="absolute -bottom-10 -right-10 w-40 h-40 gold-gradient rounded-full blur-3xl opacity-20 -z-10 animate-pulse" />
+              <div className="absolute -top-10 -left-10 w-32 h-32 bg-emerald-500 rounded-full blur-3xl opacity-10 -z-10 animate-pulse" />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="order-1 lg:order-2"
+            >
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
+                <Sparkles className="w-4 h-4" />
+                New Education Program
+              </span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6 leading-tight">
+                Master the Art of <span className="text-gold-gradient">Gold Appraisal</span>
+              </h2>
+              <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+                Unlock a rewarding career in the jewelry industry with our comprehensive Professional Gold Appraiser Course. Learn valuation, purity testing, and authentication from industry experts.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                {[
+                  { title: "Authentication", desc: "Digital & Acid testing methods" },
+                  { title: "Market Valuation", desc: "Live market rate calculator" },
+                  { title: "Net Weight Calc", desc: "Precision stone deduction" },
+                  { title: "Certification", desc: "Professional trade license" },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.title}
+                    className="flex items-start gap-3"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground text-sm">{item.title}</h4>
+                      <p className="text-muted-foreground text-xs">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-12 px-8 flex items-center justify-center gap-2 border border-emerald-500/30 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                  onClick={() => {
+                    const phoneNumber = "919876543210";
+                    const message = encodeURIComponent("Hi, I'm interested in the Gold Appraiser Course. Could you please provide more details?");
+                    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+                  }}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Enquire Now
+                </motion.button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Why Choose Us Section */}
       < section className="py-12 bg-charcoal relative overflow-hidden" >

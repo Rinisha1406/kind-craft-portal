@@ -82,64 +82,10 @@ const Products = () => {
 
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img src={productsHero} alt="Jewelry Collection" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-transparent" />
-        </div>
 
-        {/* Animated decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-20"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute bottom-32 right-1/3 w-48 h-48 bg-rose-gold rounded-full blur-3xl opacity-20"
-            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.25, 0.2] }}
-            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-          />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="max-w-3xl"
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
-            >
-              <Sparkles className="w-4 h-4" />
-              Handcrafted with Love
-            </motion.span>
-
-            <motion.h1
-              variants={fadeInUp}
-              className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
-            >
-              Our Exquisite
-              <span className="block text-gold-gradient">Collection</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
-            >
-              Each piece tells a story of tradition, craftsmanship, and timeless elegance.
-              Discover jewelry that becomes part of your family's legacy.
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
 
       {/* Category Filters */}
-      <section className="py-6 border-y border-border sticky top-20 bg-background/95 backdrop-blur-md z-40">
+      <section className="py-4 border-y border-border sticky top-20 bg-background/95 backdrop-blur-md z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-4 lg:hidden">
             <Filter className="w-5 h-5 text-primary" />
