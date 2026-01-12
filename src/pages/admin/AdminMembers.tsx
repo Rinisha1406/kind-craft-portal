@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase, API_URL } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trash2, Pencil } from "lucide-react";
 
@@ -146,41 +146,44 @@ const AdminMembers = () => {
         <div className="flex justify-between items-center">
           <p className="text-muted-foreground">Manage registered members</p>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="sm:max-w-lg bg-zinc-950 border-gold/20 text-emerald-100">
+            <DialogContent className="sm:max-w-lg bg-white border-zinc-200 text-zinc-900">
               <DialogHeader>
-                <DialogTitle className="text-gold font-serif">Edit Member</DialogTitle>
+                <DialogTitle className="text-emerald-900 font-serif">Edit Member</DialogTitle>
+                <DialogDescription>
+                  Modify the member's profile details including their name, phone, and membership status.
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleUpdate} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name" className="text-emerald-100/70">Full Name</Label>
+                  <Label htmlFor="full_name" className="text-zinc-600">Full Name</Label>
                   <Input
                     id="full_name"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="bg-black/40 border-gold/20 focus:border-gold/50 text-white"
+                    className="bg-white border-zinc-200 focus:border-emerald-500 text-zinc-900"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-emerald-100/70">Phone</Label>
+                  <Label htmlFor="phone" className="text-zinc-600">Phone</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="bg-black/40 border-gold/20 focus:border-gold/50 text-white"
+                    className="bg-white border-zinc-200 focus:border-emerald-500 text-zinc-900"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="membership" className="text-emerald-100/70">Membership Type</Label>
+                  <Label htmlFor="membership" className="text-zinc-600">Membership Type</Label>
                   <Input
                     id="membership"
                     value={formData.membership_type}
                     onChange={(e) => setFormData({ ...formData, membership_type: e.target.value })}
-                    className="bg-black/40 border-gold/20 focus:border-gold/50 text-white"
+                    className="bg-white border-zinc-200 focus:border-emerald-500 text-zinc-900"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="hover:text-gold hover:bg-gold/10">Cancel</Button>
-                  <Button type="submit" disabled={updating} className="gold-gradient text-emerald-950 font-bold">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                  <Button type="submit" disabled={updating} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
                     {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Member"}
                   </Button>
                 </div>
@@ -189,17 +192,17 @@ const AdminMembers = () => {
           </Dialog>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-950 to-black rounded-xl border border-gold/20 overflow-hidden shadow-xl">
+        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
           <Table>
-            <TableHeader className="bg-black/40">
-              <TableRow className="border-gold/10 hover:bg-transparent">
-                <TableHead className="text-gold font-serif">Name</TableHead>
-                <TableHead className="text-gold font-serif">Phone</TableHead>
-                <TableHead className="text-gold font-serif">Membership</TableHead>
-                <TableHead className="text-gold font-serif">Password</TableHead>
-                <TableHead className="text-gold font-serif">Joined</TableHead>
-                <TableHead className="text-gold font-serif">Status</TableHead>
-                <TableHead className="text-right text-gold font-serif">Actions</TableHead>
+            <TableHeader className="bg-zinc-50">
+              <TableRow className="border-zinc-100 hover:bg-transparent">
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Name</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Phone</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Membership</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Password</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Joined</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Status</TableHead>
+                <TableHead className="text-right text-zinc-600 font-serif uppercase text-xs tracking-wider">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -217,25 +220,25 @@ const AdminMembers = () => {
                 </TableRow>
               ) : (
                 members.map((member) => (
-                  <TableRow key={member.id} className="border-gold/10 hover:bg-emerald-900/20 transition-colors">
-                    <TableCell className="font-medium text-emerald-100">{member.full_name}</TableCell>
-                    <TableCell className="text-emerald-100/70">{member.phone || "-"}</TableCell>
+                  <TableRow key={member.id} className="border-zinc-100 hover:bg-emerald-50/50 transition-colors">
+                    <TableCell className="font-medium text-zinc-900">{member.full_name}</TableCell>
+                    <TableCell className="text-zinc-600">{member.phone || "-"}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize border-gold/30 text-gold bg-gold/5">
+                      <Badge variant="outline" className="capitalize border-emerald-200 text-emerald-700 bg-emerald-50">
                         {member.membership_type || "Standard"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-emerald-100/70 font-mono text-xs">
+                    <TableCell className="text-zinc-500 font-mono text-xs">
                       {member.password_plain || "-"}
                     </TableCell>
-                    <TableCell className="text-emerald-100/60">
+                    <TableCell className="text-zinc-500">
                       {new Date(member.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <Badge
                         className={`border ${member.is_active
-                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-red-50 text-red-700 border-red-200"
                           }`}
                         onClick={() => toggleActive(member.id, member.is_active)}
                         style={{ cursor: "pointer" }}
@@ -249,7 +252,7 @@ const AdminMembers = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEditDialog(member)}
-                          className="hover:bg-gold/10 hover:text-gold text-emerald-100/50"
+                          className="hover:bg-emerald-50 hover:text-emerald-600 text-zinc-400"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -257,7 +260,7 @@ const AdminMembers = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(member.id)}
-                          className="hover:bg-red-500/10 hover:text-red-400 text-emerald-100/50"
+                          className="hover:bg-red-50 hover:text-red-600 text-zinc-400"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

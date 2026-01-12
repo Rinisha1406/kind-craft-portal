@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -246,7 +246,7 @@ const AdminProducts = () => {
           <p className="text-muted-foreground">Manage your product catalog</p>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="gold-gradient text-primary-foreground">
+              <Button onClick={openAddDialog} className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Product
               </Button>
@@ -256,6 +256,9 @@ const AdminProducts = () => {
                 <DialogTitle className="font-serif text-xl">
                   {editingProduct ? "Edit Product" : "Add New Product"}
                 </DialogTitle>
+                <DialogDescription>
+                  Enter the product details below. Ensure the price and category are accurate for your inventory.
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                 <div className="space-y-2">
@@ -372,16 +375,16 @@ const AdminProducts = () => {
           </Dialog>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-950 to-black rounded-xl border border-gold/20 overflow-hidden shadow-xl">
+        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
           <Table>
-            <TableHeader className="bg-black/40">
-              <TableRow className="border-gold/10 hover:bg-transparent">
-                <TableHead className="text-gold font-serif">Image</TableHead>
-                <TableHead className="text-gold font-serif">Name</TableHead>
-                <TableHead className="text-gold font-serif">Price</TableHead>
-                <TableHead className="text-gold font-serif">Category</TableHead>
-                <TableHead className="text-gold font-serif">Visible</TableHead>
-                <TableHead className="text-right text-gold font-serif">Actions</TableHead>
+            <TableHeader className="bg-zinc-50">
+              <TableRow className="border-zinc-100 hover:bg-transparent">
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Image</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Name</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Price</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Category</TableHead>
+                <TableHead className="text-zinc-600 font-serif uppercase text-xs tracking-wider">Visible</TableHead>
+                <TableHead className="text-right text-zinc-600 font-serif uppercase text-xs tracking-wider">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -399,20 +402,20 @@ const AdminProducts = () => {
                 </TableRow>
               ) : (
                 products.map((product) => (
-                  <TableRow key={product.id} className="border-gold/10 hover:bg-emerald-900/20 transition-colors">
+                  <TableRow key={product.id} className="border-zinc-100 hover:bg-emerald-50/50 transition-colors">
                     <TableCell>
-                      <div className="w-12 h-12 bg-black/40 rounded-lg overflow-hidden border border-gold/10">
+                      <div className="w-12 h-12 bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
                         {product.image_url ? (
                           <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-emerald-100/30">✦</div>
+                          <div className="w-full h-full flex items-center justify-center text-zinc-400">✦</div>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium text-emerald-100">{product.name}</TableCell>
-                    <TableCell className="text-gold font-medium">₹{product.price.toLocaleString("en-IN")}</TableCell>
+                    <TableCell className="font-medium text-zinc-900">{product.name}</TableCell>
+                    <TableCell className="text-emerald-700 font-medium">₹{product.price.toLocaleString("en-IN")}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize border-gold/30 text-gold bg-gold/5">
+                      <Badge variant="outline" className="capitalize border-emerald-200 text-emerald-700 bg-emerald-50">
                         {product.category}
                       </Badge>
                     </TableCell>
@@ -420,7 +423,7 @@ const AdminProducts = () => {
                       <Switch
                         checked={String(product.is_active) === "1" || product.is_active === true}
                         onCheckedChange={() => handleToggleActive(product)}
-                        className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
+                        className="data-[state=unchecked]:bg-zinc-200 data-[state=checked]:bg-emerald-600"
                       />
                     </TableCell>
                     <TableCell className="text-right">
@@ -429,7 +432,7 @@ const AdminProducts = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => openEditDialog(product)}
-                          className="hover:bg-gold/10 hover:text-gold text-emerald-100/50"
+                          className="hover:bg-emerald-50 hover:text-emerald-600 text-zinc-400"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -437,7 +440,7 @@ const AdminProducts = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDelete(product.id)}
-                          className="hover:bg-red-500/10 hover:text-red-400 text-emerald-100/50"
+                          className="hover:bg-red-50 hover:text-red-600 text-zinc-400"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

@@ -1,8 +1,8 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles, Mail } from "lucide-react";
+import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles, Mail, Newspaper, Menu, X } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const navItems = [
   { name: "Matrimony", path: "/admin/matrimony", icon: Heart },
   { name: "Members", path: "/admin/members", icon: Users },
   { name: "Messages", path: "/admin/messages", icon: Mail },
+  { name: "News & Palan", path: "/admin/blogs", icon: Newspaper },
 ];
 
 interface AdminLayoutProps {
@@ -22,6 +23,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -47,42 +49,63 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
   };
 
   return (
-    <div className="h-screen bg-zinc-950 flex overflow-hidden">
+    <div className="h-screen bg-zinc-50 flex overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-gradient-to-b from-emerald-950/95 to-black border-r border-gold/20 flex flex-col backdrop-blur-xl transition-all duration-300">
-        <div className="p-6 border-b border-gold/10">
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50 
+        w-64 bg-white border-r border-zinc-200 flex flex-col transition-all duration-300 shadow-sm
+        transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div className="p-6 border-b border-emerald-100 flex items-center justify-between">
           <Link to="/admin/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 gold-gradient rounded-xl flex items-center justify-center shadow-gold group-hover:scale-105 transition-transform">
-              <Gem className="w-5 h-5 text-emerald-950" />
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+              <Gem className="w-5 h-5 text-white" />
             </div>
-            <span className="font-serif font-bold text-xl text-gold tracking-wide">Admin</span>
+            <span className="font-serif font-bold text-xl text-emerald-900 tracking-wide">Admin</span>
           </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden"
+          >
+            <X className="w-5 h-5" />
+          </Button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${isActive
-                  ? "bg-emerald-900/40 text-gold border-gold/20 shadow-lg translate-x-1"
-                  : "text-emerald-100/70 hover:bg-emerald-900/20 hover:text-gold hover:translate-x-1"
+                  ? "bg-emerald-50 text-emerald-900 shadow-sm"
+                  : "text-zinc-600 hover:bg-emerald-50/50 hover:text-emerald-700"
                   }`}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? "text-gold" : "text-emerald-100/50 group-hover:text-gold"}`} />
+                <item.icon className={`w-5 h-5 ${isActive ? "text-emerald-600" : "text-zinc-400 group-hover:text-emerald-600"}`} />
                 {item.name}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-gold/10">
+        <div className="p-4 border-t border-zinc-100">
           <Button
             variant="ghost"
             onClick={handleSignOut}
-            className="w-full justify-start text-emerald-100/60 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            className="w-full justify-start text-zinc-500 hover:text-red-600 hover:bg-red-50 transition-colors"
           >
             <LogOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -91,22 +114,35 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col bg-[url('/noise.png')] bg-opacity-5">
-        <header className="h-20 border-b border-gold/20 bg-black/95 backdrop-blur-sm flex items-center justify-between px-8 shadow-2xl z-10">
-          <h1 className="text-2xl font-serif font-bold text-gold tracking-wide">{title}</h1>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-emerald-900/20 border border-gold/10">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+      <main className="flex-1 flex flex-col min-w-0">
+        <header className="h-16 lg:h-20 border-b border-zinc-200 bg-white flex items-center justify-between px-4 lg:px-8 z-10">
+          <div className="flex items-center gap-4">
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <h1 className="text-lg lg:text-2xl font-serif font-bold text-emerald-900 tracking-wide truncate">{title}</h1>
+          </div>
+          <div className="flex items-center gap-3 lg:gap-6">
+            <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-medium text-emerald-700">Online</span>
             </div>
             <Link to="/" target="_blank">
-              <Button variant="outline" size="sm" className="border-gold/30 text-gold hover:bg-gold hover:text-emerald-950 transition-colors">
-                View Website
+              <Button variant="outline" size="sm" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">
+                <span className="hidden sm:inline">View Website</span>
+                <span className="sm:hidden">Site</span>
               </Button>
             </Link>
           </div>
         </header>
 
-        <div className="flex-1 p-8 overflow-auto scrollbar-thin scrollbar-thumb-gold/20 scrollbar-track-transparent">
+        <div className="flex-1 p-4 lg:p-8 overflow-auto bg-zinc-50/50">
           {children}
         </div>
       </main>

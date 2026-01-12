@@ -1,9 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Gem, ChevronRight } from "lucide-react";
+import { Menu, X, Gem, ChevronRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -11,6 +17,15 @@ const navLinks = [
   { name: "Products", path: "/products" },
   { name: "Matrimony", path: "/matrimony" },
   { name: "Members", path: "/members" },
+  {
+    name: "Todays News & Rasi Palan",
+    path: "#",
+    isDropdown: true,
+    subLinks: [
+      { name: "Today's News", path: "/today-news" },
+      { name: "Today's Rasi Palan", path: "/today-rasi-palan" },
+    ]
+  },
   { name: "Contact", path: "/contact" },
 ];
 
@@ -47,26 +62,52 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className="relative px-4 py-2"
-              >
-                <motion.span
-                  className={`relative z-10 text-sm font-medium transition-colors ${isActive(link.path) ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  whileHover={{ scale: 1.05 }}
+              link.isDropdown ? (
+                <DropdownMenu key={link.name}>
+                  <DropdownMenuTrigger className="relative px-4 py-2 outline-none flex items-center gap-1 group">
+                    <motion.span
+                      className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      {link.name}
+                    </motion.span>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-all duration-200 group-data-[state=open]:rotate-180" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-background/95 backdrop-blur-xl border-border/50">
+                    {link.subLinks?.map((sub) => (
+                      <DropdownMenuItem key={sub.path} asChild>
+                        <Link
+                          to={sub.path}
+                          className={`w-full cursor-pointer ${isActive(sub.path) ? "text-primary font-semibold" : ""}`}
+                        >
+                          {sub.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="relative px-4 py-2"
                 >
-                  {link.name}
-                </motion.span>
-                {isActive(link.path) && (
-                  <motion.div
-                    className="absolute inset-0 bg-primary/10 rounded-lg"
-                    layoutId="navbar-indicator"
-                    transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                  />
-                )}
-              </Link>
+                  <motion.span
+                    className={`relative z-10 text-sm font-medium transition-colors ${isActive(link.path) ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {link.name}
+                  </motion.span>
+                  {isActive(link.path) && (
+                    <motion.div
+                      className="absolute inset-0 bg-primary/10 rounded-lg"
+                      layoutId="navbar-indicator"
+                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                    />
+                  )}
+                </Link>
+              )
             ))}
 
             <div className="ml-4 pl-4 border-l border-border/50">
@@ -118,21 +159,42 @@ const Navbar = () => {
               <div className="py-4 space-y-2">
                 {navLinks.map((link, i) => (
                   <motion.div
-                    key={link.path}
+                    key={link.name}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <Link
-                      to={link.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`block px-4 py-3 rounded-xl font-medium transition-colors ${isActive(link.path)
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted"
-                        }`}
-                    >
-                      {link.name}
-                    </Link>
+                    {link.isDropdown ? (
+                      <div className="space-y-1">
+                        <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          {link.name}
+                        </div>
+                        {link.subLinks?.map((sub) => (
+                          <Link
+                            key={sub.path}
+                            to={sub.path}
+                            onClick={() => setIsOpen(false)}
+                            className={`block px-8 py-2 rounded-xl text-sm font-medium transition-colors ${isActive(sub.path)
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:bg-muted"
+                              }`}
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <Link
+                        to={link.path}
+                        onClick={() => setIsOpen(false)}
+                        className={`block px-4 py-3 rounded-xl font-medium transition-colors ${isActive(link.path)
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-muted"
+                          }`}
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
 

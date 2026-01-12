@@ -15,6 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -253,18 +254,18 @@ const AdminServices = () => {
                 </Button>
             </div>
 
-            <div className="rounded-xl border border-gold/20 overflow-hidden shadow-2xl bg-gradient-to-br from-emerald-950 to-black text-champagne">
+            <div className="rounded-xl border border-zinc-200 overflow-hidden shadow-sm bg-white text-zinc-900">
                 <div className="overflow-x-auto">
                     <Table>
-                        <TableHeader className="bg-black/40 border-b border-gold/20">
-                            <TableRow className="hover:bg-transparent border-gold/10">
-                                <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Image</TableHead>
-                                <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Title</TableHead>
-                                <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Date Added</TableHead>
-                                <TableHead className="text-gold font-serif whitespace-nowrap">Provider</TableHead>
-                                <TableHead className="text-gold font-serif whitespace-nowrap text-center">Price</TableHead>
-                                <TableHead className="text-gold font-serif whitespace-nowrap text-center">Visible</TableHead>
-                                <TableHead className="text-right text-gold font-serif whitespace-nowrap">Actions</TableHead>
+                        <TableHeader className="bg-zinc-50 border-b border-zinc-200">
+                            <TableRow className="hover:bg-transparent border-zinc-100">
+                                <TableHead className="text-zinc-600 font-serif py-6 whitespace-nowrap uppercase text-xs tracking-wider">Image</TableHead>
+                                <TableHead className="text-zinc-600 font-serif py-6 whitespace-nowrap uppercase text-xs tracking-wider">Title</TableHead>
+                                <TableHead className="text-zinc-600 font-serif py-6 whitespace-nowrap uppercase text-xs tracking-wider">Date Added</TableHead>
+                                <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Provider</TableHead>
+                                <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider text-center">Price</TableHead>
+                                <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider text-center">Visible</TableHead>
+                                <TableHead className="text-right text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -280,29 +281,29 @@ const AdminServices = () => {
                                 </TableRow>
                             ) : (
                                 services.map((service) => (
-                                    <TableRow key={service.id} className="hover:bg-emerald-900/20 border-b border-gold/10 transition-colors group">
+                                    <TableRow key={service.id} className="hover:bg-emerald-50/50 border-b border-zinc-100 transition-colors group">
                                         <TableCell className="py-4">
-                                            <div className="w-12 h-12 bg-black/40 rounded-lg overflow-hidden border border-gold/10">
+                                            <div className="w-12 h-12 bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
                                                 {service.image_url ? (
                                                     <img src={service.image_url} alt={service.title} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-emerald-100/30">✦</div>
+                                                    <div className="w-full h-full flex items-center justify-center text-zinc-400">✦</div>
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-medium text-white group-hover:text-gold transition-colors whitespace-nowrap">{service.title}</TableCell>
-                                        <TableCell className="text-zinc-400 whitespace-nowrap text-sm">
+                                        <TableCell className="font-medium text-zinc-900 group-hover:text-emerald-700 transition-colors whitespace-nowrap">{service.title}</TableCell>
+                                        <TableCell className="text-zinc-500 whitespace-nowrap text-sm">
                                             {service.created_at ? new Date(service.created_at).toLocaleDateString() : "-"}
                                         </TableCell>
-                                        <TableCell className="text-emerald-100/70 whitespace-nowrap">
+                                        <TableCell className="text-zinc-600 whitespace-nowrap">
                                             {service.provider_name || "Platform"}
                                         </TableCell>
-                                        <TableCell className="text-center text-blue-300 font-bold">{service.price || "-"}</TableCell>
+                                        <TableCell className="text-center text-emerald-600 font-bold">{service.price || "-"}</TableCell>
                                         <TableCell className="text-center">
                                             <Switch
                                                 checked={Number(service.is_active) === 1}
                                                 onCheckedChange={() => handleToggleActive(service)}
-                                                className="data-[state=unchecked]:bg-zinc-700 data-[state=checked]:bg-emerald-600 border-2 border-transparent"
+                                                className="data-[state=unchecked]:bg-zinc-200 data-[state=checked]:bg-emerald-600"
                                             />
                                         </TableCell>
                                         <TableCell className="text-right">
@@ -311,7 +312,7 @@ const AdminServices = () => {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => handleOpenDialog(service)}
-                                                    className="hover:bg-gold/10 hover:text-gold text-zinc-400"
+                                                    className="hover:bg-emerald-50 hover:text-emerald-600 text-zinc-400"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </Button>
@@ -319,7 +320,7 @@ const AdminServices = () => {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => handleDelete(service.id)}
-                                                    className="hover:bg-red-500/10 hover:text-red-400 text-zinc-400"
+                                                    className="hover:bg-red-50 hover:text-red-600 text-zinc-400"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
@@ -339,6 +340,9 @@ const AdminServices = () => {
                         <DialogTitle className="text-xl font-serif text-emerald-900">
                             {editingService ? "Edit Service" : "Add New Service"}
                         </DialogTitle>
+                        <DialogDescription>
+                            Enter the details of the service you want to {editingService ? "update" : "add"}. This will be visible to your customers.
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-6 py-4">
@@ -413,7 +417,7 @@ const AdminServices = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </AdminLayout>
+        </AdminLayout >
     );
 };
 

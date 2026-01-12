@@ -9,6 +9,7 @@ import collectionGold from "@/assets/collection-gold.png";
 import collectionDiamond from "@/assets/collection-diamond.png";
 import collectionPlatinum from "@/assets/collection-platinum.png";
 import goldAppraiserCourse from "@/assets/gold-appraiser-course.png";
+import SocialMediaSection from "@/components/home/SocialMediaSection";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -572,6 +573,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <SocialMediaSection />
 
       {/* Testimonials */}
       < section className="py-12 relative" >

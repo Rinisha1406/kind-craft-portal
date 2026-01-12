@@ -23,6 +23,10 @@ import AdminMatrimony from "./pages/admin/AdminMatrimony";
 import AdminMembers from "./pages/admin/AdminMembers";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminMessages from "./pages/admin/AdminMessages";
+import TodayNews from "@/pages/TodayNews";
+import NewsDetails from "@/pages/NewsDetails";
+import TodayRasiPalan from "@/pages/TodayRasiPalan";
+import AdminBlogs from "@/pages/admin/AdminBlogs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +59,10 @@ const App = () => (
             <Route path="/admin/matrimony" element={<AdminMatrimony />} />
             <Route path="/admin/members" element={<AdminMembers />} />
             <Route path="/admin/messages" element={<AdminMessages />} />
+            <Route path="/admin/blogs" element={<AdminBlogs />} />
+            <Route path="/today-news" element={<TodayNews />} />
+            <Route path="/today-news/:id" element={<NewsDetails />} />
+            <Route path="/today-rasi-palan" element={<TodayRasiPalan />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

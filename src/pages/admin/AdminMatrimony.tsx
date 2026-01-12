@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Loader2, Trash2, Eye, EyeOff, Pencil, Camera } from "lucide-react";
 
 interface MatrimonyProfile {
@@ -240,44 +240,47 @@ const AdminMatrimony = () => {
         <div className="flex justify-between items-center">
           <p className="text-muted-foreground">Manage and view all registered matrimony profiles.</p>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="sm:max-w-2xl bg-zinc-950 border-gold/20 text-emerald-100 max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl bg-white border-zinc-200 text-zinc-900 max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-gold font-serif">Edit Profile</DialogTitle>
+                <DialogTitle className="text-emerald-900 font-serif">Edit Profile</DialogTitle>
+                <DialogDescription>
+                  Update the matrimony profile details for {formData.full_name}.
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleUpdate} className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Full Name</Label>
-                    <Input value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Full Name</Label>
+                    <Input value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Mobile Number</Label>
-                    <Input value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Mobile Number</Label>
+                    <Input value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Occupation</Label>
-                    <Input value={formData.occupation} onChange={(e) => setFormData({ ...formData, occupation: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Occupation</Label>
+                    <Input value={formData.occupation} onChange={(e) => setFormData({ ...formData, occupation: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Location</Label>
-                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Location</Label>
+                    <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Date of Birth</Label>
-                    <Input value={formData.dob} onChange={(e) => setFormData({ ...formData, dob: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Date of Birth</Label>
+                    <Input value={formData.dob} onChange={(e) => setFormData({ ...formData, dob: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Profile Image</Label>
+                    <Label className="text-zinc-600">Profile Image</Label>
                     <div className="flex items-center gap-4">
                       {formData.image_url && (
-                        <div className="w-16 h-16 rounded-lg overflow-hidden border border-gold/20 shrink-0">
+                        <div className="w-16 h-16 rounded-lg overflow-hidden border border-zinc-200 shrink-0">
                           <img src={formData.image_url} alt="Profile" className="w-full h-full object-cover" />
                         </div>
                       )}
                       <div className="flex-1">
                         <Label
                           htmlFor="image-upload"
-                          className="cursor-pointer inline-flex items-center justify-center gap-2 bg-black/40 border border-gold/20 hover:bg-gold/10 text-gold px-4 py-2 rounded-lg transition-colors w-full h-10"
+                          className="cursor-pointer inline-flex items-center justify-center gap-2 bg-zinc-50 border border-zinc-200 hover:bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg transition-colors w-full h-10"
                         >
                           <Camera className="w-4 h-4" />
                           <span>{formData.image_url ? "Change Photo" : "Upload Photo"}</span>
@@ -293,39 +296,39 @@ const AdminMatrimony = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">New Password (Optional)</Label>
+                    <Label className="text-zinc-600">New Password (Optional)</Label>
                     <Input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="bg-black/40 border-gold/20 text-white"
+                      className="bg-white border-zinc-200 text-zinc-900"
                       placeholder="Leave blank to keep current"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Salary</Label>
-                    <Input value={formData.salary} onChange={(e) => setFormData({ ...formData, salary: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Salary</Label>
+                    <Input value={formData.salary} onChange={(e) => setFormData({ ...formData, salary: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Caste</Label>
-                    <Input value={formData.caste} onChange={(e) => setFormData({ ...formData, caste: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Caste</Label>
+                    <Input value={formData.caste} onChange={(e) => setFormData({ ...formData, caste: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Community</Label>
-                    <Input value={formData.community} onChange={(e) => setFormData({ ...formData, community: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Community</Label>
+                    <Input value={formData.community} onChange={(e) => setFormData({ ...formData, community: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Father's Name</Label>
-                    <Input value={formData.father_name} onChange={(e) => setFormData({ ...formData, father_name: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Father's Name</Label>
+                    <Input value={formData.father_name} onChange={(e) => setFormData({ ...formData, father_name: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-emerald-100/70">Mother's Name</Label>
-                    <Input value={formData.mother_name} onChange={(e) => setFormData({ ...formData, mother_name: e.target.value })} className="bg-black/40 border-gold/20 text-white" />
+                    <Label className="text-zinc-600">Mother's Name</Label>
+                    <Input value={formData.mother_name} onChange={(e) => setFormData({ ...formData, mother_name: e.target.value })} className="bg-white border-zinc-200 text-zinc-900" />
                   </div>
                 </div>
                 <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="hover:text-gold hover:bg-gold/10">Cancel</Button>
-                  <Button type="submit" disabled={updating} className="gold-gradient text-emerald-950 font-bold">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                  <Button type="submit" disabled={updating} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
                     {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Profile"}
                   </Button>
                 </div>
@@ -334,23 +337,23 @@ const AdminMatrimony = () => {
           </Dialog>
         </div>
 
-        <div className="rounded-xl border border-gold/20 overflow-hidden shadow-2xl bg-gradient-to-br from-emerald-950 to-black text-champagne">
+        <div className="rounded-xl border border-zinc-200 overflow-hidden shadow-sm bg-white text-zinc-900">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-black/40 border-b border-gold/20">
-                <TableRow className="hover:bg-transparent border-gold/10">
-                  <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Image</TableHead>
-                  <TableHead className="text-gold font-serif py-6 whitespace-nowrap">Name</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">DOB</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Mobile Number</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Father's Name</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Mother's Name</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Caste</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Community</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Occupation</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Salary</TableHead>
-                  <TableHead className="text-gold font-serif whitespace-nowrap">Password</TableHead>
-                  <TableHead className="text-right text-gold font-serif whitespace-nowrap">Actions</TableHead>
+              <TableHeader className="bg-zinc-50 border-b border-zinc-200">
+                <TableRow className="hover:bg-transparent border-zinc-100">
+                  <TableHead className="text-zinc-600 font-serif py-6 whitespace-nowrap uppercase text-xs tracking-wider">Image</TableHead>
+                  <TableHead className="text-zinc-600 font-serif py-6 whitespace-nowrap uppercase text-xs tracking-wider">Name</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">DOB</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Mobile Number</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Father's Name</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Mother's Name</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Caste</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Community</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Occupation</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Salary</TableHead>
+                  <TableHead className="text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Password</TableHead>
+                  <TableHead className="text-right text-zinc-600 font-serif whitespace-nowrap uppercase text-xs tracking-wider">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -368,40 +371,40 @@ const AdminMatrimony = () => {
                   </TableRow>
                 ) : (
                   profiles.map((profile) => (
-                    <TableRow key={profile.id} className="hover:bg-emerald-900/20 border-b border-gold/10 transition-colors group">
+                    <TableRow key={profile.id} className="hover:bg-emerald-50/50 border-b border-zinc-100 transition-colors group">
                       <TableCell className="py-4">
-                        <div className="w-12 h-12 bg-black/40 rounded-lg overflow-hidden border border-gold/10">
+                        <div className="w-12 h-12 bg-zinc-100 rounded-lg overflow-hidden border border-zinc-200">
                           {profile.image_url ? (
                             <img src={profile.image_url} alt={profile.full_name} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-emerald-100/30">✦</div>
+                            <div className="w-full h-full flex items-center justify-center text-zinc-400">✦</div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium text-white group-hover:text-gold transition-colors whitespace-nowrap">{profile.full_name}</TableCell>
-                      <TableCell className="text-emerald-100/70 whitespace-nowrap">{profile.details?.dob || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/70 whitespace-nowrap">{profile.contact_phone || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/60 whitespace-nowrap">{profile.details?.father_name || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/60 whitespace-nowrap">{profile.details?.mother_name || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/60 whitespace-nowrap">{profile.details?.caste || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/60 whitespace-nowrap">{profile.details?.community || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/80 whitespace-nowrap">{profile.occupation || "-"}</TableCell>
-                      <TableCell className="text-gold/90 whitespace-nowrap">{profile.details?.salary || "-"}</TableCell>
-                      <TableCell className="text-emerald-100/40 font-mono text-xs whitespace-nowrap">
+                      <TableCell className="font-medium text-zinc-900 group-hover:text-emerald-700 transition-colors whitespace-nowrap">{profile.full_name}</TableCell>
+                      <TableCell className="text-zinc-600 whitespace-nowrap">{profile.details?.dob || "-"}</TableCell>
+                      <TableCell className="text-zinc-600 whitespace-nowrap">{profile.contact_phone || "-"}</TableCell>
+                      <TableCell className="text-zinc-500 whitespace-nowrap">{profile.details?.father_name || "-"}</TableCell>
+                      <TableCell className="text-zinc-500 whitespace-nowrap">{profile.details?.mother_name || "-"}</TableCell>
+                      <TableCell className="text-zinc-500 whitespace-nowrap">{profile.details?.caste || "-"}</TableCell>
+                      <TableCell className="text-zinc-500 whitespace-nowrap">{profile.details?.community || "-"}</TableCell>
+                      <TableCell className="text-zinc-700 whitespace-nowrap">{profile.occupation || "-"}</TableCell>
+                      <TableCell className="text-emerald-600 font-medium whitespace-nowrap">{profile.details?.salary || "-"}</TableCell>
+                      <TableCell className="text-zinc-400 font-mono text-xs whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className="min-w-[8ch]">
                             {visiblePasswords.has(profile.id)
                               ? (profile.details?.password_plain
-                                ? <span className="text-gold font-mono">{profile.details.password_plain}</span>
+                                ? <span className="text-emerald-700 font-mono">{profile.details.password_plain}</span>
                                 : (profile.is_custom_password
-                                  ? <span className="text-zinc-500 italic text-xs">Legacy (Hidden)</span>
+                                  ? <span className="text-zinc-400 italic text-xs">Legacy (Hidden)</span>
                                   : (profile.details?.dob || "N/A")))
                               : "••••••"}
                           </span>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-4 w-4 hover:bg-gold/10 hover:text-gold text-zinc-400"
+                            className="h-4 w-4 hover:bg-emerald-50 hover:text-emerald-600 text-zinc-400"
                             onClick={() => togglePasswordVisibility(profile.id)}
                             title={visiblePasswords.has(profile.id) ? "Hide Password" : "Show Password"}
                           >
@@ -417,7 +420,7 @@ const AdminMatrimony = () => {
                             size="icon"
                             onClick={() => toggleActive(profile.id, profile.is_active)}
                             title={profile.is_active ? "Hide Profile" : "Unhide Profile"}
-                            className="hover:bg-gold/10 hover:text-gold text-zinc-400"
+                            className="hover:bg-emerald-50 hover:text-emerald-600 text-zinc-400"
                           >
                             {profile.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </Button>
@@ -426,7 +429,7 @@ const AdminMatrimony = () => {
                             size="icon"
                             onClick={() => openEditDialog(profile)}
                             title="Edit"
-                            className="hover:bg-gold/10 hover:text-gold text-zinc-400"
+                            className="hover:bg-emerald-50 hover:text-emerald-600 text-zinc-400"
                           >
                             <Pencil className="w-4 h-4" />
                           </Button>
@@ -435,7 +438,7 @@ const AdminMatrimony = () => {
                             size="icon"
                             onClick={() => handleDelete(profile.id)}
                             title="Delete"
-                            className="hover:bg-red-500/10 hover:text-red-400 text-zinc-400"
+                            className="hover:bg-red-50 hover:text-red-600 text-zinc-400"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
