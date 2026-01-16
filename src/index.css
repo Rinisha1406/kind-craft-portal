@@ -97,11 +97,29 @@
 }
 
 @layer base {
+  html {
+    font-size: 14px;
+    @apply antialiased;
+  }
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  .standard-card {
+    @apply bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300;
+  }
+  
+  .small-card {
+    @apply standard-card shadow-sm hover:shadow-md hover:-translate-y-1;
+  }
+
+  .standard-grid {
+    @apply grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5;
   }
 }
 

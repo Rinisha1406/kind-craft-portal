@@ -69,7 +69,7 @@ CREATE TABLE `products` (
   `id` char(36) NOT NULL,
   `name` text NOT NULL,
   `price` decimal(10,2) NOT NULL,
-  `category` enum('silver','gold','diamond','platinum','gemstone') NOT NULL,
+  `category` enum('silver','gold','diamond','platinum','gemstone','Chidhanbaram Mumbai Bengal Gold','Covering & Fashion Jewel','Imported Jewels','Herbal-care product','Ayurvedha-Sidha-Homeo-product','SKIN. Hair & BeautyiCare','ORGANICS, SPICES, Nuts & Dates','GROCERIES & Home FARE Product') NOT NULL,
   `description` text DEFAULT NULL,
   `image_url` text DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,

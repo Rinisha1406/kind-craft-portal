@@ -2,11 +2,12 @@ import { ReactNode, useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles, Mail, Newspaper, Menu, X } from "lucide-react";
+import { Gem, LayoutDashboard, Package, Heart, Users, LogOut, Loader2, Sparkles, Mail, Newspaper, Menu, X, Image } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Products", path: "/admin/products", icon: Package },
+  { name: "Gallery", path: "/admin/gallery", icon: Image },
   { name: "Services", path: "/admin/services", icon: Sparkles },
   { name: "Matrimony", path: "/admin/matrimony", icon: Heart },
   { name: "Members", path: "/admin/members", icon: Users },
@@ -52,7 +53,7 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
     <div className="h-screen bg-zinc-50 flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />

@@ -6,7 +6,7 @@
 // For local XAMPP, use the subfolder path
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 export const API_URL = isLocal
-  ? 'http://localhost/kind-craft-portal/api'
+  ? 'http://localhost/gold/kind-craft-portal/api'
   : 'https://darkseagreen-ram-733578.hostingersite.com/api';
 
 // Helper to make requests
@@ -133,17 +133,22 @@ class SupabaseCompat {
         return { data: { path: res.data.publicUrl }, error: null };
       },
       getPublicUrl: (path: string) => {
-        // Assuming logic returns full or relative path that works
-        // Verify if path already has /uploads prefix (from upload response) or needs it
-        // If path already has /uploads (anywhere) or /public/uploads, assume it's good or relative to root
+        const baseUrl = API_URL.replace('/api', '');
         let publicUrl = path;
-        if (!path.startsWith('/') && !path.startsWith('http')) {
-          // If it's just a filename "foo.jpg"
-          publicUrl = `/public/uploads/${path}`;
-        } else if (path.startsWith('/uploads/')) {
-          // Legacy fix: if it starts with /uploads/, map to /public/uploads/
-          publicUrl = `/public${path}`;
+
+        if (path.startsWith('http')) {
+          return { data: { publicUrl } };
         }
+
+        if (path.startsWith('/public/')) {
+          publicUrl = `${baseUrl}${path}`;
+        } else if (path.startsWith('/uploads/')) {
+          publicUrl = `${baseUrl}/public${path}`;
+        } else {
+          // Assume it's just a filename
+          publicUrl = `${baseUrl}/public/uploads/${path}`;
+        }
+
         return { data: { publicUrl } };
       }
     })

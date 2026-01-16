@@ -198,7 +198,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="standard-grid"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -207,23 +207,47 @@ const Index = () => {
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
-                className="group p-8 bg-card rounded-2xl border border-border shadow-card hover:shadow-emerald-500/20 transition-all duration-500 relative overflow-hidden"
+                className="group small-card"
                 variants={fadeInUp}
-                whileHover={{ y: -8 }}
+                whileHover={{ y: -5 }}
               >
-                <div className="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
-                <motion.div
-                  className="w-16 h-16 gold-gradient rounded-2xl flex items-center justify-center mb-6 shadow-gold"
-                  whileHover={{ rotate: 5, scale: 1.1 }}
-                >
-                  <feature.icon className="w-8 h-8 text-primary-foreground" />
-                </motion.div>
-                <h3 className="text-xl font-serif font-semibold text-foreground mb-3 group-hover:text-emerald-600 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {feature.description}
-                </p>
+                <div className="aspect-square bg-muted flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
+                  <motion.div
+                    className="w-20 h-20 gold-gradient rounded-2xl flex items-center justify-center shadow-gold relative z-10"
+                    whileHover={{ rotate: 5, scale: 1.1 }}
+                  >
+                    <feature.icon className="w-10 h-10 text-primary-foreground" />
+                  </motion.div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-base font-serif font-semibold text-foreground mb-1 group-hover:text-emerald-600 transition-colors line-clamp-1">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 h-8 mb-3">
+                    {feature.description}
+                  </p>
+
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded">
+                      Enquire Now
+                    </span>
+                    <motion.button
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="h-9 w-9 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center relative overflow-hidden group/btn border border-emerald-400/20"
+                      onClick={() => {
+                        const phoneNumber = "919514879417";
+                        const message = encodeURIComponent(`Hi, I'm interested in your ${feature.title} service. Could you please provide more information?`);
+                        window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+                      }}
+                      title="Enquire on WhatsApp"
+                    >
+                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out" />
+                      <MessageCircle className="w-4 h-4 relative z-10" />
+                    </motion.button>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -251,7 +275,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -264,7 +288,7 @@ const Index = () => {
             ].map((collection, index) => (
               <motion.div
                 key={collection.title}
-                className="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer"
+                className="group relative h-[300px] small-card cursor-pointer"
                 variants={fadeInUp}
                 whileHover={{ scale: 1.02 }}
               >
@@ -274,9 +298,9 @@ const Index = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-8 text-center transform transition-transform duration-500 group-hover:-translate-y-2">
-                  <h3 className="text-2xl font-serif font-bold text-white mb-2">{collection.title}</h3>
-                  <p className="text-white/80 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-center transform transition-transform duration-500 group-hover:-translate-y-2">
+                  <h3 className="text-xl font-serif font-bold text-white mb-1">{collection.title}</h3>
+                  <p className="text-white/80 text-xs mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     {collection.desc}
                   </p>
                   <Link to={`/products?category=${collection.link}`}>
@@ -597,7 +621,7 @@ const Index = () => {
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={testimonial.name}
-                className="bg-card p-8 rounded-2xl border border-border shadow-card relative"
+                className="p-6 small-card relative"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

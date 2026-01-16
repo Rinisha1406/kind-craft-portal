@@ -28,57 +28,78 @@ $stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows > 0) {
-    send_json_response(['error' => 'User already exists'], 409);
-}
+$user_id = null;
+$user_exists = false;
+$reg_type = isset($input['options']['data']['registration_type']) ? $input['options']['data']['registration_type'] : 'unknown';
 
-// Create new user
-$user_id = generate_uuid();
-$password_hash = password_hash($password, PASSWORD_DEFAULT);
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+    $user_id = $user['id'];
+    $user_exists = true;
+
+    // Check for specific profile existence
+    if ($reg_type === 'matrimony') {
+        $stmt_mat = $conn->prepare("SELECT id FROM matrimony_profiles WHERE user_id = ?");
+        $stmt_mat->bind_param("s", $user_id);
+        $stmt_mat->execute();
+        if ($stmt_mat->get_result()->num_rows > 0) {
+            send_json_response(['error' => 'Matrimony profile already registered for this number'], 409);
+        }
+    } elseif ($reg_type === 'member') {
+        $stmt_mem = $conn->prepare("SELECT id FROM members WHERE user_id = ?");
+        $stmt_mem->bind_param("s", $user_id);
+        $stmt_mem->execute();
+        if ($stmt_mem->get_result()->num_rows > 0) {
+            send_json_response(['error' => 'Member profile already registered for this number'], 409);
+        }
+    } else {
+        send_json_response(['error' => 'User already exists'], 409);
+    }
+}
 
 $conn->begin_transaction();
 
 try {
-    // Insert user
-    $stmt = $conn->prepare("INSERT INTO users (id, phone, password_hash, password_plain) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $user_id, $phone, $password_hash, $password);
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to create user");
-    }
-    file_put_contents('../debug_register.log', " - User inserted\n", FILE_APPEND);
+    if (!$user_exists) {
+        $user_id = generate_uuid();
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert profile
-    $profile_id = generate_uuid();
-    $stmt = $conn->prepare("INSERT INTO profiles (id, user_id, phone, full_name) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $profile_id, $user_id, $phone, $full_name);
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to create profile");
-    }
-    
-    // Assign default role (user)
-    $role_id = generate_uuid();
-    $role = 'user';
-    $stmt = $conn->prepare("INSERT INTO user_roles (id, user_id, role) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $role_id, $user_id, $role);
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to assign role");
-    }
-    file_put_contents('../debug_register.log', " - Role assigned\n", FILE_APPEND);
+        // Insert user
+        $stmt = $conn->prepare("INSERT INTO users (id, phone, password_hash, password_plain) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $user_id, $phone, $password_hash, $password);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to create user");
+        }
+        file_put_contents('../debug_register.log', " - User inserted\n", FILE_APPEND);
 
-    $reg_type = isset($input['options']['data']['registration_type']) ? $input['options']['data']['registration_type'] : 'unknown';
+        // Insert basic profile
+        $profile_id = generate_uuid();
+        $stmt = $conn->prepare("INSERT INTO profiles (id, user_id, phone, full_name) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $profile_id, $user_id, $phone, $full_name);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to create profile");
+        }
+        
+        // Assign default role (user)
+        $role_id = generate_uuid();
+        $role = 'user';
+        $stmt = $conn->prepare("INSERT INTO user_roles (id, user_id, role) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $role_id, $user_id, $role);
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to assign role");
+        }
+        file_put_contents('../debug_register.log', " - Role assigned\n", FILE_APPEND);
+    }
 
     // Handle Matrimony Registration
     if ($reg_type === 'matrimony') {
         $matrimony_data = $input['options']['data'];
-        $mat_id = generate_uuid();
         
         // Extract fields
         $age = isset($matrimony_data['dob']) ? date_diff(date_create($matrimony_data['dob']), date_create('today'))->y : 0;
         $gender = $matrimony_data['gender'] ?? 'other';
         $occupation = $matrimony_data['occupation'] ?? null;
-        $education = null; 
         $location = $matrimony_data['location'] ?? $matrimony_data['city'] ?? null;
-        $bio = null; 
         
         // details JSON for extra fields
         $details = json_encode([
@@ -99,26 +120,30 @@ try {
         }
         file_put_contents('../debug_register.log', " - Matrimony inserted\n", FILE_APPEND);
     }
-    // Handle Member Registration (ensure it shows in Admin Members and is editable)
+    // Handle Member Registration
     elseif ($reg_type === 'member') {
         $member_data = $input['options']['data'] ?? [];
         $address = $member_data['address'] ?? '';
         
-        // Insert into members table
-        $member_id = generate_uuid();
-        $stmt_member = $conn->prepare("INSERT INTO members (id, user_id, full_name, phone, password_hash, password_plain, address, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
-        $stmt_member->bind_param("sssssss", $member_id, $user_id, $full_name, $phone, $password_hash, $password, $address);
-        
-        if (!$stmt_member->execute()) {
-             file_put_contents('../debug_register.log', " - Failed to insert into members: " . $stmt_member->error . "\n", FILE_APPEND);
-        } else {
-             file_put_contents('../debug_register.log', " - Member profile created successfully\n", FILE_APPEND);
+        // Check if member already exists for this user (additional safety)
+        $stmt_check = $conn->prepare("SELECT id FROM members WHERE user_id = ?");
+        $stmt_check->bind_param("s", $user_id);
+        $stmt_check->execute();
+        if ($stmt_check->get_result()->num_rows === 0) {
+            $member_id = generate_uuid();
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt_member = $conn->prepare("INSERT INTO members (id, user_id, full_name, phone, password_hash, password_plain, address, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+            $stmt_member->bind_param("sssssss", $member_id, $user_id, $full_name, $phone, $password_hash, $password, $address);
+            
+            if (!$stmt_member->execute()) {
+                throw new Exception("Failed to insert into members: " . $stmt_member->error);
+            }
         }
     }
 
     $conn->commit();
     
-    // Return success (similar to Supabase structure)
+    // Return success
     send_json_response([
         'data' => [
             'user' => [
@@ -127,7 +152,7 @@ try {
                 'role' => 'authenticated'
             ],
             'session' => [
-                'access_token' => $user_id, // SIMPLIFIED TOKEN
+                'access_token' => $user_id,
                 'token_type' => 'bearer',
                 'user' => [
                     'id' => $user_id,
@@ -139,7 +164,9 @@ try {
     ], 200);
 
 } catch (Exception $e) {
-    $conn->rollback();
+    if ($conn->connect_errno === 0) {
+        $conn->rollback();
+    }
     file_put_contents('../debug_register.log', " - Exception: " . $e->getMessage() . "\n", FILE_APPEND);
     send_json_response(['error' => $e->getMessage()], 500);
 }

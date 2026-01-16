@@ -14,7 +14,7 @@ import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { z } from "zod";
 
-type ProductCategory = "silver" | "gold" | "diamond" | "platinum" | "gemstone";
+type ProductCategory = "silver" | "gold" | "diamond" | "platinum" | "gemstone" | "Chidhanbaram Mumbai Bengal Gold" | "Covering & Fashion Jewel" | "Imported Jewels" | "Herbal-care product" | "Ayurvedha-Sidha-Homeo-product" | "SKIN. Hair & BeautyiCare" | "ORGANICS, SPICES, Nuts & Dates" | "GROCERIES & Home FARE Product";
 
 interface Product {
   id: string;
@@ -28,12 +28,40 @@ interface Product {
   created_at: string;
 }
 
-const categories: ProductCategory[] = ["silver", "gold", "diamond", "platinum", "gemstone"];
+const categories: ProductCategory[] = [
+  "silver",
+  "gold",
+  "diamond",
+  "platinum",
+  "gemstone",
+  "Chidhanbaram Mumbai Bengal Gold",
+  "Covering & Fashion Jewel",
+  "Imported Jewels",
+  "Herbal-care product",
+  "Ayurvedha-Sidha-Homeo-product",
+  "SKIN. Hair & BeautyiCare",
+  "ORGANICS, SPICES, Nuts & Dates",
+  "GROCERIES & Home FARE Product"
+];
 
 const productSchema = z.object({
   name: z.string().trim().min(2, "Name is required").max(100),
   price: z.number().positive("Price must be positive"),
-  category: z.enum(["silver", "gold", "diamond", "platinum", "gemstone"]),
+  category: z.enum([
+    "silver",
+    "gold",
+    "diamond",
+    "platinum",
+    "gemstone",
+    "Chidhanbaram Mumbai Bengal Gold",
+    "Covering & Fashion Jewel",
+    "Imported Jewels",
+    "Herbal-care product",
+    "Ayurvedha-Sidha-Homeo-product",
+    "SKIN. Hair & BeautyiCare",
+    "ORGANICS, SPICES, Nuts & Dates",
+    "GROCERIES & Home FARE Product"
+  ]),
   description: z.string().max(500).optional(),
   is_active: z.boolean(),
 });

@@ -134,6 +134,7 @@ const Dashboard = () => {
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 lg:gap-4 pt-6">
               {[
                 { label: "Add New Product", desc: "Create a new jewelry item", href: "/admin/products" },
+                { label: "Manage Gallery", desc: "Update images and videos", href: "/admin/gallery" },
                 { label: "Review Messages", desc: "Check customer inquiries", href: "/admin/messages" },
                 { label: "Manage Blogs", desc: "Update News & Rasi Palan", href: "/admin/blogs" },
                 { label: "Manage Registrations", desc: "Approve or reject requests", href: "/admin/registrations" },

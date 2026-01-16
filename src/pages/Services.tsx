@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gem, Heart, Users, PenTool, RefreshCw, ArrowRight, ShieldCheck, Sparkles, Moon, Star, Sun, Cloud, Music, Camera, Gift } from "lucide-react"; // Import all generic icons possibly used
+import { Gem, Heart, Users, PenTool, RefreshCw, ArrowRight, ShieldCheck, Sparkles, Moon, Star, Sun, Cloud, Music, Camera, Gift, MessageCircle } from "lucide-react"; // Import all generic icons possibly used
 import { Button } from "@/components/ui/button";
 import MainLayout from "@/components/layout/MainLayout";
 import heroImage from "@/assets/services-hero.png";
@@ -216,12 +216,16 @@ const Services = () => {
                     </div>
 
                     {loading ? (
-                        <div className="text-center text-gold py-20">Loading our services...</div>
+                        <div className="standard-grid">
+                            {[...Array(10)].map((_, i) => (
+                                <div key={i} className="small-card aspect-square animate-pulse bg-muted" />
+                            ))}
+                        </div>
                     ) : services.length === 0 ? (
                         <div className="text-center text-muted-foreground py-20">No active services at the moment.</div>
                     ) : (
                         <motion.div
-                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                            className="standard-grid"
                             initial="initial"
                             whileInView="animate"
                             viewport={{ once: true }}
@@ -231,10 +235,10 @@ const Services = () => {
                                 <motion.div
                                     key={service.id}
                                     variants={fadeInUp}
-                                    className="group bg-card/30 rounded-3xl overflow-hidden border border-border/50 hover:border-gold/30 transition-all duration-500 hover:shadow-2xl hover:shadow-gold/5 flex flex-col h-full"
+                                    className="group small-card"
                                 >
                                     {/* Image Section */}
-                                    <div className="h-64 overflow-hidden relative bg-black/20">
+                                    <div className="aspect-square overflow-hidden relative bg-black/20">
                                         {service.image_url ? (
                                             <>
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10 opacity-60 transition-opacity duration-500 group-hover:opacity-40" />
@@ -249,43 +253,44 @@ const Services = () => {
                                                 <Sparkles className="w-12 h-12 text-gold/20" />
                                             </div>
                                         )}
-                                        {/* Icon Overlay (Optional decoration) */}
-                                        <div className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-gold/20 flex items-center justify-center">
-                                            <ShieldCheck className="w-5 h-5 text-gold" />
-                                        </div>
+                                        {/* Category Badge */}
+                                        <Badge className="absolute top-2 right-2 text-[10px] px-2 py-0 h-5 bg-gold/20 text-gold border-gold/30 backdrop-blur-md">
+                                            {service.category || "General"}
+                                        </Badge>
                                     </div>
 
                                     {/* Content Section */}
-                                    <div className="p-8 flex flex-col flex-grow">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gold/60">{service.category || "General"}</span>
-                                            {service.provider_name && (
-                                                <span className="text-[10px] bg-gold/10 text-gold px-2 py-0.5 rounded-full font-bold">
-                                                    {service.provider_name}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <h2 className="text-2xl font-serif font-bold text-foreground mb-1 group-hover:text-gold transition-colors">
+                                    <div className="p-4 flex flex-col flex-grow">
+                                        <h2 className="text-base font-serif font-bold text-foreground mb-1 group-hover:text-gold transition-colors line-clamp-1">
                                             {service.title}
                                         </h2>
-                                        <p className="text-gold font-bold mb-4">{service.price || "Price on Request"}</p>
-
-                                        <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
+                                        <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 h-8 mb-3">
                                             {service.description}
                                         </p>
 
-                                        {service.features && service.features.length > 0 && (
-                                            <div className="pt-6 border-t border-border/10">
-                                                <ul className="space-y-3">
-                                                    {service.features.map((feature, idx) => (
-                                                        <li key={idx} className="flex items-start gap-3 text-sm text-foreground/80">
-                                                            <div className="min-w-[5px] h-[5px] rounded-full bg-gold mt-2" />
-                                                            {feature}
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                        <div className="flex items-center justify-between mt-auto">
+                                            <div className="flex flex-col">
+                                                <span className="text-primary font-bold text-sm">{service.price || "Price on Request"}</span>
+                                                {service.provider_name && (
+                                                    <span className="text-[9px] text-muted-foreground italic">By {service.provider_name}</span>
+                                                )}
                                             </div>
-                                        )}
+                                            <motion.button
+                                                whileHover={{ scale: 1.1, rotate: 5 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                className="h-9 w-9 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center relative overflow-hidden group/btn border border-emerald-400/20"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    const phoneNumber = "919514879417";
+                                                    const message = encodeURIComponent(`Hi, I'm interested in the service: ${service.title}`);
+                                                    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+                                                }}
+                                                title="Enquire on WhatsApp"
+                                            >
+                                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out" />
+                                                <MessageCircle className="w-4 h-4 relative z-10" />
+                                            </motion.button>
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))}

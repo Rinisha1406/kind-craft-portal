@@ -9,7 +9,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingBag, Sparkles, Filter, ChevronRight, Star, Shield, RefreshCw, ArrowRight, MessageCircle } from "lucide-react";
 import productsHero from "@/assets/products-hero.jpg";
 
-const categories = ["all", "gold", "silver", "diamond", "platinum", "gemstone"];
+const categories = [
+  "all",
+  "gold",
+  "silver",
+  "diamond",
+  "platinum",
+  "gemstone",
+  "Chidhanbaram Mumbai Bengal Gold",
+  "Covering & Fashion Jewel",
+  "Imported Jewels",
+  "Herbal-care product",
+  "Ayurvedha-Sidha-Homeo-product",
+  "SKIN. Hair & BeautyiCare",
+  "ORGANICS, SPICES, Nuts & Dates",
+  "GROCERIES & Home FARE Product"
+];
 
 const categoryInfo: Record<string, { color: string; icon: string; desc: string }> = {
   gold: { color: "bg-gold text-primary-foreground", icon: "✦", desc: "22K & 24K Pure Gold" },
@@ -17,6 +32,14 @@ const categoryInfo: Record<string, { color: string; icon: string; desc: string }
   diamond: { color: "bg-diamond text-charcoal", icon: "◆", desc: "VVS Certified Diamonds" },
   platinum: { color: "bg-platinum text-charcoal", icon: "○", desc: "Pure Platinum" },
   gemstone: { color: "bg-rose-gold text-primary-foreground", icon: "❖", desc: "Precious Gemstones" },
+  "Chidhanbaram Mumbai Bengal Gold": { color: "bg-gold text-primary-foreground", icon: "✦", desc: "Traditional South Indian Gold" },
+  "Covering & Fashion Jewel": { color: "bg-rose-gold text-primary-foreground", icon: "✨", desc: "Exquisite Fashion Jewelry" },
+  "Imported Jewels": { color: "bg-platinum text-charcoal", icon: "🌍", desc: "Globally Sourced Collections" },
+  "Herbal-care product": { color: "bg-emerald-600 text-white", icon: "🌿", desc: "Natural Wellness Products" },
+  "Ayurvedha-Sidha-Homeo-product": { color: "bg-emerald-700 text-white", icon: "🧪", desc: "Traditional Healing Solutions" },
+  "SKIN. Hair & BeautyiCare": { color: "bg-pink-500 text-white", icon: "✨", desc: "Beauty & Personal Care" },
+  "ORGANICS, SPICES, Nuts & Dates": { color: "bg-amber-700 text-white", icon: "🥜", desc: "Premium Organic Foods" },
+  "GROCERIES & Home FARE Product": { color: "bg-zinc-700 text-white", icon: "🏠", desc: "Daily Essentials for Home" },
 };
 
 interface Product {
@@ -131,21 +154,21 @@ const Products = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-card rounded-2xl overflow-hidden">
+            <div className="standard-grid">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="small-card">
                   <Skeleton className="aspect-square w-full" />
-                  <div className="p-6 space-y-3">
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-8 w-1/3" />
+                  <div className="p-4 space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-6 w-1/3" />
                   </div>
                 </div>
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+              className="standard-grid"
               layout
             >
               <AnimatePresence mode="popLayout">
@@ -157,8 +180,8 @@ const Products = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group bg-card rounded-2xl overflow-hidden border border-border shadow-card hover:shadow-gold transition-all duration-500"
-                    whileHover={{ y: -10 }}
+                    className="group small-card"
+                    whileHover={{ y: -5 }}
                   >
                     <div className="aspect-square bg-muted overflow-hidden relative">
                       {product.image_url ? (
@@ -170,7 +193,7 @@ const Products = () => {
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
                           <motion.span
-                            className="text-6xl text-muted-foreground/30"
+                            className="text-4xl text-muted-foreground/30"
                             animate={{ rotate: [0, 5, -5, 0] }}
                             transition={{ duration: 4, repeat: Infinity }}
                           >
@@ -180,7 +203,7 @@ const Products = () => {
                       )}
 
                       {/* Category Badge */}
-                      <Badge className={`absolute top-4 right-4 ${categoryInfo[product.category]?.color || "bg-primary text-primary-foreground"}`}>
+                      <Badge className={`absolute top-2 right-2 text-[10px] px-2 py-0 h-5 ${categoryInfo[product.category]?.color || "bg-primary text-primary-foreground"}`}>
                         {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
                       </Badge>
 
@@ -204,19 +227,19 @@ const Products = () => {
                       )}
                     </div>
 
-                    <div className="p-6">
+                    <div className="p-4">
                       <Link to={`/product/${product.id}`}>
-                        <h3 className="font-serif text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                        <h3 className="font-serif text-base font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
                           {product.name}
                         </h3>
                       </Link>
                       {product.description && (
-                        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                        <p className="text-muted-foreground text-xs mb-3 line-clamp-2 leading-relaxed h-8">
                           {product.description}
                         </p>
                       )}
                       <div className="flex items-center justify-between">
-                        <p className="text-primary font-bold text-2xl">
+                        <p className="text-primary font-bold text-xl">
                           ₹{product.price.toLocaleString("en-IN")}
                         </p>
                         <motion.button
@@ -225,7 +248,7 @@ const Products = () => {
                           className="h-10 w-10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white rounded-full shadow-lg shadow-emerald-500/30 flex items-center justify-center relative overflow-hidden group border border-emerald-400/20"
                           onClick={(e) => {
                             e.preventDefault();
-                            const phoneNumber = "919876543210";
+                            const phoneNumber = "919514879417";
                             const message = encodeURIComponent(
                               `Hi, I am interested in buying the following product:\n\n*${product.name}*\nPrice: ₹${product.price}\nCategory: ${product.category}\nLink: ${window.location.origin}/product/${product.id}`
                             );

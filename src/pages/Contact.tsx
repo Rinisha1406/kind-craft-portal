@@ -1,43 +1,42 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { supabase, API_URL } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { Phone, Mail, MapPin, Clock, Send, MessageCircle, Sparkles, Instagram, Facebook, Twitter, Globe } from "lucide-react";
-import { z } from "zod";
-import contactHero from "@/assets/contact-hero.png";
+import { Phone, Mail, MapPin, Clock, MessageCircle, Sparkles, Instagram, Facebook, Twitter, Globe, ArrowRight } from "lucide-react";
+import SocialMediaSection from "@/components/home/SocialMediaSection";
 
-const contactSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Please enter a valid email address"),
-  phone: z.string().trim().min(10, "Please enter a valid phone number").max(15),
-  subject: z.string().trim().max(200).optional(),
-  message: z.string().trim().min(10, "Message must be at least 10 characters").max(1000),
-});
-
-const contactInfo = [
-  { icon: Phone, label: "Call Us", value: "+91 98765 43210", subtext: "Mon-Sat, 10AM-8PM" },
-  { icon: MapPin, label: "Visit Us", value: "123 Jewelry Street", subtext: "Mumbai, Maharashtra 400001" },
-  { icon: Clock, label: "Working Hours", value: "10:00 AM - 8:00 PM", subtext: "Monday to Saturday" },
+const contactDetails = [
+  {
+    icon: Phone,
+    label: "Phone Support",
+    values: ["+91 95148 79417", "+91 98408 26683", "+91 81247 20549"],
+    subtext: "Multiple lines available 24/7",
+    color: "emerald"
+  },
+  {
+    icon: MessageCircle,
+    label: "WhatsApp Chat",
+    values: ["+91 95148 79417"],
+    subtext: "Instant response for your queries",
+    color: "emerald",
+    isWhatsApp: true
+  },
+  {
+    icon: Mail,
+    label: "Official Email",
+    values: ["pandiansekar880@gmail.com"],
+    subtext: "Typical response within 2 hours",
+    color: "amber"
+  },
+  {
+    icon: MapPin,
+    label: "Our Location",
+    values: ["S. P. GEM GOLD ACADEMY", "No: 147/282, R. K. MUTT ROAD", "R. A. PURAM, CHENNAI - 600028"],
+    subtext: "Visit our luxury hub",
+    color: "amber"
+  }
 ];
 
-
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const { toast } = useToast();
-
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -48,70 +47,13 @@ const Contact = () => {
     animate: { transition: { staggerChildren: 0.1 } }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const validated = contactSchema.parse(formData);
-      setSubmitting(true);
-
-      const { error } = await supabase.from("contact_messages").insert({
-        name: validated.name,
-        email: validated.email,
-        phone: validated.phone,
-        subject: validated.subject || null,
-        message: validated.message,
-      });
-
-      if (error) throw error;
-
-      // 2. Sync with PHP/MySQL Database
-      const response = await fetch(`${API_URL}/contact_messages.php`, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validated)
-      });
-
-      toast({
-        title: "Message Sent! ✨",
-        description: "Thank you for reaching out. We'll get back to you within 24 hours.",
-      });
-      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({ title: "Validation Error", description: error.errors[0].message, variant: "destructive" });
-      } else {
-        toast({ title: "Error", description: "Failed to send message.", variant: "destructive" });
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <MainLayout>
-      {/* Hero */}
-      <section className="relative min-h-[40vh] flex items-center overflow-hidden">
-        {/* Background Image with Parallax effect simulation */}
+      {/* Minimalist Professional Hero Section */}
+      <section className="relative min-h-[45vh] flex items-center overflow-hidden bg-charcoal">
         <div className="absolute inset-0 z-0">
-          <img src={contactHero} alt="Contact Us" className="w-full h-full object-cover scale-110" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-white" />
-          {/* SVG Pattern Overlay */}
-          <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-        </div>
-
-        {/* Animated decorative elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-500/20 blur-[120px] rounded-full"
-            animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute bottom-1/4 -right-20 w-96 h-96 bg-amber-500/20 blur-[120px] rounded-full"
-            animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,_hsl(var(--primary)_/_0.15),_transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,_hsl(var(--gold)_/_0.05),_transparent_40%)]" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10 pt-20">
@@ -121,233 +63,152 @@ const Contact = () => {
             animate="animate"
             variants={staggerContainer}
           >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/10 backdrop-blur-md text-gold border border-white/20 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-8 shadow-2xl"
-            >
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              Exquisite Support
-            </motion.span>
+            <motion.div variants={fadeInUp}>
+              <Badge className="mb-6 bg-gold/10 text-gold border-gold/20 backdrop-blur-sm px-6 py-1 rounded-full uppercase tracking-[0.2em] text-[10px] font-black">
+                Connect With Excellence
+              </Badge>
+            </motion.div>
 
             <motion.h1
               variants={fadeInUp}
-              className="text-5xl md:text-6xl font-sans font-black text-white mb-8 tracking-tighter leading-[0.9] drop-shadow-2xl"
+              className="text-5xl md:text-7xl font-serif font-bold text-champagne mb-8 leading-tight tracking-tight"
             >
-              Let's craft <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">Something Beautiful</span>
+              How can we <span className="text-gold-gradient italic">help you?</span>
             </motion.h1>
+
+            <motion.p
+              variants={fadeInUp}
+              className="text-champagne/60 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed"
+            >
+              At GOLDJEWELTECH, every inquiry is handled with the utmost care.
+              Discover our legacy of trust and craftsmanship.
+            </motion.p>
           </motion.div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-16 -mt-20 relative z-20">
+      {/* Clean Contact Cards Grid */}
+      <section className="py-24 -mt-16 relative z-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 max-w-7xl mx-auto items-start">
-            {/* Form Side */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="lg:col-span-7"
-            >
-              <div className="bg-white/90 backdrop-blur-2xl p-8 md:p-10 rounded-[2.5rem] border border-white/50 shadow-[0_40px_100px_rgba(0,0,0,0.1)] relative overflow-hidden group">
-                {/* Internal decorative blobs */}
-                <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-emerald-500/10 transition-colors duration-1000" />
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-amber-500/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-amber-500/10 transition-colors duration-1000" />
-
-                <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
-                    <motion.div
-                      className="w-16 h-16 bg-gradient-to-tr from-emerald-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)]"
-                      whileHover={{ rotate: 10, scale: 1.1 }}
-                    >
-                      <Send className="w-6 h-6 text-white" />
-                    </motion.div>
-                    <div className="text-center md:text-left">
-                      <h3 className="text-3xl font-sans font-black text-zinc-900 tracking-tighter mb-2">Send a Message</h3>
-                      <p className="text-base text-zinc-500 font-medium">We typically respond within 24 hours</p>
-                    </div>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      <motion.div className="space-y-3" variants={fadeInUp}>
-                        <Label htmlFor="name" className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-2">Name *</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          placeholder="John Doe"
-                          required
-                          className="h-16 rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-lg px-6"
-                        />
-                      </motion.div>
-                      <motion.div className="space-y-3" variants={fadeInUp}>
-                        <Label htmlFor="email" className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-2">Email *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          placeholder="john@example.com"
-                          required
-                          className="h-16 rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-lg px-6"
-                        />
-                      </motion.div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      <motion.div className="space-y-3" variants={fadeInUp}>
-                        <Label htmlFor="phone" className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-2">Phone *</Label>
-                        <Input
-                          id="phone"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="+91 98765 43210"
-                          required
-                          className="h-16 rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-lg px-6"
-                        />
-                      </motion.div>
-                      <motion.div className="space-y-3" variants={fadeInUp}>
-                        <Label htmlFor="subject" className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-2">Subject</Label>
-                        <Input
-                          id="subject"
-                          value={formData.subject}
-                          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                          placeholder="How can we help?"
-                          className="h-16 rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-lg px-6"
-                        />
-                      </motion.div>
-                    </div>
-
-                    <motion.div className="space-y-3" variants={fadeInUp}>
-                      <Label htmlFor="message" className="text-[10px] uppercase tracking-[0.3em] font-black text-zinc-500 ml-2">Message *</Label>
-                      <Textarea
-                        id="message"
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        placeholder="Tell us about your inquiry..."
-                        rows={6}
-                        required
-                        className="rounded-2xl bg-zinc-50/50 border-zinc-200 focus:border-emerald-500 transition-all text-base p-4 resize-none"
-                      />
-                    </motion.div>
-
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="pt-4"
-                    >
-                      <Button
-                        type="submit"
-                        disabled={submitting}
-                        className="w-full h-14 bg-gradient-to-tr from-emerald-600 to-amber-500 text-white hover:opacity-95 px-12 rounded-2xl font-black uppercase tracking-widest text-sm shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center gap-4 transition-all"
-                      >
-                        {submitting ? "Sending..." : (
-                          <>
-                            Send Message
-                            <Send className="w-5 h-5" />
-                          </>
-                        )}
-                      </Button>
-                    </motion.div>
-                  </form>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            {contactDetails.map((detail, index) => (
+              <motion.div
+                key={index}
+                variants={fadeInUp}
+                whileHover={{ y: -5 }}
+                className="group bg-background border border-border/50 hover:border-gold/30 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center h-full"
+              >
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 ${detail.color === 'emerald'
+                  ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                  : 'bg-gold/5 text-gold group-hover:bg-gold group-hover:text-primary-foreground'
+                  }`}>
+                  <detail.icon className="w-7 h-7" />
                 </div>
-              </div>
-            </motion.div>
 
+                <h3 className="text-lg font-serif font-bold text-foreground mb-4 tracking-tight">{detail.label}</h3>
 
-            {/* Contact Info Side */}
-            <motion.div
-              className="lg:col-span-5 space-y-8"
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="grid grid-cols-1 gap-6">
-                {/* Contact Card 1 */}
-                <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl group hover:-translate-y-2 transition-all duration-500 flex items-center gap-8">
-                  <div className="w-16 h-16 bg-emerald-600/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:rotate-12 transition-all duration-500">
-                    <Phone className="w-8 h-8 text-emerald-600 group-hover:text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black text-zinc-900 tracking-tighter">Support Line</h4>
-                    <p className="text-zinc-500 font-bold">+91 98765 43210</p>
-                    <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest mt-1">Available 24/7</p>
-                  </div>
+                <div className="flex-1 space-y-1 mb-6">
+                  {detail.values.map((val, i) => (
+                    <p key={i} className="text-muted-foreground text-sm font-medium">{val}</p>
+                  ))}
                 </div>
-                {/* Contact Card 2 */}
-                <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl group hover:-translate-y-2 transition-all duration-500 flex items-center gap-8">
-                  <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:rotate-12 transition-all duration-500">
-                    <Mail className="w-8 h-8 text-amber-500 group-hover:text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black text-zinc-900 tracking-tighter">Direct Email</h4>
-                    <p className="text-zinc-500 font-bold">hello@kindcraft.com</p>
-                    <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest mt-1">Typical response: 2h</p>
-                  </div>
-                </div>
-                {/* Contact Card 3 */}
-                <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-zinc-200 shadow-xl group hover:-translate-y-2 transition-all duration-500 flex items-center gap-8">
-                  <div className="w-16 h-16 bg-emerald-600/10 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:rotate-12 transition-all duration-500">
-                    <MapPin className="w-8 h-8 text-emerald-600 group-hover:text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black text-zinc-900 tracking-tighter">Visit Gallery</h4>
-                    <p className="text-zinc-500 font-bold">Mumbai, Maharashtra</p>
-                    <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest mt-1">Global Presence</p>
-                  </div>
-                </div>
-              </div>
 
-              {/* Status Hub (Redesigned Map Placeholder) */}
-              <div className="relative h-[350px] rounded-[2.5rem] overflow-hidden border border-zinc-200 shadow-2xl group flex flex-col">
-                <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 to-emerald-50/50" />
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
-
-                <div className="flex-1 flex flex-col items-center justify-center p-8 relative z-10 text-center">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    className="w-16 h-16 bg-white rounded-2xl shadow-2xl border border-zinc-100 flex items-center justify-center mb-8 group-hover:rotate-6 transition-all duration-700"
-                  >
-                    <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center relative">
-                      <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full" />
-                      <Globe className="w-6 h-6 text-emerald-600 relative z-10" />
-                    </div>
-                  </motion.div>
-
-                  <Badge variant="outline" className="mb-4 border-emerald-200 text-emerald-600 bg-emerald-50/50 px-4 py-1 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">
-                    Global Headquarters
-                  </Badge>
-
-                  <h3 className="text-2xl font-sans font-black text-zinc-900 tracking-tighter mb-4 leading-none">
-                    Mumbai <span className="text-emerald-600">Luxury Hub</span>
-                  </h3>
-
-                  <p className="text-zinc-500 font-medium text-sm max-w-[280px] leading-relaxed">
-                    10th Floor, Marina Tower,<br />
-                    Nariman Point, Mumbai 400021
+                <div className="mt-auto w-full pt-6 border-t border-border/5">
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-4">
+                    {detail.subtext}
                   </p>
-                </div>
 
-                <div className="bg-white border-t border-zinc-100 p-6 flex items-center justify-between mt-auto">
-                  <div className="flex items-center gap-4">
-                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-                    <span className="text-xs font-black text-zinc-900 uppercase tracking-widest">Systems Active</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="rounded-2xl border-zinc-200 font-bold hover:bg-zinc-50"
-                    onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Nariman+Point+Mumbai', '_blank')}
-                  >
-                    Get Directions
-                  </Button>
+                  {detail.isWhatsApp ? (
+                    <a
+                      href={`https://wa.me/919514879417`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-emerald-600 font-bold text-xs hover:underline group/link"
+                    >
+                      Instant Chat <ArrowRight className="w-3 h-3 group-hover/link:translate-x-1 transition-transform" />
+                    </a>
+                  ) : (
+                    <div className="flex justify-center gap-4 text-muted-foreground/30">
+                      <Instagram className="w-3.5 h-3.5 hover:text-gold transition-colors cursor-pointer" />
+                      <Facebook className="w-3.5 h-3.5 hover:text-gold transition-colors cursor-pointer" />
+                      <Twitter className="w-3.5 h-3.5 hover:text-gold transition-colors cursor-pointer" />
+                    </div>
+                  )}
                 </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <SocialMediaSection />
+
+      {/* Simplified Luxury Presence Section */}
+      <section className="pb-24 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="max-w-7xl mx-auto rounded-[2.5rem] overflow-hidden border border-border bg-muted/30 h-[400px] relative group flex items-center justify-center p-8"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none'/%3E%3Cpath d='M0 0l40 40M40 0L0 40' stroke='%23000' stroke-width='0.5'/%3E%3C/svg%3E")` }} />
+
+            <div className="relative z-10 flex flex-col items-center text-center max-w-lg">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mb-6"
+              >
+                <MapPin className="w-8 h-8 text-gold" />
+              </motion.div>
+              <h3 className="text-3xl font-serif font-bold text-foreground tracking-tight">Chennai Luxury Hub</h3>
+              <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
+                Connect with us at our flagship discovery center. Experience a legacy of craftsmanship
+                designed for the modern era.
+              </p>
+              <div className="mt-8 p-4 bg-background/50 backdrop-blur-sm rounded-2xl border border-border/50">
+                <p className="text-xs font-bold text-foreground">R. A. PURAM, CHENNAI - 600028</p>
               </div>
-            </motion.div>
-          </div>
+              <button
+                onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=R.A.+Puram+Chennai', '_blank')}
+                className="mt-8 flex items-center gap-2 text-gold font-bold text-sm hover:underline"
+              >
+                View on Google Maps <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="absolute hidden lg:block bottom-12 right-12 text-right">
+              <div className="w-12 h-0.5 gold-gradient mb-4 ml-auto" />
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">Heritage Excellence</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Minimalism Quote Section */}
+      <section className="py-20 border-t border-border/50 text-center relative bg-background">
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto"
+          >
+            <Sparkles className="w-6 h-6 text-gold/20 mx-auto mb-8" />
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-4 italic tracking-tight">
+              Crafting Trust Since 1974
+            </h2>
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">
+              GOLDJEWELTECH PRIDE
+            </p>
+          </motion.div>
         </div>
       </section>
     </MainLayout>

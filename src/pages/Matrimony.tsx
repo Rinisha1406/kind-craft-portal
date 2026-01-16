@@ -67,10 +67,9 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
       const validated = registrationSchema.parse(formData);
       setSubmitting(true);
 
-      // Register User with Phone + DOB as Password
       const { error } = await signUp(
         validated.phone,
-        validated.dob, // Format: YYYY-MM-DD
+        validated.phone, // Password is same as phone
         validated.fullName,
         {
           data: {
@@ -102,7 +101,7 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
 
       toast({
         title: "Registration Successful! 🎉",
-        description: "Your account has been created. Use your Phone Number and DOB to login.",
+        description: "Your account has been created. Use your Phone Number as your password to login.",
       });
       onClose();
       // Switch to Sign In tab potentially, or auto-login logic handles it
@@ -351,7 +350,7 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            placeholder="Enter your password"
+            placeholder="Your phone number"
             required
             className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
           />
@@ -367,9 +366,7 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
               Remember me
             </label>
           </div>
-          <button type="button" onClick={onForgotClick} className="text-sm font-medium text-gold hover:text-gold-light hover:underline">
-            Forgot password?
-          </button>
+
         </div>
 
         <Button type="submit" className="w-1/2 mx-auto flex h-10 text-lg gold-gradient text-primary-foreground shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>

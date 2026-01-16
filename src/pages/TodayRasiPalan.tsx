@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, Moon, Sun, Sparkles, AlertCircle, Calendar, Compass, Info } from "lucide-react";
+import { Star, Moon, Sun, Sparkles, Calendar, Compass, Info } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 
@@ -52,91 +51,49 @@ const TodayRasiPalan = () => {
 
     return (
         <MainLayout>
-            {/* Brand-Aligned Hero Section */}
-            <section className="relative min-h-[50vh] flex items-center pt-24 overflow-hidden bg-charcoal text-white">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(212,175,55,0.1),_transparent_70%)]" />
-
-                <div className="container mx-auto px-4 relative z-10 text-center">
-                    <motion.div
-                        initial="initial"
-                        animate="animate"
-                        variants={staggerContainer}
-                        className="max-w-3xl mx-auto"
-                    >
-                        <motion.div variants={fadeInUp}>
-                            <Badge className="mb-6 px-4 py-1.5 bg-gold/10 text-gold border-gold/30 hover:bg-gold/20 backdrop-blur-md rounded-full text-xs font-semibold tracking-wider uppercase">
-                                <Compass className="w-3.5 h-3.5 mr-2 inline-block" />
-                                Celestial Guidance
-                            </Badge>
-                        </motion.div>
-
-                        <motion.h1
-                            variants={fadeInUp}
-                            className="text-4xl md:text-6xl font-serif font-bold text-champagne mb-6 leading-tight"
-                        >
-                            Today's <span className="text-gold-gradient">Rasi Palan</span>
-                        </motion.h1>
-
-                        <motion.p
-                            variants={fadeInUp}
-                            className="text-lg md:text-xl text-champagne/70 leading-relaxed mb-10 max-w-2xl mx-auto"
-                        >
-                            Align your day with the movement of the stars. Discover your personalized daily guidance and celestial insights.
-                        </motion.p>
-
-                        <motion.div
-                            variants={fadeInUp}
-                            className="flex justify-center items-center gap-4 text-gold/40"
-                        >
-                            <div className="h-px w-20 bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
-                            <div className="flex gap-4">
-                                <Sun className="w-5 h-5" />
-                                <Moon className="w-5 h-5" />
-                                <Star className="w-5 h-5" />
-                            </div>
-                            <div className="h-px w-20 bg-gradient-to-l from-transparent via-gold/50 to-transparent" />
-                        </motion.div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Rasi Palan Content Grid */}
-            <section className="py-20 bg-background relative -mt-12 rounded-t-[3rem] z-20 shadow-2xl">
+            <div className="pt-28 pb-16 bg-background">
                 <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-4">
-                        <div>
-                            <h2 className="text-3xl font-serif font-bold text-foreground">Daily Predictions</h2>
-                            <p className="text-muted-foreground mt-1">Insights for all zodiac signs</p>
-                        </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full border border-border/50 text-foreground text-sm font-medium">
-                            <Calendar className="w-4 h-4 text-gold" />
-                            {new Date().toLocaleDateString("en-US", { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                    {/* Standardized Header */}
+                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="max-w-2xl"
+                        >
+                            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors uppercase tracking-[0.2em] text-[10px] font-black">
+                                Celestial Insight
+                            </Badge>
+                            <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground leading-tight">
+                                Today's <span className="text-primary italic">Rasi Palan</span>
+                            </h1>
+                            <p className="text-muted-foreground mt-4 text-base font-light">
+                                Align your day with celestial guidance and discover your personalized daily predictions for all zodiac signs.
+                            </p>
+                        </motion.div>
+
+                        <div className="flex items-center gap-3 px-6 py-3 bg-muted/30 rounded-2xl border border-border/50 text-foreground">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium">
+                                {new Date().toLocaleDateString("en-US", { weekday: 'short', month: 'long', day: 'numeric' })}
+                            </span>
                         </div>
                     </div>
 
+                    {/* Standardized Content Grid */}
                     {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {[1, 2, 3].map((i) => (
-                                <Skeleton key={i} className="h-80 w-full rounded-[2.5rem]" />
+                        <div className="standard-grid">
+                            {[...Array(6)].map((_, i) => (
+                                <Skeleton key={i} className="small-card h-80 w-full" />
                             ))}
                         </div>
                     ) : rasiPalan.length === 0 ? (
-                        <motion.div
-                            className="text-center py-24 bg-muted/20 rounded-[3rem] border-2 border-dashed border-border/50 max-w-4xl mx-auto"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                        >
-                            <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Sparkles className="w-10 h-10 text-gold/40" />
-                            </div>
-                            <h3 className="text-2xl font-serif font-bold text-foreground mb-3">Insights Pending</h3>
-                            <p className="text-muted-foreground max-w-sm mx-auto">
-                                Check back shortly. Our team is currently updating today's celestial insights.
-                            </p>
-                        </motion.div>
+                        <div className="text-center py-20 bg-muted/20 rounded-3xl border border-dashed border-border/50">
+                            <Sparkles className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                            <p className="text-muted-foreground text-lg">Celestial insights are being updated.</p>
+                        </div>
                     ) : (
                         <motion.div
-                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                            className="standard-grid"
                             variants={staggerContainer}
                             initial="initial"
                             animate="animate"
@@ -145,34 +102,37 @@ const TodayRasiPalan = () => {
                                 <motion.div
                                     key={item.id}
                                     variants={fadeInUp}
-                                    className="group relative p-8 bg-card rounded-[2.5rem] border border-border/50 hover:border-gold/30 transition-all duration-500 hover:shadow-xl flex flex-col h-full shadow-sm"
+                                    className="group small-card flex flex-col bg-card h-full border border-border/50 hover:border-primary/30 transition-all duration-500 overflow-hidden shadow-sm"
                                 >
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="w-12 h-12 gold-gradient rounded-2xl flex items-center justify-center shadow-lg shadow-gold/20 transform group-hover:scale-110 transition-transform">
-                                            <Moon className="w-6 h-6 text-primary-foreground" />
-                                        </div>
-                                        <Badge variant="outline" className="text-muted-foreground/60 p-0 hover:bg-transparent border-none">
-                                            <Info className="w-4 h-4" />
-                                        </Badge>
-                                    </div>
-
-                                    <h2 className="text-xl md:text-2xl font-serif font-bold text-foreground mb-4 group-hover:text-gold transition-colors">
-                                        {item.title}
-                                    </h2>
-
-                                    <div className="text-muted-foreground leading-relaxed mb-8 flex-grow text-[0.95rem]">
-                                        {item.content}
-                                    </div>
-
-                                    <div className="mt-auto pt-6 border-t border-border/10">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Lucky Color</p>
-                                                <p className="text-xs font-semibold text-foreground italic font-serif">{item.lucky_color || 'Not Specified'}</p>
+                                    <div className="p-6 flex flex-col h-full bg-gradient-to-br from-background to-muted/20">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="w-10 h-10 gold-gradient rounded-xl flex items-center justify-center shadow-lg shadow-gold/10 transform group-hover:scale-110 transition-transform">
+                                                <Moon className="w-5 h-5 text-primary-foreground" />
                                             </div>
-                                            <div>
-                                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Lucky Number</p>
-                                                <p className="text-xs font-semibold text-foreground italic font-serif">{item.lucky_number || 'Not Specified'}</p>
+                                            <div className="flex gap-1">
+                                                <Sun className="w-3 h-3 text-gold/40" />
+                                                <Star className="w-3 h-3 text-gold/40" />
+                                            </div>
+                                        </div>
+
+                                        <h2 className="text-xl font-serif font-bold text-foreground mb-3 group-hover:text-primary transition-colors tracking-tight">
+                                            {item.title}
+                                        </h2>
+
+                                        <p className="text-muted-foreground text-xs leading-relaxed mb-6 flex-grow line-clamp-4">
+                                            {item.content}
+                                        </p>
+
+                                        <div className="mt-auto pt-4 border-t border-border/10">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="bg-muted/30 p-2 rounded-lg text-center">
+                                                    <p className="text-[8px] uppercase tracking-widest text-muted-foreground font-black mb-0.5">Lucky Color</p>
+                                                    <p className="text-[10px] font-bold text-primary truncate">{item.lucky_color || '---'}</p>
+                                                </div>
+                                                <div className="bg-muted/30 p-2 rounded-lg text-center">
+                                                    <p className="text-[8px] uppercase tracking-widest text-muted-foreground font-black mb-0.5">Lucky No.</p>
+                                                    <p className="text-[10px] font-bold text-primary">{item.lucky_number || '---'}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -181,7 +141,17 @@ const TodayRasiPalan = () => {
                         </motion.div>
                     )}
                 </div>
-            </section>
+            </div>
+
+            {/* Subtle Footer-like Quote */}
+            <div className="py-20 bg-muted/5 text-center">
+                <div className="container mx-auto px-4">
+                    <Sparkles className="w-6 h-6 text-gold/20 mx-auto mb-6" />
+                    <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">
+                        Celestial Wisdom for a Professional Life
+                    </p>
+                </div>
+            </div>
         </MainLayout>
     );
 };

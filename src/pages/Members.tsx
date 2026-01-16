@@ -195,11 +195,6 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button type="button" onClick={onForgotClick} className="text-sm font-medium text-gold hover:text-gold-light hover:underline">
-          Forgot password?
-        </button>
-      </div>
 
       <Button type="submit" disabled={submitting} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold hover:scale-[1.02] transition-transform rounded-xl">
         {submitting ? "Signing In..." : "Sign In"}

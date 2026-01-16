@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Gem, Phone, Mail, MapPin, Instagram, Facebook, Twitter, Youtube, ArrowUpRight } from "lucide-react";
+import { Gem, Phone, Mail, MapPin, Instagram, Facebook, Twitter, Youtube, ArrowUpRight, MessageCircle } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -113,18 +113,37 @@ const Footer = () => {
           >
             <h4 className="font-serif text-lg font-semibold text-champagne mb-6">Contact Us</h4>
             <ul className="space-y-4">
-              {[
-                { icon: Phone, text: "+91 98765 43210" },
-                { icon: Mail, text: "info@goldjeweltech.com" },
-                { icon: MapPin, text: "123 Jewelry Street, Mumbai, Maharashtra 400001" },
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-champagne/60 text-sm">
-                  <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <item.icon className="w-4 h-4 text-gold" />
-                  </div>
-                  <span className="leading-relaxed">{item.text}</span>
-                </li>
-              ))}
+              <li className="flex items-start gap-3 text-champagne/60 text-sm">
+                <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Phone className="w-4 h-4 text-gold" />
+                </div>
+                <div className="flex flex-col gap-1 leading-relaxed">
+                  <span>+91 95148 79417</span>
+                  <span>+91 98408 26683</span>
+                  <span>+91 81247 20549</span>
+                </div>
+              </li>
+              <li className="flex items-start gap-3 text-champagne/60 text-sm">
+                <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <MessageCircle className="w-4 h-4 text-emerald-500" />
+                </div>
+                <div className="flex flex-col gap-1 leading-relaxed">
+                  <span className="text-emerald-500 font-bold">WhatsApp Support</span>
+                  <span>+91 95148 79417</span>
+                </div>
+              </li>
+              <li className="flex items-start gap-3 text-champagne/60 text-sm">
+                <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4 text-gold" />
+                </div>
+                <span className="leading-relaxed">pandiansekar880@gmail.com</span>
+              </li>
+              <li className="flex items-start gap-3 text-champagne/60 text-sm">
+                <div className="w-8 h-8 bg-gold/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <MapPin className="w-4 h-4 text-gold" />
+                </div>
+                <span className="leading-relaxed">S. P. GEM GOLD ACADEMY JEWELS DIAMONDS. G. T. MART. No: 147/282, R. K. MUTT ROAD, R. A. PURAM, CHENNAI - 600028.</span>
+              </li>
             </ul>
           </motion.div>
         </div>

@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Products from "./pages/Products";
+import Gallery from "./pages/Gallery";
 import ProductDetails from "./pages/ProductDetails";
 import Matrimony from "./pages/Matrimony";
 import MatrimonyProfile from "./pages/MatrimonyProfile";
@@ -22,6 +23,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminMatrimony from "./pages/admin/AdminMatrimony";
 import AdminMembers from "./pages/admin/AdminMembers";
 import AdminServices from "./pages/admin/AdminServices";
+import AdminGallery from "./pages/admin/AdminGallery";
 import AdminMessages from "./pages/admin/AdminMessages";
 import TodayNews from "@/pages/TodayNews";
 import NewsDetails from "@/pages/NewsDetails";
@@ -43,6 +45,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/matrimony" element={<Matrimony />} />
             <Route path="/matrimony/profile" element={<MatrimonyProfile />} />
@@ -56,6 +59,7 @@ const App = () => (
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/products" element={<AdminProducts />} />
             <Route path="/admin/services" element={<AdminServices />} />
+            <Route path="/admin/gallery" element={<AdminGallery />} />
             <Route path="/admin/matrimony" element={<AdminMatrimony />} />
             <Route path="/admin/members" element={<AdminMembers />} />
             <Route path="/admin/messages" element={<AdminMessages />} />

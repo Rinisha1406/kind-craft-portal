@@ -59,7 +59,7 @@ const ProductDetails = () => {
         if (!product) return;
 
         // Replace with actual business number
-        const phoneNumber = "919876543210";
+        const phoneNumber = "919514879417";
         const message = encodeURIComponent(
             `Hi, I am interested in buying the following product:\n\n*${product.name}*\nPrice: ₹${product.price}\nCategory: ${product.category}\nLink: ${window.location.href}`
         );
@@ -145,8 +145,8 @@ const ProductDetails = () => {
                                         key={idx}
                                         onClick={() => setSelectedImage(img)}
                                         className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${selectedImage === img
-                                                ? "border-primary shadow-lg ring-2 ring-primary/20"
-                                                : "border-transparent opacity-70 hover:opacity-100"
+                                            ? "border-primary shadow-lg ring-2 ring-primary/20"
+                                            : "border-transparent opacity-70 hover:opacity-100"
                                             }`}
                                     >
                                         <img src={img} alt={`${product.name} view ${idx + 1}`} className="w-full h-full object-cover" />
