@@ -245,7 +245,7 @@ const ManageServices = () => {
                             </div>
                             <h1 className="text-4xl md:text-5xl font-serif font-bold text-champagne mb-3">Manage My Services</h1>
                             <p className="text-champagne/60 text-lg max-w-2xl leading-relaxed">
-                                Create and manage the services you offer to the GOLDJEWELTECH community.
+                                Create and manage the services you offer to the S. P. GEM GOLD ACADEMY community.
                             </p>
                         </motion.div>
 

@@ -71,7 +71,7 @@ const stats = [
 const testimonials = [
   {
     name: "Meera & Arjun Sharma",
-    text: "GOLDJEWELTECH helped us find each other through their matrimony service. The jewelry for our wedding was absolutely stunning!",
+    text: "S. P. GEM GOLD ACADEMY helped us find each other through their matrimony service. The jewelry for our wedding was absolutely stunning!",
     role: "Married in 2023",
   },
   {
@@ -431,7 +431,7 @@ const Index = () => {
                 A Legacy of Trust & Excellence
               </h2>
               <p className="text-champagne/70 text-lg mb-8 leading-relaxed">
-                For over five decades, GOLDJEWELTECH has been the cornerstone of our community,
+                For over five decades, S. P. GEM GOLD ACADEMY has been the cornerstone of our community,
                 providing exceptional jewelry and fostering meaningful connections through our
                 matrimony services.
               </p>

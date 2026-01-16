@@ -1,6 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { supabase, API_URL } from "@/integrations/supabase/client";
+import { API_URL } from "@/integrations/supabase/client";
 
 // Types
 interface User {
@@ -22,9 +21,19 @@ interface AuthContextType {
   signIn: (phone: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (phone: string, password: string, fullName?: string, options?: any) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  getTokenKey: () => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper to get token key based on current portal path
+const getTokenKey = () => {
+  const path = window.location.pathname;
+  if (path.includes('/admin')) return "sb-admin-token";
+  if (path.includes('/matrimony')) return "sb-matrimony-token";
+  if (path.includes('/member') || path.includes('/members')) return "sb-member-token";
+  return "sb-member-token"; // Default to member token for general site access
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -32,58 +41,89 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Helper to get token
-  const getToken = () => localStorage.getItem("sb-access-token");
+  // We track the current portal to detect when to re-validate
+  const [currentKey, setCurrentKey] = useState(getTokenKey());
+
+  // Listen for URL changes even though we are outside BrowserRouter
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const newKey = getTokenKey();
+      if (newKey !== currentKey) {
+        setCurrentKey(newKey);
+      }
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    // Also wrap pushState to detect internal navigation
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function (...args) {
+      originalPushState.apply(window.history, args);
+      handleLocationChange();
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.history.pushState = originalPushState;
+    };
+  }, [currentKey]);
 
   useEffect(() => {
-    // Check for existing session
     const checkSession = async () => {
-      const token = getToken();
+      setLoading(true);
+      const token = localStorage.getItem(currentKey);
+
       if (!token) {
+        setUser(null);
+        setSession(null);
+        setIsAdmin(false);
         setLoading(false);
         return;
       }
 
       try {
         const response = await fetch(`${API_URL}/auth/me.php`, {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+          headers: { "Authorization": `Bearer ${token}` }
         });
 
         if (response.ok) {
           const data = await response.json();
-          const user = {
+          const roles = data.data.app_metadata?.roles || [];
+          const isUserAdmin = roles.includes('admin');
+
+          // Security check: If on admin portal, must be admin
+          if (currentKey === 'sb-admin-token' && !isUserAdmin) {
+            localStorage.removeItem(currentKey);
+            throw new Error("Unauthorized portal access");
+          }
+
+          const userData = {
             id: data.data.id,
             phone: data.data.phone,
             role: data.data.role
           };
-          const newSession = {
-            access_token: token,
-            user
-          };
 
-          setUser(user);
-          setSession(newSession);
-
-          // Check admin role
-          const roles = data.data.app_metadata?.roles || [];
-          setIsAdmin(roles.includes('admin'));
+          setUser(userData);
+          setSession({ access_token: token, user: userData });
+          setIsAdmin(isUserAdmin);
         } else {
-          // Invalid token
-          localStorage.removeItem("sb-access-token");
+          localStorage.removeItem(currentKey);
           setUser(null);
           setSession(null);
+          setIsAdmin(false);
         }
       } catch (error) {
         console.error("Session check failed", error);
+        localStorage.removeItem(currentKey);
+        setUser(null);
+        setSession(null);
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }
     };
 
     checkSession();
-  }, []);
+  }, [currentKey]);
 
   const signIn = async (phone: string, password: string) => {
     try {
@@ -99,20 +139,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { error: new Error(data.error || "Login failed") };
       }
 
-      const token = data.data.session.access_token;
-      localStorage.setItem("sb-access-token", token);
+      const roles = data.data.user.app_metadata?.roles || [];
+      const isUserAdmin = roles.includes('admin');
 
-      const user = {
+      // Re-verify intended portal key
+      const targetKey = getTokenKey();
+      if (targetKey === 'sb-admin-token' && !isUserAdmin) {
+        return { error: new Error("You do not have administrative privileges.") };
+      }
+
+      // Exclusive login rule: Clear other portal tokens
+      const allKeys = ["sb-admin-token", "sb-matrimony-token", "sb-member-token"];
+      allKeys.forEach(k => {
+        localStorage.removeItem(k);
+      });
+
+      const token = data.data.session.access_token;
+      localStorage.setItem(targetKey, token);
+
+      const userData = {
         id: data.data.user.id,
         phone: data.data.user.phone,
         role: data.data.user.role
       };
 
-      setUser(user);
-      setSession({ access_token: token, user });
-
-      const roles = data.data.user.app_metadata?.roles || [];
-      setIsAdmin(roles.includes('admin'));
+      setUser(userData);
+      setSession({ access_token: token, user: userData });
+      setIsAdmin(isUserAdmin);
+      setCurrentKey(targetKey);
 
       return { error: null };
     } catch (err: any) {
@@ -145,18 +199,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { error: new Error(data.error || "Registration failed") };
       }
 
-      // Auto login after signup
-      const token = data.data.session.access_token;
-      localStorage.setItem("sb-access-token", token);
+      const targetKey = getTokenKey();
+      const allKeys = ["sb-admin-token", "sb-matrimony-token", "sb-member-token"];
+      allKeys.forEach(k => localStorage.removeItem(k));
 
-      const user = {
+      const token = data.data.session.access_token;
+      localStorage.setItem(targetKey, token);
+
+      const userData = {
         id: data.data.user.id,
         phone: data.data.user.phone,
         role: data.data.user.role
       };
 
-      setUser(user);
-      setSession({ access_token: token, user });
+      setUser(userData);
+      setSession({ access_token: token, user: userData });
+      setCurrentKey(targetKey);
 
       return { error: null };
     } catch (err: any) {
@@ -165,14 +223,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    localStorage.removeItem("sb-access-token");
+    const keyToClear = getTokenKey();
+    localStorage.removeItem(keyToClear);
     setUser(null);
     setSession(null);
     setIsAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signUp, signOut, getTokenKey }}>
       {children}
     </AuthContext.Provider>
   );

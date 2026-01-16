@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     
     if ($is_admin) {
-        $result = $conn->query("SELECT * FROM members");
+        $result = $conn->query("SELECT m.*, (SELECT COUNT(*) FROM members WHERE referred_by = m.id) as referral_count FROM members m");
         $members = [];
         while ($row = $result->fetch_assoc()) {
             $members[] = $row;
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         send_json_response(['data' => $members, 'error' => null]);
     } else {
         // User sees only their own membership
-        $stmt = $conn->prepare("SELECT * FROM members WHERE user_id = ?");
+        $stmt = $conn->prepare("SELECT m.*, (SELECT COUNT(*) FROM members WHERE referred_by = m.id) as referral_count FROM members m WHERE m.user_id = ?");
         $stmt->bind_param("s", $user['id']);
         $stmt->execute();
         $result = $stmt->get_result();

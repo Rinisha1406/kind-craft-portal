@@ -132,8 +132,25 @@ try {
         if ($stmt_check->get_result()->num_rows === 0) {
             $member_id = generate_uuid();
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt_member = $conn->prepare("INSERT INTO members (id, user_id, full_name, phone, password_hash, password_plain, address, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
-            $stmt_member->bind_param("sssssss", $member_id, $user_id, $full_name, $phone, $password_hash, $password, $address);
+            
+            // Handle Referral
+            $referred_by = null;
+            $ref_code = $member_data['referral_code'] ?? null;
+            if ($ref_code) {
+                $stmt_ref = $conn->prepare("SELECT id FROM members WHERE referral_code = ?");
+                $stmt_ref->bind_param("s", $ref_code);
+                $stmt_ref->execute();
+                $ref_res = $stmt_ref->get_result();
+                if ($ref_res->num_rows > 0) {
+                    $referred_by = $ref_res->fetch_assoc()['id'];
+                }
+            }
+            
+            // Generate unique referral code for new member
+            $new_ref_code = strtoupper(substr(md5($member_id . time()), 0, 8));
+
+            $stmt_member = $conn->prepare("INSERT INTO members (id, user_id, full_name, phone, password_hash, password_plain, address, is_active, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)");
+            $stmt_member->bind_param("sssssssss", $member_id, $user_id, $full_name, $phone, $password_hash, $password, $address, $new_ref_code, $referred_by);
             
             if (!$stmt_member->execute()) {
                 throw new Exception("Failed to insert into members: " . $stmt_member->error);

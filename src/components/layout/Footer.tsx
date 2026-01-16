@@ -152,7 +152,7 @@ const Footer = () => {
         <div className="border-t border-champagne/10 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-champagne/40 text-sm">
-              © {currentYear} GOLDJEWELTECH. All rights reserved.
+              © {currentYear} S. P. GEM GOLD ACADEMY. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-champagne/40">
               <a href="#" className="hover:text-gold transition-colors">Privacy Policy</a>

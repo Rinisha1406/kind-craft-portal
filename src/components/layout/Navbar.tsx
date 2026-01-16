@@ -56,7 +56,7 @@ const Navbar = () => {
               <Gem className="w-6 h-6 text-primary-foreground" />
             </motion.div>
             <span className="text-xl font-serif font-bold text-foreground">
-              GOLD<span className="text-primary">JEWELTECH</span>
+              S. P. GEM <span className="text-primary">GOLD ACADEMY</span>
             </span>
           </Link>
 

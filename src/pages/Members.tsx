@@ -30,6 +30,7 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
     phone: "",
     address: "",
     password: "",
+    referralCode: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
@@ -39,7 +40,12 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const validated = registrationSchema.parse(formData);
+      const validated = registrationSchema.parse({
+        fullName: formData.fullName,
+        phone: formData.phone,
+        address: formData.address,
+        password: formData.password
+      });
       setSubmitting(true);
 
       const { error } = await signUp(validated.phone, validated.password, validated.fullName, {
@@ -48,6 +54,7 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
           full_name: validated.fullName,
           phone: validated.phone,
           address: validated.address,
+          referral_code: formData.referralCode, // Added referral code
         }
       });
 
@@ -116,6 +123,16 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
           placeholder="Enter your complete address"
           required
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-gold font-serif text-sm">Referral Code (Optional)</Label>
+        <Input
+          value={formData.referralCode}
+          onChange={(e) => setFormData({ ...formData, referralCode: e.target.value })}
+          placeholder="Enter code if you were referred"
           className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
         />
       </div>
@@ -194,7 +211,6 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
           />
         </div>
       </div>
-
 
       <Button type="submit" disabled={submitting} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold hover:scale-[1.02] transition-transform rounded-xl">
         {submitting ? "Signing In..." : "Sign In"}
@@ -281,25 +297,21 @@ const Members = () => {
     transition: { duration: 0.6 }
   };
 
-  const staggerContainer = {
-    animate: { transition: { staggerChildren: 0.1 } }
-  };
-
   return (
     <MainLayout showFooter={false}>
       {/* Hero Section with Auth Tabs */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden py-8">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden py-8 bg-gray-50">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img src={membersHero} alt="Exclusive Membership" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/80 to-transparent" />
+          <div className="absolute inset-0 bg-white/80 md:bg-white/40" />
         </div>
 
         {/* Animated decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-10"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+            className="absolute top-20 right-20 w-64 h-64 gold-gradient rounded-full blur-3xl opacity-20"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
             transition={{ duration: 4, repeat: Infinity }}
           />
         </div>
@@ -316,7 +328,7 @@ const Members = () => {
             >
               <motion.span
                 variants={fadeInUp}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm text-gold border border-gold/30 rounded-full text-sm font-medium mb-6"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 text-gold-700 border border-gold/30 rounded-full text-sm font-bold mb-6"
               >
                 <Crown className="w-4 h-4" />
                 Exclusive Membership
@@ -324,15 +336,15 @@ const Members = () => {
 
               <motion.h1
                 variants={fadeInUp}
-                className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-champagne mb-6 leading-tight"
+                className="text-5xl md:text-6xl lg:text-7xl font-serif font-black text-gray-900 mb-6 leading-tight"
               >
                 Join Our
-                <span className="block text-gold-gradient">Elite Community</span>
+                <span className="block text-gold">Elite Community</span>
               </motion.h1>
 
               <motion.p
                 variants={fadeInUp}
-                className="text-lg md:text-xl text-champagne/80 mb-8 max-w-xl leading-relaxed"
+                className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl leading-relaxed"
               >
                 Become a member and unlock exclusive benefits, premium discounts, and personalized services
                 that make every moment special.
@@ -346,19 +358,19 @@ const Members = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="w-full max-w-md ml-auto"
             >
-              <div className="bg-charcoal/40 backdrop-blur-xl border border-gold/20 rounded-3xl shadow-2xl p-8">
+              <div className="bg-white border text-gray-900 rounded-[2rem] shadow-2xl p-8">
                 {user ? (
                   <div className="text-center space-y-6 py-8">
                     <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-gold/20">
                       <Crown className="w-10 h-10 text-gold" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back!</h3>
-                      <p className="text-champagne/60 mt-2">You are currently signed in.</p>
+                      <h3 className="text-2xl font-serif font-bold text-gray-900">Welcome Back!</h3>
+                      <p className="text-gray-500 mt-2">You are currently signed in.</p>
                     </div>
                     <Button
                       onClick={() => navigate("/member/dashboard")}
-                      className="w-full h-12 gold-gradient text-emerald-950 font-black shadow-gold hover:scale-[1.02] transition-transform rounded-xl"
+                      className="w-full h-12 bg-gold text-white font-black shadow-lg shadow-gold/20 hover:scale-[1.02] transition-transform rounded-xl"
                     >
                       Go to Dashboard <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -374,10 +386,13 @@ const Members = () => {
                         transition={{ duration: 0.3 }}
                       >
                         <div className="text-center mb-6">
-                          <h3 className="text-2xl font-serif font-bold text-champagne">Create Account</h3>
-                          <p className="text-champagne/60 text-sm">Join the family today</p>
+                          <h3 className="text-2xl font-serif font-bold text-gray-900">Create Account</h3>
+                          <p className="text-gray-500 text-sm">Join the family today</p>
                         </div>
-                        <MemberRegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
+                        <MemberRegistrationForm
+                          onClose={() => setActiveTab("register")}
+                          onSignInClick={() => setActiveTab("signin")}
+                        />
                       </motion.div>
                     ) : activeTab === "signin" ? (
                       <motion.div
@@ -388,10 +403,13 @@ const Members = () => {
                         transition={{ duration: 0.3 }}
                       >
                         <div className="text-center mb-6">
-                          <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
-                          <p className="text-champagne/60 text-sm">Sign in to your account</p>
+                          <h3 className="text-2xl font-serif font-bold text-gray-900">Welcome Back</h3>
+                          <p className="text-gray-500 text-sm">Sign in to your account</p>
                         </div>
-                        <MemberSignInForm onRegisterClick={() => setActiveTab("register")} onForgotClick={() => setActiveTab("forgot-password")} />
+                        <MemberSignInForm
+                          onRegisterClick={() => setActiveTab("register")}
+                          onForgotClick={() => setActiveTab("forgot-password")}
+                        />
                       </motion.div>
                     ) : (
                       <motion.div
@@ -402,8 +420,8 @@ const Members = () => {
                         transition={{ duration: 0.3 }}
                       >
                         <div className="text-center mb-6">
-                          <h3 className="text-2xl font-serif font-bold text-champagne">Reset Password</h3>
-                          <p className="text-champagne/60 text-sm">Verify details to continue</p>
+                          <h3 className="text-2xl font-serif font-bold text-gray-900">Reset Password</h3>
+                          <p className="text-gray-500 text-sm">Verify details to continue</p>
                         </div>
                         <MemberForgotPasswordForm onBackToLogin={() => setActiveTab("signin")} />
                       </motion.div>
@@ -416,9 +434,6 @@ const Members = () => {
           </div>
         </div>
       </section>
-
-
-
     </MainLayout>
   );
 };

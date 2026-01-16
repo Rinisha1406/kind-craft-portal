@@ -8,14 +8,14 @@ const contactDetails = [
   {
     icon: Phone,
     label: "Phone Support",
-    values: ["+91 95148 79417", "+91 98408 26683", "+91 81247 20549"],
+    values: ["+91 98408 26683", "+91 81247 20549"],
     subtext: "Multiple lines available 24/7",
     color: "emerald"
   },
   {
     icon: MessageCircle,
     label: "WhatsApp Chat",
-    values: ["+91 95148 79417"],
+    values: ["+91 74180 94867", "+91 95148 79417"],
     subtext: "Instant response for your queries",
     color: "emerald",
     isWhatsApp: true
@@ -80,7 +80,7 @@ const Contact = () => {
               variants={fadeInUp}
               className="text-champagne/60 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed"
             >
-              At GOLDJEWELTECH, every inquiry is handled with the utmost care.
+              At S. P. GEM GOLD ACADEMY, every inquiry is handled with the utmost care.
               Discover our legacy of trust and craftsmanship.
             </motion.p>
           </motion.div>
@@ -206,7 +206,7 @@ const Contact = () => {
               Crafting Trust Since 1974
             </h2>
             <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black">
-              GOLDJEWELTECH PRIDE
+              S. P. GEM GOLD ACADEMY PRIDE
             </p>
           </motion.div>
         </div>

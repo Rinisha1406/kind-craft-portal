@@ -9,12 +9,22 @@ export const API_URL = isLocal
   ? 'http://localhost/gold/kind-craft-portal/api'
   : 'https://darkseagreen-ram-733578.hostingersite.com/api';
 
+// Helper to determine token key based on current portal path
+const getTokenKey = () => {
+  const path = window.location.pathname;
+  if (path.includes('/admin')) return "sb-admin-token";
+  if (path.includes('/matrimony')) return "sb-matrimony-token";
+  if (path.includes('/member') || path.includes('/members')) return "sb-member-token";
+  return "sb-member-token"; // Default
+};
+
 // Helper to make requests
 async function apiRequest(endpoint: string, method: string, body?: any) {
-  const token = localStorage.getItem('sb-access-token');
+  const key = getTokenKey();
+  const token = localStorage.getItem(key);
   const headers: Record<string, string> = {};
 
-  console.log('[API Request]', method, endpoint, 'Token exists:', !!token);
+  console.log('[API Request]', method, endpoint, 'Using Key:', key, 'Token exists:', !!token);
 
   // Note: FormData handles its own Content-Type boundary
   if (!(body instanceof FormData)) {
@@ -25,7 +35,7 @@ async function apiRequest(endpoint: string, method: string, body?: any) {
     headers['Authorization'] = `Bearer ${token}`;
     console.log('[API Request] Attaching Authorization header');
   } else {
-    console.warn('[API Request] No token found in localStorage (sb-access-token)');
+    console.warn(`[API Request] No token found in localStorage (${key})`);
   }
 
   try {
@@ -53,7 +63,7 @@ class SupabaseCompat {
     signInWithPassword: async ({ phone, password }: any) => {
       const res = await apiRequest('/auth/login.php', 'POST', { phone, password });
       if (!res.error && res.data?.session) {
-        localStorage.setItem('sb-access-token', res.data.session.access_token);
+        localStorage.setItem(getTokenKey(), res.data.session.access_token);
         this._notifyAuthListeners('SIGNED_IN', res.data.session);
       }
       return res;
@@ -67,18 +77,18 @@ class SupabaseCompat {
       };
       const res = await apiRequest('/auth/register.php', 'POST', payload);
       if (!res.error && res.data?.session) {
-        localStorage.setItem('sb-access-token', res.data.session.access_token);
+        localStorage.setItem(getTokenKey(), res.data.session.access_token);
         this._notifyAuthListeners('SIGNED_IN', res.data.session);
       }
       return res;
     },
     signOut: async () => {
-      localStorage.removeItem('sb-access-token');
+      localStorage.removeItem(getTokenKey());
       this._notifyAuthListeners('SIGNED_OUT', null);
       return { error: null };
     },
     getSession: async () => {
-      const token = localStorage.getItem('sb-access-token');
+      const token = localStorage.getItem(getTokenKey());
       if (!token) return { data: { session: null } };
 
       // Verify token with /me
