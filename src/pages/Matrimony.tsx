@@ -136,7 +136,7 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
     <form onSubmit={handleRegister} className="space-y-4 mt-2 w-full lg:w-[60rem]">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fullName" className="text-champagne/90 font-serif tracking-wide">Full Name</Label>
+          <Label htmlFor="fullName" className="text-gold font-serif tracking-wide">Full Name</Label>
           <Input
             id="fullName"
             value={formData.fullName}
@@ -144,28 +144,28 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
             placeholder="Name"
             required
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-champagne/90 font-serif tracking-wide">Phone Number</Label>
+          <Label htmlFor="phone" className="text-gold font-serif tracking-wide">Phone Number</Label>
           <Input
             id="phone"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="Phone"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="gender" className="text-champagne/90 font-serif tracking-wide">Gender</Label>
+          <Label htmlFor="gender" className="text-gold font-serif tracking-wide">Gender</Label>
           <select
             id="gender"
             value={formData.gender}
             onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
             disabled={submitting}
-            className="w-full h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl px-3 border disabled:opacity-50"
+            className="w-full h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl px-3 border disabled:opacity-50"
           >
             <option value="" className="bg-charcoal text-gray-400">Gender</option>
             <option value="male" className="bg-charcoal">Male</option>
@@ -176,7 +176,7 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="dob" className="text-champagne/90 font-serif tracking-wide">Date of Birth</Label>
+          <Label htmlFor="dob" className="text-gold font-serif tracking-wide">Date of Birth</Label>
           <div className="relative">
             <Input
               id="dob"
@@ -184,101 +184,101 @@ const RegistrationForm = ({ onClose, onSignInClick }: { onClose: () => void, onS
               value={formData.dob}
               onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
               disabled={submitting}
-              className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 disabled:opacity-50"
+              className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10 disabled:opacity-50"
             />
-            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-champagne/50 pointer-events-none" />
+            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gold/50 pointer-events-none" />
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="fatherName" className="text-champagne/90 font-serif tracking-wide">Father's Name</Label>
+          <Label htmlFor="fatherName" className="text-gold font-serif tracking-wide">Father's Name</Label>
           <Input
             id="fatherName"
             value={formData.fatherName}
             onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
             placeholder="Father's Name"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="motherName" className="text-champagne/90 font-serif tracking-wide">Mother's Name</Label>
+          <Label htmlFor="motherName" className="text-gold font-serif tracking-wide">Mother's Name</Label>
           <Input
             id="motherName"
             value={formData.motherName}
             onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
             placeholder="Mother's Name"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="caste" className="text-champagne/90 font-serif tracking-wide">Caste</Label>
+          <Label htmlFor="caste" className="text-gold font-serif tracking-wide">Caste</Label>
           <Input
             id="caste"
             value={formData.caste}
             onChange={(e) => setFormData({ ...formData, caste: e.target.value })}
             placeholder="Caste"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="community" className="text-champagne/90 font-serif tracking-wide">Community</Label>
+          <Label htmlFor="community" className="text-gold font-serif tracking-wide">Community</Label>
           <Input
             id="community"
             value={formData.community}
             onChange={(e) => setFormData({ ...formData, community: e.target.value })}
             placeholder="Community"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="occupation" className="text-champagne/90 font-serif tracking-wide">Occupation</Label>
+          <Label htmlFor="occupation" className="text-gold font-serif tracking-wide">Occupation</Label>
           <Input
             id="occupation"
             value={formData.occupation}
             onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
             placeholder="Occupation"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2 md:col-span-1">
-          <Label htmlFor="salary" className="text-champagne/90 font-serif tracking-wide">Salary</Label>
+          <Label htmlFor="salary" className="text-gold font-serif tracking-wide">Salary</Label>
           <Input
             id="salary"
             value={formData.salary}
             onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
             placeholder="Annual Salary"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="city" className="text-champagne/90 font-serif tracking-wide">City</Label>
+          <Label htmlFor="city" className="text-gold font-serif tracking-wide">City</Label>
           <Input
             id="city"
             value={formData.city}
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             placeholder="City"
             disabled={submitting}
-            className="h-11 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl disabled:opacity-50"
+            className="h-11 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl disabled:opacity-50"
           />
         </div>
       </div>
 
-      <Button type="submit" className="w-1/3 mx-auto flex justify-center h-10 text-lg gold-gradient text-primary-foreground shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
+      <Button type="submit" className="w-1/3 mx-auto flex justify-center h-10 text-lg gold-gradient text-emerald-950 font-black shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
         {submitting ? "Submitting..." : "Begin Your Journey"}
       </Button>
 
-      <div className="text-center text-sm text-champagne/60">
+      <div className="text-center text-sm text-gray-500">
         Already have an account?{" "}
         <button
           type="button"
@@ -330,7 +330,7 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
     <form onSubmit={handleSignIn} className="space-y-6 mt-6">
       <div className="max-w-sm mx-auto space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="signin-phone" className="text-champagne/90 font-serif tracking-wide">Phone Number</Label>
+          <Label htmlFor="signin-phone" className="text-gold font-serif tracking-wide">Phone Number</Label>
           <Input
             id="signin-phone"
             type="tel"
@@ -338,12 +338,12 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="Enter your phone number"
             required
-            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           />
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="signin-password" className="text-champagne/90 font-serif tracking-wide">Password</Label>
+            <Label htmlFor="signin-password" className="text-gold font-serif tracking-wide">Password</Label>
           </div>
           <Input
             id="signin-password"
@@ -352,7 +352,7 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             placeholder="Your phone number"
             required
-            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne placeholder:text-champagne/30 rounded-xl"
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           />
         </div>
 
@@ -361,7 +361,7 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
             <Checkbox id="remember" className="border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-primary-foreground" />
             <label
               htmlFor="remember"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-champagne/80"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700"
             >
               Remember me
             </label>
@@ -369,12 +369,12 @@ const SignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick?: () =
 
         </div>
 
-        <Button type="submit" className="w-1/2 mx-auto flex h-10 text-lg gold-gradient text-primary-foreground shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
+        <Button type="submit" className="w-1/2 mx-auto flex h-10 text-lg gold-gradient text-emerald-950 font-black shadow-gold hover:scale-[1.02] transition-transform rounded-xl" disabled={submitting}>
           {submitting ? "Signing In..." : "Sign In"}
         </Button>
       </div>
 
-      <div className="text-center text-sm text-champagne/60">
+      <div className="text-center text-sm text-gray-500">
         Don't have an account?{" "}
         <button
           type="button"
@@ -433,52 +433,52 @@ const ForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void }) =>
   return (
     <form onSubmit={handleReset} className="space-y-5 mt-4">
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Mobile Number</Label>
+        <Label className="text-gold font-serif">Mobile Number</Label>
         <Input
           required
           value={formData.phone}
           onChange={e => setFormData({ ...formData, phone: e.target.value })}
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           placeholder="Enter registered mobile"
         />
       </div>
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Date of Birth (Verification)</Label>
+        <Label className="text-gold font-serif">Date of Birth (Verification)</Label>
         <div className="relative">
           <Input
             required
             type="date"
             value={formData.dob}
             onChange={e => setFormData({ ...formData, dob: e.target.value })}
-            className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10"
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-0 pr-10"
           />
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-champagne/50 pointer-events-none" />
+          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gold/50 pointer-events-none" />
         </div>
       </div>
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">New Password</Label>
+        <Label className="text-gold font-serif">New Password</Label>
         <Input
           required
           type="password"
           value={formData.newPassword}
           onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           placeholder="Enter new password"
         />
       </div>
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Confirm New Password</Label>
+        <Label className="text-gold font-serif">Confirm New Password</Label>
         <Input
           required
           type="password"
           value={formData.confirmPassword}
           onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-          className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           placeholder="Confirm new password"
         />
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold rounded-xl">
+      <Button type="submit" disabled={loading} className="w-full h-11 gold-gradient text-emerald-950 font-black shadow-gold rounded-xl">
         {loading ? "Resetting..." : "Reset Password"}
       </Button>
 
@@ -587,7 +587,7 @@ const Matrimony = () => {
               className={`w-full ml-auto h-full flex flex-col justify-center lg:col-span-3 ${activeTab === "signin" || activeTab === "forgot-password" ? "items-end lg:pr-10" : "items-center"}`}
             >
               <motion.div
-                className={`bg-transparent backdrop-blur-xl border border-gold/20 rounded-3xl shadow-2xl w-auto h-auto flex flex-col justify-center overflow-hidden ${activeTab === "signin" || activeTab === "forgot-password" ? "p-10" : "p-6"}`}
+                className={`bg-white border text-gray-900 rounded-[2rem] shadow-2xl w-auto h-auto flex flex-col justify-center overflow-hidden ${activeTab === "signin" || activeTab === "forgot-password" ? "p-10" : "p-6"}`}
               >
                 <AnimatePresence mode="wait">
                   {activeTab === "register" ? (
@@ -599,7 +599,7 @@ const Matrimony = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="text-center mb-6">
-                        <h3 className="text-2xl font-serif font-bold text-champagne">Create Profile</h3>
+                        <h3 className="text-2xl font-serif font-bold text-gray-900">Create Profile</h3>
                       </div>
                       <RegistrationForm onClose={() => setActiveTab("register")} onSignInClick={() => setActiveTab("signin")} />
                     </motion.div>
@@ -612,7 +612,7 @@ const Matrimony = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="text-center mb-6">
-                        <h3 className="text-2xl font-serif font-bold text-champagne">Welcome Back</h3>
+                        <h3 className="text-2xl font-serif font-bold text-gray-900">Welcome Back</h3>
                       </div>
                       <SignInForm
                         onRegisterClick={() => setActiveTab("register")}
@@ -628,8 +628,8 @@ const Matrimony = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="text-center mb-6">
-                        <h3 className="text-2xl font-serif font-bold text-champagne">Reset Password</h3>
-                        <p className="text-champagne/60 text-sm mt-2">Verify details to set new password</p>
+                        <h3 className="text-2xl font-serif font-bold text-gray-900">Reset Password</h3>
+                        <p className="text-gray-900/60 text-sm mt-2">Verify details to set new password</p>
                       </div>
                       <ForgotPasswordForm onBackToLogin={() => setActiveTab("signin")} />
                     </motion.div>

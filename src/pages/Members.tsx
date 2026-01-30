@@ -82,48 +82,48 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
   return (
     <form onSubmit={handleRegister} className="space-y-4 mt-2 w-full max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Full Name</Label>
+        <Label className="text-gold font-serif">Full Name</Label>
         <Input
           value={formData.fullName}
           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
           placeholder="John Doe"
           required
-          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
         />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label className="text-champagne/90 font-serif">Phone Number</Label>
+          <Label className="text-gold font-serif">Phone Number</Label>
           <Input
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="Enter phone number"
             required
-            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-champagne/90 font-serif">Create Password</Label>
+          <Label className="text-gold font-serif">Create Password</Label>
           <Input
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             placeholder="Min 6 characters"
             required
-            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+            className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Personal Address</Label>
+        <Label className="text-gold font-serif">Personal Address</Label>
         <Input
           value={formData.address}
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
           placeholder="Enter your complete address"
           required
-          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
         />
       </div>
 
@@ -133,7 +133,7 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
           value={formData.referralCode}
           onChange={(e) => setFormData({ ...formData, referralCode: e.target.value })}
           placeholder="Enter code if you were referred"
-          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+          className="h-10 bg-white/5 border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
         />
       </div>
 
@@ -141,7 +141,7 @@ const MemberRegistrationForm = ({ onClose, onSignInClick }: { onClose: () => voi
         {submitting ? "Creating Membership..." : "Confirm & Join Now"}
       </Button>
 
-      <div className="text-center text-sm text-champagne/60 py-2">
+      <div className="text-center text-sm text-gray-500 py-2">
         Already a member?{" "}
         <button type="button" onClick={onSignInClick} className="text-gold hover:underline font-medium">
           Sign In
@@ -183,7 +183,7 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
   return (
     <form onSubmit={handleSignIn} className="space-y-5 mt-4">
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Phone Number</Label>
+        <Label className="text-gold font-serif">Phone Number</Label>
         <div className="relative">
           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/50" />
           <Input
@@ -191,13 +191,13 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="Enter phone number"
             required
-            className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+            className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           />
         </div>
       </div>
       <div className="space-y-2">
         <div className="flex justify-between">
-          <Label className="text-champagne/90 font-serif">Password</Label>
+          <Label className="text-gold font-serif">Password</Label>
         </div>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gold/50" />
@@ -207,7 +207,7 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             placeholder="Enter password"
             required
-            className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl"
+            className="h-11 pl-10 bg-transparent border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl"
           />
         </div>
       </div>
@@ -216,7 +216,7 @@ const MemberSignInForm = ({ onRegisterClick, onForgotClick }: { onRegisterClick:
         {submitting ? "Signing In..." : "Sign In"}
       </Button>
 
-      <div className="text-center text-sm text-champagne/60 pt-2">
+      <div className="text-center text-sm text-gray-500 pt-2">
         Not a member yet?{" "}
         <button type="button" onClick={onRegisterClick} className="text-gold hover:underline font-medium">
           Register for free
@@ -264,16 +264,16 @@ const MemberForgotPasswordForm = ({ onBackToLogin }: { onBackToLogin: () => void
   return (
     <form onSubmit={handleReset} className="space-y-4 mt-4">
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Registered Phone</Label>
-        <Input required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+        <Label className="text-gold font-serif">Registered Phone</Label>
+        <Input required value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl" />
       </div>
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">New Password</Label>
-        <Input required type="password" value={formData.newPassword} onChange={e => setFormData({ ...formData, newPassword: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+        <Label className="text-gold font-serif">New Password</Label>
+        <Input required type="password" value={formData.newPassword} onChange={e => setFormData({ ...formData, newPassword: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl" />
       </div>
       <div className="space-y-2">
-        <Label className="text-champagne/90 font-serif">Confirm Password</Label>
-        <Input required type="password" value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-champagne rounded-xl" />
+        <Label className="text-gold font-serif">Confirm Password</Label>
+        <Input required type="password" value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} className="h-10 bg-transparent border-gold/20 focus:border-gold/50 text-gray-900 rounded-xl" />
       </div>
       <Button type="submit" disabled={loading} className="w-full h-11 gold-gradient text-primary-foreground font-bold shadow-gold rounded-xl mt-2">
         {loading ? "Resetting..." : "Reset Password"}
